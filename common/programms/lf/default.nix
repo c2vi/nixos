@@ -3,7 +3,7 @@
 	home-manager.users.me.programs.lf = {
 		package = pkgs.lf.overrideAttrs (final: prev: {
 			patches = (prev.patches or [ ]) ++ [
-				lib/patches/lf-filter.patch
+				./lf-filter.patch
 			];
 			checkPhase = "";
 		});
@@ -34,5 +34,5 @@
 			ee = "editor-open";
 			V = ''$${pkgs.bat}/bin/bat --paging=always --theme=gruvbox "$f"'';
 		};
-	
+	};
 }

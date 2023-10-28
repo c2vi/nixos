@@ -7,7 +7,7 @@
 
 		historyFile = "${persistentDir}/bash-history";
 		historyFileSize = 100000;
-		historyControl = "ignoredups";
+		historyControl = [ "ignoredups" ];
 		historyIgnore = [
 			"ls"
 			"cd"
@@ -28,17 +28,23 @@
 		];
 
 		sessionVariables = {
+			# this does not work aparently....
+
 			# is needed to that ssh works
 			TREM = "xterm";
 
 			# my prompt
 			PS1 = ''\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ '';
+
+			TEST = "hiiiiiiiiiiiiiiiiiiiiiiiiiii";
+
+			HIII = "hiiiiiiiiiiiiiiiiiiiiii";
 		};
 
 		shellAliases = {
 			shutdown = "echo try harder.... xD";
 			npw = "nmcli c up pw";
-			nixre = "sd nixos-rebuild switch --flake ~/work/config/nix --impure";
+			nixre = "sd nixos-rebuild switch --flake ~/work/config/ --impure";
 			flex = "neofetch | lolcat";
 			kwoche = "curl https://kalenderwoche.celll.net/?api=1; echo";
 			psg = "ps -e | grep";
@@ -62,6 +68,12 @@
 		};
 
 		bashrcExtra = ''
+			export TREM="xterm"
+
+			# my prompt
+			export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+
+
 			# If not running interactively, don't do anything
 			case $- in
 				 *i*) ;;

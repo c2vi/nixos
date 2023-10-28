@@ -12,7 +12,7 @@ def main():
     db_matches = get_db_matches(pwd)
     folder_matches = get_folder_matches(pwd)
 
-    print(my_resolve("~/work/config/"))
+    print(my_resolve("~/work/config"))
     print("db:", db_matches)
     print("folder:", folder_matches)
 

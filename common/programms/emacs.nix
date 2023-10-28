@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-	home-manager.users.me.programms.emcas = {
-		enable = true;
-	};
+	#home-manager.users.me.programs.emcas = {
+		#enable = true;
+	#};
 }

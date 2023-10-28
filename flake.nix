@@ -14,19 +14,20 @@
 		nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
 	};
 
-	outputs = let 
-		confDir = "/home/me/work/config";
-		workDir = "/home/me/work";
-		secretsDir = "/home/me/.mysecrets";
-		persistentDir = "/home/me/work/app-data";
-	in
-	{ self, nixpkgs, ... }@inputs: {
+	outputs = { self, nixpkgs, ... }@inputs: 
+		let 
+			confDir = "/home/me/work/config";
+			workDir = "/home/me/work";
+			secretsDir = "/home/me/.mysecrets";
+			persistentDir = "/home/me/work/app-data";
+		in
+	{
    	nixosConfigurations = {
 
    		"c2vi-main" = nixpkgs.lib.nixosSystem {
       		system = "x86_64-linux";
 
-      		specialArgs = [ inputs confDir workDir ]; 
+      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir; };
       		modules = [
          		./hosts/main.nix
       		];

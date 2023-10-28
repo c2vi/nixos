@@ -1,11 +1,11 @@
 { ... }:
 {
-	home-manager.users.me.programms.git = {
+	home-manager.users.me.programs.git = {
 		enable = true;
 		userName  = "Sebastian Moser";
-		userEmail = "sewi.moser@gmail.com";
+		userEmail = "me@c2vi.dev";
 	
 		extraConfig.core.editor = "nvim";
-		extraConfig.core.excludesfile = "gitignore";
+		extraConfig.core.excludesfile = "~/.config/git/gitignore";
 	};
 }

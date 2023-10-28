@@ -1,6 +1,6 @@
 { ... }:
 {
-	home-manager.users.me.programms.alacritty = {
+	home-manager.users.me.programs.alacritty = {
 		enable = true;
 		settings = {
 			font = {
@@ -100,9 +100,9 @@
 			  { key = "V"; mods = "Control|Shift"; action = "Paste"; }
 			  { key = "C"; mods = "Control|Shift"; action = "Copy"; }
 			  { key = "J"; mods = "Control"; chars = ''\x1b\x5b\x42''; }
-			  { key = "K"; mods = "Control"; chars = ''x1b\x5b\x41''; }
-			  { key = "H"; mods = "Control"; chars = ''x1b\x5b\x44''; }
-			  { key = "L"; mods = "Control"; chars = ''x1b\x5b\x43''; }
+			  { key = "K"; mods = "Control"; chars = ''\x1b\x5b\x41''; }
+			  { key = "H"; mods = "Control"; chars = ''\x1b\x5b\x44''; }
+			  { key = "L"; mods = "Control"; chars = ''\x1b\x5b\x43''; }
 			];
 		};
 	};

@@ -1,12 +1,13 @@
 { secretsDir, ... }:
 {
-	home-manager.users.me.programms.ssh = {
+	home-manager.users.me.programs.ssh = {
 		enable = true;
 		includes = [ "./current_rpi_config" ];
+		/*
 		matchBlocks = {
 			hpm = {
 				hostame = "192.168.1.56";
-				use = "root";
+				user = "root";
 			};
 
 			servers = {
@@ -39,9 +40,10 @@
 				identityFIle = "${secretsDir}/private-key-ocib";
 			};
 		};
+		*/
 	};
 
-	home-manager.users.me.home.".ssh/rpi/local".text = ''
+	home-manager.users.me.home.file.".ssh/rpi/local".text = ''
 		Host config
 			HostName 192.168.1.2
 			User config
@@ -76,7 +78,7 @@
 			IdentityFile ${secretsDir}/private-key-main
 	'';
 
-	home-manager.users.me.home.".ssh/rpi/remote".text = ''
+	home-manager.users.me.home.file.".ssh/rpi/remote".text = ''
 		Host config
 			HostName sebastian.dns.army
 			User config
@@ -111,7 +113,7 @@
 			IdentityFile ${secretsDir}/private-key-main
 	'';
 
-	home-manager.users.me.home.".ssh/rpi/wstunnel".text = ''
+	home-manager.users.me.home.file.".ssh/rpi/wstunnel".text = ''
 		Host config
 			HostName localhost
 			User config

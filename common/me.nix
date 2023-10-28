@@ -1,5 +1,5 @@
 
-{ pkgs, workDir, confDir, secretsDir, ... }:
+{ pkgs, workDir, confDir, secretsDir, inputs, ... }:
 
 {
 	imports = [
@@ -8,7 +8,7 @@
 		./programms/alacritty.nix
 		./programms/bash.nix
 		./programms/emacs.nix
-		./programms/rofi.nix
+		./programms/rofi/default.nix
 		./programms/zathura.nix
 		./programms/ssh.nix
 		./programms/neovim.nix
@@ -39,6 +39,7 @@
 
 		home.file = {
 			".config/rclone".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf";
+			".xmobarrc".source = "${confDir}/misc/xmobar.hs";
 		 };
 
 	};
@@ -103,6 +104,8 @@
 			lolcat
 			android-tools
 
+			inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
+
 			# python....
     		(python310.withPackages (p: with p; [
       		pandas
@@ -132,7 +135,8 @@
 # xmonad
 	services.xserver.windowManager.xmonad = {
    	enable = true;
-   	config = builtins.readFile ../misc/xmobar.hs;
+   	config = ../misc/xmonad.hs;
+   	#config = "${confDir}/misc/xmo";
    	enableContribAndExtras = true;
    	extraPackages = hpkgs: [
       	hpkgs.xmobar

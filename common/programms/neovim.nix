@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-	home-manager.users.me.programms.neovim = {
+	home-manager.users.me.programs.neovim = {
 		enable = true;
 		withPython3 = true;
 		withNodeJs = true;

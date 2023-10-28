@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, confDir, ... }:
+{ pkgs, lib, workDir, confDir, inputs, ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -14,6 +14,14 @@
 ############################# BOOT #############################
 # boot
 
+	imports = [
+		../mods/battery_monitor.nix
+		../mods/my-nixpkgs-overlay.nix
+		../hardware/my-hp-laptop.nix
+		../common/me.nix
+		inputs.home-manager.nixosModules.home-manager
+	];
+	
   # Setup keyfile
   boot.initrd.secrets = {
     "/crypto_keyfile.bin" = null;
@@ -115,6 +123,7 @@ services.samba = {
 
 
 	nix.settings.experimental-features = [ "nix-command" "flakes" ];
+	nixpkgs.config.allowUnfree = true;
   	security.sudo.wheelNeedsPassword = false;
 
   	virtualisation.libvirtd.enable = true;
@@ -139,7 +148,8 @@ export PATH=$PATH:${confDir}/mybin
 		enable = true;
 		extraPortals = [
 			#pkgs.xdg-desktop-portal-gtk
-			pkgs.xdg-desktop-portal-termfilechooser
+			#pkgs.xdg-desktop-portal-termfilechooser
+			(pkgs.callPackage ../mods/xdg-desktop-portal-termfilechooser/default.nix {})
 		];
 	};
 
@@ -171,32 +181,32 @@ export PATH=$PATH:${confDir}/mybin
   services.xserver = {
    enable = true;
    displayManager = {
-      defaultSession = "none+xmonad";
-      sessionCommands = ''
-	 xmobar ${confDir}/xmonad/xmobar.hs &
+	defaultSession = "none+xmonad";
+   	sessionCommands = ''
+			xmobar ${confDir}/xmonad/xmobar.hs &
 
- 	 # aparently needed, so that xmonad works
-	 sleep 2 && \
-	 ${pkgs.xorg.xmodmap}/bin/xmodmap \
-		-e "clear control" \
-		-e "clear mod1" \
-		-e "keycode 64 = Control_L" \
-		-e "keycode 37 = Alt_L" \
-		-e "add control = Control_L" \
-		-e "add mod1 = Alt_L" \
-		&
-
+			# aparently needed, so that xmonad works
+			sleep 2 && \
+			${pkgs.xorg.xmodmap}/bin/xmodmap \
+				-e "clear control" \
+				-e "clear mod1" \
+				-e "keycode 64 = Control_L" \
+				-e "keycode 37 = Alt_L" \
+				-e "add control = Control_L" \
+				-e "add mod1 = Alt_L" \
+				&
      '';
    };
 
    displayManager.lightdm = {
-        greeters.enso = {
-          enable = true;
-          blur = true;
-          extraConfig = ''
-            default-wallpaper=/usr/share/streets_of_gruvbox.png
-          '';
-         };
+		enable = true;
+		greeters.enso = {
+			enable = true;
+			blur = true;
+			extraConfig = ''
+				default-wallpaper=/usr/share/streets_of_gruvbox.png
+			'';
+		};
    };
    layout = "at";
   };
