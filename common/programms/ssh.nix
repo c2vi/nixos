@@ -3,44 +3,40 @@
 	home-manager.users.me.programs.ssh = {
 		enable = true;
 		includes = [ "./current_rpi_config" ];
-		/*
 		matchBlocks = {
+			"github.com" = {
+				hostname = "github.com";
+				identityFile = "${secretsDir}/private-key-main";
+			};
 			hpm = {
-				hostame = "192.168.1.56";
+				hostname = "192.168.1.56";
 				user = "root";
 			};
 
 			servers = {
 				hostname = "192.168.1.3";
 				user = "server";
-				extraConfig = ''
-					AddKeysToAgent yes
-				'';
 				identityFile = "${secretsDir}/private-key-main";
 			};
 
 			server = {
 				hostname = "192.168.1.3";
 				user = "admin";
-				extraConfig = ''
-					AddKeysToAgent yes
-				'';
 				identityFile = "${secretsDir}/private-key-main";
 			};
 
 			ocia = {
 				hostname = "140.238.212.229";
 				user = "root";
-				identityFIle = "${secretsDir}/private-key-ocia";
+				identityFile = "${secretsDir}/private-key-ocia";
 			};
 
 			ocib = {
 				hostname = "140.238.211.43";
 				user = "root";
-				identityFIle = "${secretsDir}/private-key-ocib";
+				identityFile = "${secretsDir}/private-key-ocib";
 			};
 		};
-		*/
 	};
 
 	home-manager.users.me.home.file.".ssh/rpi/local".text = ''

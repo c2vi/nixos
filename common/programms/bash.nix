@@ -127,29 +127,30 @@
 
 			# a little programm, that changes the ssh config to always be able to acces rpi
 			function rpi(){
+			ssh_dir=~/.ssh
 			if [ "$1" == "l" ]
 			then
-				cp ~/work/config/ssh/rpi/local ~/work/config/ssh/current_pi_config
+				cp $ssh_dir/rpi/local $ssh_dir/current_rpi_config
 			fi
 
 			if [ "$1" == "local" ]
 			then
-				cp ~/work/config/ssh/rpi/local ~/work/config/ssh/current_pi_config
+				cp $ssh_dir/rpi/local $ssh_dir/current_rpi_config
 			fi
 
 			if [ "$1" == "r" ]
 			then
-				cp ~/work/config/ssh/rpi/remote ~/work/config/ssh/current_pi_config
+				cp $ssh_dir/rpi/remote $ssh_dir/current_rpi_config
 			fi
 
 			if [ "$1" == "remote" ]
 			then
-				cp ~/work/config/ssh/rpi/remote ~/work/config/ssh/current_pi_config
+				cp $ssh_dir/rpi/remote $ssh_dir/current_rpi_config
 			fi
 
 			if [ "$1" == "w" ]
 			then
-				cp ~/work/config/ssh/rpi/wstunnel ~/work/config/ssh/current_pi_config
+				cp $ssh_dir/rpi/wstunnel $ssh_dir/current_rpi_config
 			fi
 
 			}
