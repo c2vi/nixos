@@ -27,7 +27,7 @@
    		"c2vi-main" = nixpkgs.lib.nixosSystem {
       		system = "x86_64-linux";
 
-      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir; };
+      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
       		modules = [
          		./hosts/main.nix
       		];
