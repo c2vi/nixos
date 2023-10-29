@@ -4,17 +4,20 @@
 #default_vm_name=windp
 #default_vm_uuid=12650dba-6232-40d8-9863-6c2bb267a0c9
 
-#default_vm_name=tiny10
+default_vm_name=win
+default_vm_uuid=win
 #default_vm_uuid=6a412143-871f-4838-bacd-5dcfa5fa95c3
 
 username=me
 password=$(cat ~/.mysecrets/win-vm-pwd)
 
 if [ "$1" == "-o" ];then
-	cmd=$4
+	cmd=$5
+	username=$4
 	default_vm_name=$2
 	default_vm_uuid=$2
 	default_vm_ip=$3
+
 else
 	cmd=$1
 fi
