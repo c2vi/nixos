@@ -53,7 +53,11 @@
 			vim = "nvim";
 			sl = "ls";
 			virsh = "virsh -c qemu:///system";
-			nmgui = "nm-applet 2>&1 > /dev/null &; stalonetray 2>&1 > /dev/null; killall nm-applet";
+			nmgui = ''
+				nm-applet 2>&1 > /dev/null &
+				stalonetray 2>&1 > /dev/null
+				killall nm-applet
+			'';
 			c = "cd ..";
 			ne= "alacritty &";
 			cbs = "history | tail -n 2 | head -n 1 | awk '{\$1=\"\"; print \$0}' | cut -c 2- | cb";
@@ -72,6 +76,10 @@
 
 			# my prompt
 			export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+
+
+			# so that programms i spawn from my shell don't have so high cpu priority
+			renice -n 9 $$ > /dev/null
 
 
 			# If not running interactively, don't do anything

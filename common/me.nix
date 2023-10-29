@@ -3,15 +3,15 @@
 
 {
 	imports = [
-		./programms/git.nix
-		./programms/lf/default.nix
-		./programms/alacritty.nix
-		./programms/bash.nix
-		./programms/emacs.nix
-		./programms/rofi/default.nix
-		./programms/zathura.nix
-		./programms/ssh.nix
-		./programms/neovim.nix
+		./programs/git.nix
+		./programs/lf/default.nix
+		./programs/alacritty.nix
+		./programs/bash.nix
+		./programs/emacs/default.nix
+		./programs/rofi/default.nix
+		./programs/zathura.nix
+		./programs/ssh.nix
+		./programs/neovim.nix
 	];
 
 	home-manager.users.me = { config, pkgs, ... }: {
