@@ -69,9 +69,7 @@
 
 	# xmonad
 	services.xserver.windowManager.xmonad = {
-   	#enable = true;
-   	#config = builtins.toPath "${self}/misc/xmonad.hs";
-		enable = builtins.trace "this is self ${self}" true;
+   	enable = true;
 		
    	config = builtins.readFile "${self}/misc/xmonad.hs";
    	#config = "${confDir}/misc/xmo";
