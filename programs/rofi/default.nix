@@ -1,6 +1,6 @@
 { ... }:
 {
-	home-manager.users.me.programs.rofi = {
+	programs.rofi = {
 		enable = true;
 		theme = "Arc-Dark";
 		extraConfig = {

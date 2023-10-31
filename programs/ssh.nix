@@ -1,6 +1,6 @@
 { secretsDir, ... }:
 {
-	home-manager.users.me.programs.ssh = {
+	programs.ssh = {
 		enable = true;
 		includes = [ "./current_rpi_config" ];
 		matchBlocks = {
@@ -39,7 +39,7 @@
 		};
 	};
 
-	home-manager.users.me.home.file.".ssh/rpi/local".text = ''
+	home.file.".ssh/rpi/local".text = ''
 		Host config
 			HostName 192.168.1.2
 			User config
@@ -74,7 +74,7 @@
 			IdentityFile ${secretsDir}/private-key-main
 	'';
 
-	home-manager.users.me.home.file.".ssh/rpi/remote".text = ''
+	home.file.".ssh/rpi/remote".text = ''
 		Host config
 			HostName sebastian.dns.army
 			User config
@@ -109,7 +109,7 @@
 			IdentityFile ${secretsDir}/private-key-main
 	'';
 
-	home-manager.users.me.home.file.".ssh/rpi/wstunnel".text = ''
+	home.file.".ssh/rpi/wstunnel".text = ''
 		Host config
 			HostName localhost
 			User config

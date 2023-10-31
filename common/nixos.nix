@@ -1,4 +1,4 @@
-{}:
+{ ... }:
 
 # config that i use on all my hosts, that run native nixos
 # excluding for example my phone phone
@@ -12,6 +12,5 @@
 		#keyMap = "at";
 		useXkbConfig = true; # use xkbOptions in tty.
 	};
-
 }
 

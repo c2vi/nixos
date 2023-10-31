@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-	home-manager.users.me.programs.lf = {
+	programs.lf = {
 		package = pkgs.lf.overrideAttrs (final: prev: {
 			patches = (prev.patches or [ ]) ++ [
 				./lf-filter.patch

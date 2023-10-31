@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, confDir, inputs, ... }:
+{ pkgs, lib, workDir, self, secretsDir, ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -11,39 +11,83 @@
   # fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
 
 
-############################# BOOT #############################
-# boot
-
 	imports = [
-		../mods/battery_monitor.nix
-		../mods/my-nixpkgs-overlay.nix
-		inputs.home-manager.nixosModules.home-manager
+		../common/all.nix
+		../common/nixos.nix
+		../common/nixos-graphical.nix
 
-		../users/me/home.nix
+		../users/me/default.nix
 	];
 
-	#home-manager.users.me = import ../users/me/home.nix;
-	
-############################# MISC #############################
-# misc
+
+	networking.hostName = "c2vi-main"; # Define your hostname.
 
 
-  	nixpkgs.config.permittedInsecurePackages = [
+	# some bind mounts
+	fileSystems."${workDir}/priv-share/things" = {
+		device = "${workDir}/things";
+  		options = [ "bind" ];
+	};
+	fileSystems."${workDir}/things/htl" = {
+		device = "${workDir}/htl";
+  		options = [ "bind" ];
+	};
+	fileSystems."${workDir}/things/diplomarbeit" = {
+		device = "${workDir}/diplomarbeit";
+  		options = [ "bind" ];
+	};
+
+
+	# syncthing for main
+	services.syncthing = {
+   	enable = true;
+   	user = "me";
+   	#dataDir = "/home/";
+   	configDir = "/home/me/.config/syncthing";
+		extraFlags = ["-no-browser"];
+		openDefaultPorts = true;
+   	overrideDevices = true;     # overrides any devices added or deleted through the WebUI
+   	overrideFolders = true;     # overrides any folders added or deleted through the WebUI
+   	devices = {
+   		"seb-phone" = { 
+				id = builtins.readFile "${secretsDir}/syncthing-id-phone";
+				#addresses = [ "tcp://192.168.200.24:22000" ];
+			};
+   		"seb-tab" = { 
+				id = builtins.readFile "${secretsDir}/syncthing-id-tab";
+				#addresses = [ "tcp://192.168.200.26:22000" ];
+			};
+    	};
+    	folders = {
+      	"priv-share" = {        # Name of folder in Syncthing, also the folder ID
+        		path = "/home/me/work/priv-share";    # Which folder to add to Syncthing
+        		#devices = [ "seb-phone" "seb-tab" ];      # Which devices to share the folder with
+        		devices = [ "seb-phone" "seb-tab" ];      # Which devices to share the folder with
+      	};
+   	};
+	};
+
+
+	nixpkgs.config.permittedInsecurePackages = [
 	 	"electron-24.8.6"
   	];
+
 
 	security.polkit.enable = true;
 	networking.firewall.enable = true;
 	networking.firewall.allowPing = true;
 	services.samba.openFirewall = true;
 
+
 	# samba
 	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
+
 	networking.firewall.allowedTCPPorts = [
   		5357 # wsdd
 		8888 # for general usage
 		9999 # for general usage
 	];
+
 	networking.firewall.allowedUDPPorts = [
   		3702 # wsdd
 	];
@@ -81,13 +125,10 @@
 	};
 
 
-	nix.settings.experimental-features = [ "nix-command" "flakes" ];
-	nixpkgs.config.allowUnfree = true;
-  	security.sudo.wheelNeedsPassword = false;
-
   	virtualisation.libvirtd.enable = true;
 
   	programs.dconf.enable = true;
+
   	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
 		ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
 		ln -nsf ${workDir}/vm/qemu/* /var/lib/libvirt/qemu/
@@ -97,30 +138,8 @@
 		ln -nsf /run/current-system/sw/bin/bash /bin/bash
    '';
 
-	environment.etc.profile.text = ''
-export PATH=$PATH:${confDir}/mybin
-	'';
 
-	modules.battery_monitor.enable = true;
-
-	xdg.portal = {
-		enable = true;
-		extraPortals = [
-			#pkgs.xdg-desktop-portal-gtk
-			#pkgs.xdg-desktop-portal-termfilechooser
-			(pkgs.callPackage ../mods/xdg-desktop-portal-termfilechooser/default.nix {})
-		];
-	};
-
-	networking.hostName = "c2vi-main"; # Define your hostname.
-  	networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
-  	services.blueman.enable = true;
-	hardware.bluetooth.enable = true;
-
-
-	################
 	# swap and hibernate
-
 	swapDevices = [ { device = "/dev/lvm0/swap"; } ];
 	boot.resumeDevice = "/dev/lvm0/swap";
 	services.logind = {
@@ -136,69 +155,14 @@ export PATH=$PATH:${confDir}/mybin
 		HibernateMode=shutdown
 	'';
 
-	# Enable the X11 windowing system.
-	services.xserver = {
-		enable = true;
-   	displayManager = {
-		defaultSession = "none+xmonad";
-   	sessionCommands = ''
-			xmobar ${confDir}/xmonad/xmobar.hs &
 
-			# aparently needed, so that xmonad works
-			sleep 2 && \
-			${pkgs.xorg.xmodmap}/bin/xmodmap \
-				-e "clear control" \
-				-e "clear mod1" \
-				-e "keycode 64 = Control_L" \
-				-e "keycode 37 = Alt_L" \
-				-e "add control = Control_L" \
-				-e "add mod1 = Alt_L" \
-				&
-   	'';
-	};
-
-   displayManager.lightdm = {
-		enable = true;
-		greeters.enso = {
-			enable = true;
-			blur = true;
-			extraConfig = ''
-				default-wallpaper=/usr/share/streets_of_gruvbox.png
-			'';
-		};
-	};
-	layout = "at";
-	};
-
-	# Configure keymap in X11
-	# services.xserver.xkbOptions = "eurosign:e,caps:escape";
-
-	# Enable CUPS to print documents.
-	# services.printing.enable = true;
-
-	# Enable sound.
-	sound.enable = true;
-	hardware.pulseaudio.enable = true;
-
-	# Enable touchpad support (enabled default in most desktopManager).
-	services.xserver.libinput.enable = true;
-
-	# List packages installed in system profile. To search, run:
-	# $ nix search wget
+	# List packages installed in system profile.
 	environment.systemPackages = with pkgs; [
    	vim # Do not forget to add an editor to edit configuration.nix!
    	wget
    	xorg.xmodmap
 		bluez
 	];
-
-	# This value determines the NixOS release from which the default
-	# settings for stateful data, like file locations and database versions
-	# on your system were taken. It's perfectly fine and recommended to leave
-	# this value at the release version of the first install of this system.
-	# Before changing this value read the documentation for this option
-	# (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-	system.stateVersion = "23.05"; # Did you read the comment?
 }
 
 

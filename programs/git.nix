@@ -1,6 +1,6 @@
 { ... }:
 {
-	home-manager.users.me.programs.git = {
+	programs.git = {
 		enable = true;
 		userName  = "Sebastian Moser";
 		userEmail = "me@c2vi.dev";

@@ -1,6 +1,6 @@
 { persistentDir, confDir, ... }:
 {
-	home-manager.users.me.programs.bash = {
+	programs.bash = {
 
 		enable = true;
 		enableCompletion = true;
@@ -259,13 +259,13 @@
 			function nixre(){
 				if [ "$1" == "boot" ]
 				then
-					nix build github:c2vi/nixos#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure ''${@:2}
-					sudo ./result/bin/switch-to-configuration boot
-					rm ./result
+					nix build github:c2vi/nixos#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure ''${@:2} \
+					&& sudo ./result/bin/switch-to-configuration boot \
+					&& rm ./result
 				else
-					nix build ~/work/config#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure $@
-					sudo ./result/bin/switch-to-configuration switch
-					rm ./result
+					nix build ~/work/config#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure $@ \
+					&& sudo ./result/bin/switch-to-configuration switch \
+					&& rm ./result
 				fi
 			}
 

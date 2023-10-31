@@ -35,7 +35,7 @@
 			persistentDir = "/home/me/work/app-data";
 		in
 	{
-   	nixosConfigurations = {
+   	nixosConfigurations = rec {
 
    		"c2vi-main" = nixpkgs.lib.nixosSystem {
       		system = "x86_64-linux";
@@ -52,7 +52,7 @@
 
       		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
       		modules = [
-         		./hosts/main.nix
+         		./hosts/hpm.nix
 					./hardware/hpm-laptop.nix
       		];
    		};
@@ -67,6 +67,7 @@
    	};
 
 		packages.x86_64-linux = {
+			cbm = nixpkgs.x86_64.callPackage ./mods/cbm.nix { };
 			#default... TODO
 		};
 	};

@@ -1,6 +1,6 @@
 { ... }:
 {
-	home-manager.users.me.programs.alacritty = {
+	programs.alacritty = {
 		enable = true;
 		settings = {
 			font = {

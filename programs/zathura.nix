@@ -1,6 +1,6 @@
 { ... }:
 {
-	home-manager.users.me.programs.zathura = {
+	programs.zathura = {
 		enable = true;
 		options = {
 			selection-clipboard = "clipboard";
