@@ -49,6 +49,8 @@
 			[miscellany]
 			global-ignores = node_modules
 		''; # documentation for this config file: https://svnbook.red-bean.com/en/1.7/svn.advanced.confarea.html
+		".mysecrets/root-pwd".text = "changeme";
+		".mysecrets/me-pwd".text = "changeme";
 	};
 
 	home.packages = with pkgs; [
