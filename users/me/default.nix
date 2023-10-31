@@ -2,7 +2,7 @@
 {
 	users.users.me = {
    	isNormalUser = true;
-   	passwordFile = "${secretsDir}/main-user-pwd";
+   	passwordFile = "${secretsDir}/me-pwd";
    	extraGroups = [ "networkmanager" "wheel" "libvirtd" ]; # Enable ‘sudo’ for the user.
 
 	};
