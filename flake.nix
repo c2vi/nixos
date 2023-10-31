@@ -37,7 +37,8 @@
 	{
    	nixosConfigurations = rec {
 
-   		"c2vi-main" = nixpkgs.lib.nixosSystem {
+   		"main" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
       		system = "x86_64-linux";
 
       		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
@@ -47,7 +48,8 @@
       		];
    		};
 
-   		"c2vi-hpm" = nixpkgs.lib.nixosSystem {
+   		"hpm" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
       		system = "x86_64-linux";
 
       		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };

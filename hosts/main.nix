@@ -20,7 +20,7 @@
 	];
 
 
-	networking.hostName = "c2vi-main"; # Define your hostname.
+	networking.hostName = "main";
 
 
 	# some bind mounts

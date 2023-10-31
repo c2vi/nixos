@@ -7,5 +7,7 @@
 
 		../users/me/default.nix
 	];
+
+	networking.hostName = "hpm";
 }
 
