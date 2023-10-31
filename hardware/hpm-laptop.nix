@@ -12,7 +12,7 @@
 	boot.loader.grub = {
   		enable = true;
   		version = 2;
-  		device = "/dev/nvme0n1p1";
+  		device = "nodev";
   		efiSupport = true;
 		extraConfig = ''
 			set timeout=2
