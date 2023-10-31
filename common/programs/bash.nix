@@ -259,7 +259,7 @@
 			function nixre(){
 				if [ "$1" == "boot" ]
 				then
-					nix build ~/work/config#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure ''${@:2}
+					nix build github:c2vi/nixos#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure ''${@:2}
 					sudo ./result/bin/switch-to-configuration boot
 					rm ./result
 				else

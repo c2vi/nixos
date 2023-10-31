@@ -23,6 +23,13 @@
 		fsType = "vfat";
 	};
 
+	fileSystems."/tmp" = {
+   	fsType = "tmpfs";
+   	device = "tmpfs";
+   	options = [ "nosuid" "nodev" "relatime" "size=14G" ];
+	};
+
+
 	swapDevices = [
 		{ device = "/dev/disk/by-uuid/418bf0d8-e548-45d5-802a-53de72707ebc"; }
    ];

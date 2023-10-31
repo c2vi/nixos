@@ -43,6 +43,17 @@
       		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
       		modules = [
          		./hosts/main.nix
+					./hardware/my-hp-laptop.nix
+      		];
+   		};
+
+   		"c2vi-hpm" = nixpkgs.lib.nixosSystem {
+      		system = "x86_64-linux";
+
+      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+      		modules = [
+         		./hosts/main.nix
+					./hardware/hpm-laptop.nix
       		];
    		};
 

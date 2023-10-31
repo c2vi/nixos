@@ -17,62 +17,20 @@
 	imports = [
 		../mods/battery_monitor.nix
 		../mods/my-nixpkgs-overlay.nix
-		../hardware/my-hp-laptop.nix
 		inputs.home-manager.nixosModules.home-manager
+
 		../users/me/home.nix
 	];
 
 	#home-manager.users.me = import ../users/me/home.nix;
 	
-  	# Setup keyfile
-  	boot.initrd.secrets = {
-    	"/crypto_keyfile.bin" = null;
-  	};
-
-  	fileSystems."/home/me/work" = { 
-		#label = "work";
-		device = "/dev/disk/by-uuid/fd3c6393-b6fd-4065-baf9-5690eb6ebbed";
-		fsType = "btrfs";
-		neededForBoot = false;
-	};
-
-
-	# Use the GRUB 2 boot loader.
-	boot.loader.grub = {
-  		enable = true;
-  		version = 2;
-  		device = "nodev";
-  		efiSupport = true;
-		extraConfig = ''
-			set timeout=1
-		'';
-	};
-	boot.loader.efi.canTouchEfiVariables = true;
-
-	boot.initrd.luks.devices = {
-   	root = {
-   		#name = "root";
-      	device = "/dev/disk/by-uuid/142d2d21-2998-4eb7-9853-ab6554ba061f";
-      	preLVM = true;
-      	allowDiscards = true;
-   	};
-	};
-
-
 ############################# MISC #############################
 # misc
 
 
-  nixpkgs.config.permittedInsecurePackages = [
-	 "electron-24.8.6"
-  ];
-
-	fileSystems."/tmp" = {
-   	fsType = "tmpfs";
-   	device = "tmpfs";
-   	options = [ "nosuid" "nodev" "relatime" "size=14G" ];
-	};
-
+  	nixpkgs.config.permittedInsecurePackages = [
+	 	"electron-24.8.6"
+  	];
 
 	security.polkit.enable = true;
 	networking.firewall.enable = true;
