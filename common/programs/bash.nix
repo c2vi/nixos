@@ -31,20 +31,18 @@
 			# this does not work aparently....
 
 			# is needed to that ssh works
-			TREM = "xterm";
+			# TERM = "xterm";
 
 			# my prompt
 			PS1 = ''\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ '';
 
 			TEST = "hiiiiiiiiiiiiiiiiiiiiiiiiiii";
-
-			HIII = "hiiiiiiiiiiiiiiiiiiiiii";
 		};
 
 		shellAliases = {
 			shutdown = "echo try harder.... xD";
 			npw = "nmcli c up pw";
-			nixre = "sd nixos-rebuild switch --flake ~/work/config/ --impure";
+			#nixre = "sd nixos-rebuild switch --flake ~/work/config/ --impure";
 			flex = "neofetch | lolcat";
 			kwoche = "curl https://kalenderwoche.celll.net/?api=1; echo";
 			psg = "ps -e | grep";
@@ -72,7 +70,7 @@
 		};
 
 		bashrcExtra = ''
-			export TREM="xterm"
+			export TERM="xterm-color"
 
 			# my prompt
 			export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
@@ -254,6 +252,21 @@
 			# ipaa
 			function ipaa(){
 				ip -json addr show $1 | jq -r '.[] | .addr_info[] | select(.family == "inet") | .local'
+			}
+
+
+			# my nixos rebuild
+			function nixre(){
+				if [ "$1" == "boot" ]
+				then
+					nix build ~/work/config#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure ''${@:2}
+					sudo ./result/bin/switch-to-configuration boot
+					rm ./result
+				else
+					nix build ~/work/config#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure $@
+					sudo ./result/bin/switch-to-configuration switch
+					rm ./result
+				fi
 			}
 
 
