@@ -18,8 +18,8 @@
 		../mods/battery_monitor.nix
 		../mods/my-nixpkgs-overlay.nix
 		../hardware/my-hp-laptop.nix
-		../common/me.nix
 		inputs.home-manager.nixosModules.home-manager
+		../users/me/home.nix
 	];
 	
   # Setup keyfile

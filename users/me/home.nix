@@ -3,20 +3,32 @@
 
 {
 	imports = [
-		./programs/git.nix
-		./programs/lf/default.nix
-		./programs/alacritty.nix
-		./programs/bash.nix
-		./programs/emacs/default.nix
-		./programs/rofi/default.nix
-		./programs/zathura.nix
-		./programs/ssh.nix
-		./programs/neovim.nix
+		../../common/programs/git.nix
+		../../common/programs/lf/default.nix
+		../../common/programs/alacritty.nix
+		../../common/programs/bash.nix
+		../../common/programs/emacs/default.nix
+		../../common/programs/rofi/default.nix
+		../../common/programs/zathura.nix
+		../../common/programs/ssh.nix
+		../../common/programs/neovim.nix
+
 	];
+
+	home-manager.backupFileExtension = "backup";
 
 	home-manager.users.me = { config, pkgs, ... }: {
 		/* The home.stateVersion option does not have a default and must be set */
 		home.stateVersion = "23.05";
+
+		imports = [
+			inputs.nix-index-database.hmModules.nix-index
+		];
+
+		programs.nix-index.enable = false;
+		programs.nix-index.enableBashIntegration = false;
+		programs.nix-index.enableZshIntegration = false;
+		#programs.command-not-found.enable = false;
 
 		gtk.cursorTheme = {
 			name = "Yaru";
@@ -40,6 +52,10 @@
 		home.file = {
 			".config/rclone".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf";
 			".xmobarrc".source = "${confDir}/misc/xmobar.hs";
+         ".subversion/config".text = ''
+            [miscellany]
+            global-ignores = node_modules
+         ''; # documentation for this config file: https://svnbook.red-bean.com/en/1.7/svn.advanced.confarea.html
 		 };
 
 	};
@@ -103,6 +119,24 @@
 			gparted
 			lolcat
 			android-tools
+			moonlight-qt
+			comma
+			(busybox.overrideAttrs (final: prev: {
+				# get only nslookup from busybox
+				# because the less would overwrite the actuall less and the busybox does not have -r
+				# it's a pfusch, but it works
+				postInstall = prev.postInstall + ''
+					echo ============ removing anything but nslookup ============
+					mv $out/bin/nslookup $out/nslookup
+					mv $out/bin/busybox $out/busybox
+
+					rm $out/bin/*
+
+					mv $out/nslookup $out/bin/nslookup
+					mv $out/busybox $out/bin/busybox
+				'';
+			}))
+			delta
 
 			inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
 
@@ -135,7 +169,7 @@
 # xmonad
 	services.xserver.windowManager.xmonad = {
    	enable = true;
-   	config = ../misc/xmonad.hs;
+   	config = ../../misc/xmonad.hs;
    	#config = "${confDir}/misc/xmo";
    	enableContribAndExtras = true;
    	extraPackages = hpkgs: [
