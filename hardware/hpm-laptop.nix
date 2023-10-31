@@ -8,6 +8,17 @@
    	[ (modulesPath + "/installer/scan/not-detected.nix")
    ];
 
+	# Use the GRUB 2 boot loader.
+	boot.loader.grub = {
+  		enable = true;
+  		version = 2;
+  		device = "nodev";
+  		efiSupport = true;
+		extraConfig = ''
+			set timeout=2
+		'';
+	};
+
 	boot.initrd.availableKernelModules = [ "xhci_pci" "vmd" "nvme" "usbhid" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
 	boot.initrd.kernelModules = [ "dm-snapshot" ];
 	boot.kernelModules = [ "kvm-intel" ];
