@@ -154,15 +154,6 @@
 		HibernateDelaySec=2h
 		HibernateMode=shutdown
 	'';
-
-
-	# List packages installed in system profile.
-	environment.systemPackages = with pkgs; [
-   	vim # Do not forget to add an editor to edit configuration.nix!
-   	wget
-   	xorg.xmodmap
-		bluez
-	];
 }
 
 
