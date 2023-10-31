@@ -122,8 +122,6 @@
 
   	virtualisation.libvirtd.enable = true;
 
-  	programs.dconf.enable = true;
-
   	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
 		ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
 		ln -nsf ${workDir}/vm/qemu/* /var/lib/libvirt/qemu/

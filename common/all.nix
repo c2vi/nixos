@@ -11,6 +11,7 @@
 
 	home-manager.extraSpecialArgs = specialArgs;
 
+  	programs.dconf.enable = true;
 
 	# set root user pwd
 	users.users.root.password = "changeme";
