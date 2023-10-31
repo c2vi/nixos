@@ -4,6 +4,8 @@
 	inputs = {
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 		nixpkgs.url = "github:NixOS/nixpkgs/release-23.05";
+
+
 		firefox.url = "github:nix-community/flake-firefox-nightly";
 
 
@@ -33,6 +35,15 @@
 			workDir = "/home/me/work";
 			secretsDir = "/home/me/.mysecrets";
 			persistentDir = "/home/me/work/app-data";
+      	specialArgs = {
+				inherit inputs confDir workDir secretsDir persistentDir self;
+				pkgs = import nixpkgs { system = "x86_64-linux"; config = {
+					allowUnfree = true;
+					permittedInsecurePackages = [
+	 					"electron-24.8.6"
+  					];
+				}; };
+			};
 		in
 	{
    	nixosConfigurations = rec {

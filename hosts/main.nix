@@ -68,11 +68,6 @@
 	};
 
 
-	nixpkgs.config.permittedInsecurePackages = [
-	 	"electron-24.8.6"
-  	];
-
-
 	security.polkit.enable = true;
 	networking.firewall.enable = true;
 	networking.firewall.allowPing = true;
