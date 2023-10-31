@@ -13,7 +13,7 @@
 
 
 	# set root user pwd
-	users.users.root.passwordFile = "${secretsDir}/main-root-pwd";
+	users.users.root.passwordFile = "${secretsDir}/root-pwd";
 
 	# Set your time zone.
 	time.timeZone = "Europe/Vienna";
@@ -25,8 +25,6 @@ export PATH=$PATH:${self}/mybin
 	'';
 
 	
-	nixpkgs.config.allowUnfree = true;
-
 	nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 	home-manager.backupFileExtension = "backup";
