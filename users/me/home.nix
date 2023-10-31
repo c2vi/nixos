@@ -1,5 +1,5 @@
 
-{ config, pkgs, workDir, confDir, secretsDir, inputs, ... }:
+{ config, pkgs, self, secretsDir, inputs, ... }:
 
 {
 	# The home.stateVersion option does not have a default and must be set
@@ -41,11 +41,10 @@
 		EDITOR = "nvim";
 	};
 
-	home.sessionPath = [ "${workDir}/config/mybin" ];
+	home.sessionPath = [ "${self}/mybin" ];
 
 	home.file = {
 		".config/rclone".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf";
-		".xmobarrc".source = "${confDir}/misc/xmobar.hs";
 		".subversion/config".text = ''
 			[miscellany]
 			global-ignores = node_modules
