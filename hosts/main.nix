@@ -83,6 +83,8 @@
 	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 	networking.firewall.allowedTCPPorts = [
   		5357 # wsdd
+		8888 # for general usage
+		9999 # for general usage
 	];
 	networking.firewall.allowedUDPPorts = [
   		3702 # wsdd
