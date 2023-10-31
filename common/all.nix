@@ -13,7 +13,7 @@
 
 
 	# set root user pwd
-	users.users.root.passwordFile = "${secretsDir}/root-pwd";
+	users.users.root.password = "changeme";
 
 	# Set your time zone.
 	time.timeZone = "Europe/Vienna";
@@ -31,7 +31,7 @@ export PATH=$PATH:${self}/mybin
 
   	security.sudo.wheelNeedsPassword = false;
 
-	users.mutableUsers = false;
+	users.mutableUsers = true;
 
   	networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
