@@ -53,7 +53,6 @@
 	};
 
 	home.packages = with pkgs; [
-		neovim
 		vim
 		obsidian
 		tree
