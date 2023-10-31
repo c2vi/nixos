@@ -52,7 +52,6 @@
 				inherit specialArgs;
       		system = "x86_64-linux";
 
-      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
       		modules = [
          		./hosts/main.nix
 					./hardware/my-hp-laptop.nix
@@ -63,7 +62,6 @@
 				inherit specialArgs;
       		system = "x86_64-linux";
 
-      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
       		modules = [
          		./hosts/hpm.nix
 					./hardware/hpm-laptop.nix
