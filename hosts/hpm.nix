@@ -27,9 +27,10 @@
 	];
 
 	networking = {
+		#usePredictableInterfaceNames = false;
 		defaultGateway = {
 			address = "192.168.1.1";
-			interface = "enp0s13f0u1c2";
+			interface = "eth0";
 		};
 		hostName = "hpm";
 		nameservers = [ "1.1.1.1" "8.8.8.8" ];
