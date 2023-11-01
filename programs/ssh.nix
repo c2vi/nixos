@@ -9,8 +9,9 @@
 				identityFile = "${secretsDir}/private-key-main";
 			};
 			hpm = {
-				hostname = "192.168.1.56";
-				user = "root";
+				hostname = "192.168.1.6";
+				user = "me";
+				identityFile = "${secretsDir}/private-key-main";
 			};
 
 			servers = {
