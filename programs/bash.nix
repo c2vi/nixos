@@ -166,6 +166,14 @@
 			}
 
 
+
+         # git commit func
+         function gc(){
+            tmp=$(echo -en $@)
+            git commit -m "$tmp"
+         }
+
+
 			# while true -> do cat.....
 			function follow (){
 			while true;
