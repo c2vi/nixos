@@ -16,6 +16,12 @@
   		settings.PermitRootLogin = "yes";
 	};
 
+	nix.settings = {
+		trusted-public-keys = [
+			"sebastian@c2vi.dev:0tIXGRJMLaI9H1ZPdU4gh+BikUuBVHtk+e1B5HggdZo="
+		];
+	};
+
 	users.users.me.openssh.authorizedKeys.keys = [
 		"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
 	];
