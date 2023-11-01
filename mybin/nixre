@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# my nixos rebuild script
+
+
+
+build_from_github(){
+	export out_path=$(nix build --refresh "github:c2vi/nixos#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
+	build_exit_code=$?
+	echo out_path: $out_path
+
+	return $build_exit_code
+}
+
+build_from_local(){
+	export out_path=$(nix build "$HOME/work/config#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
+	build_exit_code=$?
+
+	echo out_path: $out_path
+
+	return $build_exit_code
+}
+
+do_switch(){
+	if [[ "$host" == "$(hostname)" ]]
+	then
+		[[ "$boot" == "false" ]] && sudo $out_path/bin/switch-to-configuration switch
+		[[ "$boot" == "true" ]] && sudo $out_path/bin/switch-to-configuration boot
+	else
+		nix path-info $out_path -r | xargs sudo nix store sign -k ~/.mysecrets/nix-private-key
+		nix copy --no-check-sigs --no-require-sigs --to ssh-ng://$host $out_path 
+		[[ "$boot" == "false" ]] && ssh $host "sudo $out_path/bin/switch-to-configuration switch"
+		[[ "$boot" == "true" ]] && ssh $host "sudo $out_path/bin/switch-to-configuration boot"
+	fi
+}
+
+
+# main
+
+host=$(hostname)
+export host
+boot=false
+use_github=""
+flag=""
+
+while getopts ':gbh:' flag; do
+  case "${flag}" in
+    h) host="${OPTARG}";;
+    b) boot=true;;
+    g) use_github=true;;
+    *) break;; # makes it so, that at the first unknown option we start passing the rest of the arguments to the nix build command....
+  esac
+done
+
+if [[ "$use_github" == "true" ]]
+then
+	echo rebuild from github
+	build_from_github && do_switch
+else
+	echo "rebuild from local (~/work/config/)"
+	build_from_local && do_switch
+fi	
+
+
+
