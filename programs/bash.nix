@@ -42,7 +42,6 @@
 		shellAliases = {
 			shutdown = "echo try harder.... xD";
 			npw = "nmcli c up pw";
-			#nixre = "sd nixos-rebuild switch --flake ~/work/config/ --impure";
 			flex = "neofetch | lolcat";
 			kwoche = "curl https://kalenderwoche.celll.net/?api=1; echo";
 			psg = "ps -e | grep";
