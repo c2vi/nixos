@@ -73,7 +73,12 @@
 			export TERM="xterm-color"
 
 			# my prompt
-			export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+			if [[ "$(hostname)" == "main" ]]
+			then
+				export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+			else
+				export PS1="\033[1;32m$(hostname)❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+			fi
 
 
 			# so that programms i spawn from my shell don't have so high cpu priority
