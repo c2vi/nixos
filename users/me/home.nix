@@ -107,8 +107,6 @@
 		comma
 		delta
 
-		hack-font
-
 		inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
 
 		# python....
@@ -154,6 +152,3 @@
 }
 
 
-	#fonts.fonts = with pkgs; [
-   	#hack-font
-	#];
