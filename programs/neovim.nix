@@ -53,7 +53,7 @@
 			autocmd BufReadPost * call Setup()
 
 			function Setup()
-				if index(["typst", "haskell", "tex", "c", "rust", "js", "vhdl"], &syntax) >= 0
+				if index(["typst", "haskell", "tex", "c", "rust", "js", "vhdl", "nix"], &syntax) >= 0
 					execute "call Setup_" . &syntax . "()"
 				endif
 			endfunction
@@ -166,6 +166,20 @@
 
 
 			""""""""""""""""""""""""""""" languages """""""""""""""""""""""""""""
+
+			" ###### nix ###### "
+			function! Setup_typst()
+            " use spaces for indentation with nix .. so that multiline strings get stripped of tabs
+            set smartindent
+            set tabstop=2
+            set expandtab
+            set shiftwidth=2
+
+         endfunction
+
+
+
+
 
 			" ###### typst ###### "
 			"Typst highlight customisation
