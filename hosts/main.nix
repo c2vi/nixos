@@ -19,6 +19,11 @@
 		../users/me/default.nix
 	];
 
+	nix.settings = {
+		trusted-public-keys = [
+			"sebastian@c2vi.dev:0tIXGRJMLaI9H1ZPdU4gh+BikUuBVHtk+e1B5HggdZo="
+		];
+	};
 
 	networking.hostName = "main";
 
