@@ -257,13 +257,14 @@
 
 			# my nixos rebuild
 			function nixre(){
+				nix flake prefetch --refresh github:c2vi/nixos
 				if [ "$1" == "boot" ]
 				then
 					nix build github:c2vi/nixos#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure ''${@:2} \
 					&& sudo ./result/bin/switch-to-configuration boot \
 					&& rm ./result
 				else
-					nix build ~/work/config#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure $@ \
+					nix build github:c2vi/nixos#nixosConfigurations.c2vi-main.config.system.build.toplevel --impure $@ \
 					&& sudo ./result/bin/switch-to-configuration switch \
 					&& rm ./result
 				fi
