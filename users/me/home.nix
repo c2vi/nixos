@@ -106,6 +106,8 @@
 		moonlight-qt
 		comma
 		delta
+    	jq
+		xorg.xkill
 
 		inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
 
