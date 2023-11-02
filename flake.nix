@@ -27,6 +27,12 @@
       	inputs.nixpkgs.follows = "nixpkgs";
     	};
 
+
+      robotnix = {
+         url = "github:nix-community/robotnix";
+         #inputs.nixpkgs.follows = "nixpkgs";
+      };
+
 	};
 
 	outputs = { self, nixpkgs, ... }@inputs: 
@@ -77,9 +83,23 @@
 			};
    	};
 
+      robotnixConfigurations = rec {
+         "phone" = inputs.robotnix.lib.robotnixSystem (import ./hosts/phone/default.nix);
+      };
+
 		packages.x86_64-linux = {
 			cbm = nixpkgs.x86_64.callPackage ./mods/cbm.nix { };
 			#default... TODO
+			run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
+				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
+        '';
+		};
+
+		apps.x86_64-linux = {
+			 default = {
+          	type = "app";
+          	program = "${self.packages.x86_64-linux.run-vm}/bin/run-vm";
+        };
 		};
 	};
 }
