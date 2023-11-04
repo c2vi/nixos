@@ -10,6 +10,7 @@
 			# typst ... TODO
 			rust-vim
 			dracula-vim
+         lf-vim
 		];
 
 		coc.enable = true;
@@ -74,7 +75,14 @@
 			:tmap <C-l> <Esc><C-l>
 
 
-			cnoreabbrev ta Te
+         nmap <C-n> :LfNewTab<ENTER>
+			cnoreabbrev e LfCurrentFile
+         let g:floaterm_width = 0.88
+         let g:floaterm_height = 0.88
+
+         nmap <C-w> :wq<ENTER>
+         imap <C-w> :wq<ENTER>
+			cnoreabbrev ta LfNewTab
 			cnoreabbrev hh TSHighlightCapturesUnderCursor
 
 			nnoremap ga :call CocActionAsync('doHover')<ENTER>
@@ -97,7 +105,7 @@
 
 			cnoreabbrev s set filetype=javascriptreact
 
-			nnoremap <C-n> <cmd>lua require('renamer').rename()<cr>
+			"nnoremap <C-n> <cmd>lua require('renamer').rename()<cr>
 
 			"cmap t <TAB>
 			"cmap <C-j> <C-i>
@@ -168,7 +176,7 @@
 			""""""""""""""""""""""""""""" languages """""""""""""""""""""""""""""
 
 			" ###### nix ###### "
-			function! Setup_typst()
+			function! Setup_nix()
             " use spaces for indentation with nix .. so that multiline strings get stripped of tabs
             set smartindent
             set tabstop=2
@@ -183,7 +191,7 @@
 
 			" ###### typst ###### "
 			"Typst highlight customisation
-			function Setup_typst()
+			function! Setup_typst()
 				" set highlight of Headings to not be underlined
 				"autocmd TermClose * echo v:shell_error
 				"au TermClose * call feedkeys("ii")
@@ -232,7 +240,7 @@
 
 			" ###### js ###### "
 			set tabstop=3 shiftwidth=3
-			function Setup_js()
+			function! Setup_js()
 
 			"autocmd Filetype js set tabstop=2 shiftwidth=2 expandtab
 				set tabstop=4 shiftwidth=4
@@ -244,7 +252,7 @@
 
 
 			" ###### c ###### "
-			function Setup_c()
+			function! Setup_c()
 				cnoreabbrev c call SaveAndCompile_c()
 			endfunction
 
@@ -262,7 +270,7 @@
 			let g:UltiSnipsJumpForwardTrigger = '<c-j>'
 			let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
 
-			function Setup_tex()
+			function! Setup_tex()
 				set tabstop=2 shiftwidth=2
 				"command SaveAndCompilelatex
 				cnoreabbrev c call SaveAndCompile_latex()
@@ -306,7 +314,7 @@
 
 			" ###### vhdl ###### "
 
-			function Setup_vhdl()
+			function! Setup_vhdl()
 				function Vhdl_toggle_comment()
 					let line=getline('.')
 					let chars = split(line, '\zs') 
@@ -335,7 +343,7 @@
 
 			" ###### haskell ###### "
 
-			function Setup_haskell()
+			function! Setup_haskell()
 				set tabstop=4 shiftwidth=4 expandtab
 
 				"command SaveAndCompile_haskell
@@ -374,7 +382,7 @@
 
 			" ###### rust ###### "
 
-			function Setup_rust()
+			function! Setup_rust()
 
 				vnoremap s :call Rust_toggle_comment()<Enter>
 

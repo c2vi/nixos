@@ -7,7 +7,9 @@
 build_from_github(){
 	export out_path=$(nix build --refresh "github:c2vi/nixos#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
 	build_exit_code=$?
+
 	echo out_path: $out_path
+   echo build_exit_code: $build_exit_code
 
 	return $build_exit_code
 }
@@ -17,6 +19,7 @@ build_from_local(){
 	build_exit_code=$?
 
 	echo out_path: $out_path
+   echo build_exit_code: $build_exit_code
 
 	return $build_exit_code
 }

@@ -74,6 +74,42 @@
       		];
    		};
 
+      # my server at home
+   		"rpi" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+      };
+
+      # my raspberry to try out stuff with
+   		"luna" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+      };
+
+      # my headless nixos vm
+   		"loki" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+      };
+
+      # a nixos chroot environment
+   		"chroot" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+
+      	modules = [
+          ./hosts/the-most-default.nix
+          ({ ... }: {
+            
+          })
+        ];
+      };
+
+   		"wsl" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+      };
+
 			"the-most-default" = nixpkgs.lib.nixosSystem {
       		system = "x86_64-linux";
       		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
@@ -83,12 +119,12 @@
 			};
    	};
 
-      robotnixConfigurations = rec {
-         "phone" = inputs.robotnix.lib.robotnixSystem (import ./hosts/phone/default.nix);
-      };
+    robotnixConfigurations = rec {
+      "phone" = inputs.robotnix.lib.robotnixSystem (import ./hosts/phone/default.nix);
+    };
 
 		packages.x86_64-linux = {
-			cbm = nixpkgs.x86_64.callPackage ./mods/cbm.nix { };
+			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };
 			#default... TODO
 			run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
 				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4

@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 {
 	imports = [
 		../common/all.nix
@@ -16,10 +16,15 @@
   		settings.PermitRootLogin = "yes";
 	};
 
+  environment.systemPackages = with pkgs; [
+    ntfs3g
+  ];
+
 	nix.settings = {
 		trusted-public-keys = [
 			"sebastian@c2vi.dev:0tIXGRJMLaI9H1ZPdU4gh+BikUuBVHtk+e1B5HggdZo="
 		];
+      trusted-users = [ "me" ];
 	};
 
 	users.users.me.openssh.authorizedKeys.keys = [

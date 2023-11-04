@@ -58,12 +58,9 @@
 		obsidian
 		tree
 		xorg.xkbcomp
-		rofi
 		haskellPackages.xmonad-extras
 		haskellPackages.xmonad-contrib
-		alacritty
 		xorg.xev
-		ntfs3g
 		htop
 		subversion
 		pv
@@ -77,7 +74,6 @@
 		haskellPackages.xmobar
 		dolphin
 		mupdf
-		zathura
 		xclip
 		rclone
 		stalonetray
@@ -108,6 +104,8 @@
 		delta
     	jq
 		xorg.xkill
+      wget
+      xorg.xmodmap
 
 		inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
 

@@ -1,8 +1,30 @@
-{ ... }:
+{ pkgs, ... }:
 {
 	programs.alacritty = {
 		enable = true;
+
+      # overwrite alacritty package.... to the one with smooth scrolling....
+      # for it you also need to add cursor.smooth_factor to the alacritty settings
+      /*
+		package = pkgs.alacritty.overrideAttrs ( final: prev: rec {
+		   src = pkgs.fetchFromGitHub {
+			   owner = "gregthemadmonk";
+            repo = "alacritty";
+            rev = "master";
+            sha256 = "2XFHVqXR5RyXpdNd+oimrwGHl4k0qaMzLO+WVGWnQ/M=";
+		   };
+         #cargoSha256 = "0000000000000000000000000000000000000000000000000000";
+         #cargoSha256 = "";
+
+         cargoDeps = prev.cargoDeps.overrideAttrs (_: {
+            inherit src;
+            outputHash = "sha256-6Gt9ikXrcBXtxHRSvKPEoLoVituxc3rTVDoWlGR4V7A=";
+            # ...
+         });
+      });
+      #*/
 		settings = {
+         #cursor.smooth_factor = 0.5;
 			font = {
 			  normal = {
 				 family = "Hack";

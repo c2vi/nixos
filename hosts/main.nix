@@ -17,15 +17,45 @@
 		../common/nixos-graphical.nix
 
 		../users/me/default.nix
+		../users/root/default.nix
 	];
 
 	nix.settings = {
 		trusted-public-keys = [
 			"sebastian@c2vi.dev:0tIXGRJMLaI9H1ZPdU4gh+BikUuBVHtk+e1B5HggdZo="
 		];
+      builders = "@/etc/nix/machines";
+      trusted-users = [ "me" ];
 	};
+   nix = {
+      distributedBuilds = true;
+      buildMachines = [
+         {
+            hostName = "hpm";
+            maxJobs = 8;
+            speedFactor = 5;
+            systems = [
+               "x86_64-linux"
+            ];
+         }
+         /*
+         {
+            hostName = "main";
+            maxJobs = 4;
+            systems = [
+               "x86_64-linux"
+            ];
+         }
+         */
+      ];
+   };
 
 	networking.hostName = "main";
+   networking.search = [ "c2vi.local" ];
+   networking.extraHosts = ''
+      192.168.1.6 hpm
+      192.168.1.2 rpi
+   '';
 
 
 	# some bind mounts

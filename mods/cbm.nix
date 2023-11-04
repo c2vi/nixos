@@ -1,6 +1,6 @@
 { stdenv
 , fetchFromGitHub
-, libncurses
+, ncurses
 }:
 
 stdenv.mkDerivation rec {
@@ -10,10 +10,11 @@ stdenv.mkDerivation rec {
 	src = fetchFromGitHub {
 		owner = "resurrecting-open-source-projects";
 		repo = "cbm";
-		tag = version;
+    rev = "master";
+    sha256 = "sha256-Ubm8jky8nbJZWVSlqipg22ZjlnsgdVmoQWxYi9cyags=";
 	};
 
 	nativeBuildInputs = [
-		libncurses
+		ncurses
 	];
 }
