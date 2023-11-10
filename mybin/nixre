@@ -15,7 +15,7 @@ build_from_github(){
 }
 
 build_from_local(){
-	export out_path=$(nix build "$HOME/work/config#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
+	export out_path=$(sudo nix build "$HOME/work/config#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
 	build_exit_code=$?
 
 	echo out_path: $out_path

@@ -7,7 +7,7 @@ then
 
 elif [ "$1" == "mnt-wechner" ]
 then
-rclone mount --vfs-cache-mode full -vvvv onedrive-school:projekt-autobatterie ~/wechner-mount/
+rclone mount --vfs-cache-mode full -vvvv onedrive-school:projekt-autobatterie ~/work/htl/projekt/wechner/mnt
 
 
 elif [ "$1" == "wstunnel" ]

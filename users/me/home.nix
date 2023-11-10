@@ -1,5 +1,5 @@
 
-{ config, pkgs, self, secretsDir, inputs, ... }:
+{ config, pkgs, self, secretsDir, inputs, persistentDir, ... }:
 
 {
 	# The home.stateVersion option does not have a default and must be set
@@ -44,13 +44,17 @@
 	home.sessionPath = [ "${self}/mybin" ];
 
   home.file = {
-    ".config/rclone".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf";
+    ".rclone.conf".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf";
     ".subversion/config".text = ''
       [miscellany]
       global-ignores = node_modules target
     ''; # documentation for this config file: https://svnbook.red-bean.com/en/1.7/svn.advanced.confarea.html
     ".mysecrets/root-pwd".text = "changeme";
     ".mysecrets/me-pwd".text = "changeme";
+
+    ".mozilla/firefox".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/firefox";
+    ".cache/rofi-3.runcache".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/rofi-run-cache";
+
   };
 
 	home.packages = with pkgs; [
@@ -102,10 +106,11 @@
 		moonlight-qt
 		comma
 		delta
-    	jq
+    jq
 		xorg.xkill
-      wget
-      xorg.xmodmap
+    wget
+    xorg.xmodmap
+    android-studio
 
 		inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
 

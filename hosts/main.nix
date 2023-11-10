@@ -20,15 +20,22 @@
 		../users/root/default.nix
 	];
 
+  virtualisation.podman.enable = true;
+  hardware.bluetooth.settings = {
+    General = {
+      MultiProfile = "multiple";
+    };
+  };
+
 	nix.settings = {
 		trusted-public-keys = [
 			"sebastian@c2vi.dev:0tIXGRJMLaI9H1ZPdU4gh+BikUuBVHtk+e1B5HggdZo="
 		];
-      builders = "@/etc/nix/machines";
+      #builders = "@/etc/nix/machines";
       trusted-users = [ "me" ];
 	};
    nix = {
-      distributedBuilds = true;
+      distributedBuilds = false; # false, because i can't build on hpm currently ... not signed by trusted user error
       buildMachines = [
          {
             hostName = "hpm";
@@ -158,7 +165,9 @@
   	virtualisation.libvirtd.enable = true;
 
   	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
+    mkdir -p /var/lib/libvirt/storage
 		ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
+    rm -rf /var/lib/libvirt/qemu/networks
 		ln -nsf ${workDir}/vm/qemu/* /var/lib/libvirt/qemu/
 
 		# there is no /bin/bash

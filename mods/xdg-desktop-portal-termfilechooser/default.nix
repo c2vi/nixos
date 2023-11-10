@@ -3,7 +3,7 @@
 , stdenv
 , fetchFromGitHub
 , meson
-, pkgconfig
+, pkg-config
 , inih
 , systemd
 , scdoc
@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
 
 	nativeBuildInputs = [
 		meson
-		pkgconfig
+		pkg-config
 		inih
 		systemd
 		scdoc
