@@ -1,4 +1,4 @@
-{ pkgs, secretsDir, inputs, ... }:
+{ pkgs, secretsDir, inputs, config, ... }:
 {
 	users.users.me = {
    	isNormalUser = true;
@@ -9,6 +9,9 @@
 
 	#home-manager._module.args = { inherit inputs; };
 	home-manager.users.me = import ./home.nix;
+  home-manager.extraSpecialArgs = {
+    hostname = config.networking.hostName;
+  };
 
 	fonts.fonts = with pkgs; [
    	hack-font

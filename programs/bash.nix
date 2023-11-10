@@ -1,11 +1,11 @@
-{ persistentDir, confDir, ... }:
+{ persistentDir, confDir, hostname, ... }:
 {
 	programs.bash = {
 
 		enable = true;
 		enableCompletion = true;
 
-		historyFile = "${persistentDir}/bash-history";
+		historyFile = "${persistentDir}/${hostname}/bash-history";
 		historyFileSize = 100000;
 		historyControl = [ "ignoredups" ];
 		historyIgnore = [
