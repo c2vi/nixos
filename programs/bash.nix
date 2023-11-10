@@ -138,6 +138,7 @@
 			# a little programm, that changes the ssh config to always be able to acces rpi
 			function rpi(){
 			ssh_dir=~/.ssh
+      rm -f $ssh_dir/current_rpi_config
 			if [ "$1" == "l" ]
 			then
 				cp $ssh_dir/rpi/local $ssh_dir/current_rpi_config
