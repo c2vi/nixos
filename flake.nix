@@ -28,10 +28,20 @@
     	};
 
 
-      robotnix = {
-         url = "github:nix-community/robotnix";
-         #inputs.nixpkgs.follows = "nixpkgs";
-      };
+    robotnix = {
+      url = "github:nix-community/robotnix";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-on-droid = {
+      #url = "github:nix-community/nix-on-droid/release-23.05";
+      url = "github:zhaofengli/nix-on-droid";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # for bootstrap zip ball creation and proot-termux builds, we use a fixed version of nixpkgs to ease maintanence.
+    # head of nixos-23.05 as of 2023-06-18
+    # note: when updating nixpkgs-for-bootstrap, update store paths of proot-termux in modules/environment/login/default.nix
+    nixpkgs-for-bootstrap.url = "github:NixOS/nixpkgs/c7ff1b9b95620ce8728c0d7bd501c458e6da9e04";
 
 	};
 
@@ -122,6 +132,34 @@
     robotnixConfigurations = rec {
       "phone" = inputs.robotnix.lib.robotnixSystem (import ./hosts/phone/default.nix);
     };
+
+    nixOnDroidConfigurations = rec {
+      "phone" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+      };
+    };
+
+    nixOnDroidConfigurations.default = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+      modules = [ ./hosts/nix-on-phone.nix ];
+
+      # list of extra special args for Nix-on-Droid modules
+      extraSpecialArgs = {
+        # rootPath = ./.;
+      };
+
+      # set nixpkgs instance, it is recommended to apply `nix-on-droid.overlays.default`
+      pkgs = import nixpkgs {
+        system = "aarch64-linux";
+
+        overlays = [
+          inputs.nix-on-droid.overlays.default
+          # add other overlays
+        ];
+      };
+
+      # set path to home-manager flake
+      home-manager-path = inputs.home-manager.outPath;
+    };
+
 
 		packages.x86_64-linux = {
 			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };
