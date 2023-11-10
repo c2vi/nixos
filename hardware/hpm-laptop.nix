@@ -23,6 +23,7 @@
 	boot.initrd.kernelModules = [ "dm-snapshot" ];
 	boot.kernelModules = [ "kvm-intel" ];
 	boot.extraModulePackages = [ ];
+  boot.loader.efi.canTouchEfiVariables = true;
 
 	fileSystems."/" = {
 		device = "/dev/disk/by-uuid/6518e61e-7120-48ef-81a3-5eae0f67297e";
