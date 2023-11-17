@@ -43,6 +43,8 @@
     # note: when updating nixpkgs-for-bootstrap, update store paths of proot-termux in modules/environment/login/default.nix
     nixpkgs-for-bootstrap.url = "github:NixOS/nixpkgs/c7ff1b9b95620ce8728c0d7bd501c458e6da9e04";
 
+    nix-wsl.url = "github:nix-community/NixOS-WSL";
+
 	};
 
 	outputs = { self, nixpkgs, ... }@inputs: 
@@ -118,6 +120,26 @@
    		"wsl" = nixpkgs.lib.nixosSystem {
 			  inherit specialArgs;
       	system = "x86_64-linux";
+        modules = [
+          inputs.nix-wsl.nixosModules.wsl
+          {
+            wsl.enable = true;
+
+            services.openssh = {
+              enable = true;
+
+              settings.PasswordAuthentication = false;
+              settings.KbdInteractiveAuthentication = false;
+            };
+
+            users.users.nixos.openssh.authorizedKeys.keys = [
+		          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
+            ]
+
+            programs.bash.loginShellInit = "nixos-wsl-welcome";
+          }
+          ./common/all.nix
+        ];
       };
 
 			"the-most-default" = nixpkgs.lib.nixosSystem {
@@ -163,17 +185,24 @@
 
 		packages.x86_64-linux = {
 			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };
+			supabase = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/supabase.nix { };
 			#default... TODO
 			run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
 				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
         '';
+      #wsl = inputs.nix-wsl.nixosConfigurations.modern.config.system.build.tarballBuilder;
+
 		};
 
 		apps.x86_64-linux = {
-			 default = {
-          	type = "app";
-          	program = "${self.packages.x86_64-linux.run-vm}/bin/run-vm";
-        };
+      wsl = {
+        type = "app";
+        program = "${self.nixosConfigurations.wsl.config.system.build.tarballBuilder}/bin/nixos-wsl-tarball-builder";
+      };
+		  default = {
+        type = "app";
+        program = "${self.packages.x86_64-linux.run-vm}/bin/run-vm";
+      };
 		};
 	};
 }

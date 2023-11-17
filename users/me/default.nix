@@ -1,4 +1,4 @@
-{ pkgs, secretsDir, inputs, config, ... }:
+{ pkgs, secretsDir, inputs, config, self, ... }:
 {
 	users.users.me = {
    	isNormalUser = true;
@@ -10,6 +10,7 @@
 	#home-manager._module.args = { inherit inputs; };
 	home-manager.users.me = import ./home.nix;
   home-manager.extraSpecialArgs = {
+    inherit self;
     hostname = config.networking.hostName;
   };
 

@@ -11,7 +11,7 @@
 
 	home-manager.extraSpecialArgs = specialArgs;
 
-  	programs.dconf.enable = true;
+  programs.dconf.enable = true;
 
 	# set root user pwd
 	users.users.root.password = "changeme";
@@ -21,20 +21,20 @@
 
 
 	# add mybin to path
-	environment.etc.profile.text = ''
-export PATH=$PATH:${self}/mybin
-	'';
+  environment.etc.profile.text = ''
+    export PATH=$PATH:${self}/mybin
+  '';
 
 	
 	nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 	home-manager.backupFileExtension = "backup";
 
-  	security.sudo.wheelNeedsPassword = false;
+  security.sudo.wheelNeedsPassword = false;
 
 	users.mutableUsers = true;
 
-  	networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
 
 	# This value determines the NixOS release from which the default

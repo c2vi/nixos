@@ -20,6 +20,13 @@
 		../users/root/default.nix
 	];
 
+  services.avahi.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    cifs-utils
+    ntfs3g
+  ];
+
   virtualisation.podman.enable = true;
   hardware.bluetooth.settings = {
     General = {
@@ -168,7 +175,10 @@
     mkdir -p /var/lib/libvirt/storage
 		ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
     rm -rf /var/lib/libvirt/qemu/networks
-		ln -nsf ${workDir}/vm/qemu/* /var/lib/libvirt/qemu/
+    ls ${workDir}/vm/qemu | while read path
+    do
+		  ln -nsf ${workDir}/vm/qemu/$path /var/lib/libvirt/qemu/$path
+    done
 
 		# there is no /bin/bash
 		# https://discourse.nixos.org/t/add-bin-bash-to-avoid-unnecessary-pain/5673

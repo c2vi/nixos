@@ -112,6 +112,9 @@
     xorg.xmodmap
     android-studio
 
+    # my own packages
+    supabase-cli
+
 		inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
 
 		# python....

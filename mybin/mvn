@@ -27,6 +27,8 @@ fi
 
 
 if [ "$1" == "ignore" ]
+echo hello
+exit
 then
 	if [ -t 0 ]
 	then
@@ -36,8 +38,9 @@ then
 		cat >> ./svn-ignore
 	fi
 	# do if no or some pipe ... apply the things in the svn-ignore file
-	cat ./svn-ignore | tr -d '"' | sed 's/$/\/../' | xargs svn propdel svn:ignore 1>/null
-	cat ./svn-ignore | tr -d '"' | sed 's\^\./\' | while read p; do
+	cat ./svn-ignore | sed 's/$/\/../' | while read p; do svn propdel svn:ignore $p 1>/dev/null; done
+
+	cat ./svn-ignore | sed 's\^\./\' | while read p; do
 		name=$(echo -en "$p" | tr "/" "\n" | tail -n 1)
 		path=${p%/*}
 		prop=$(svn propget svn:ignore $path)

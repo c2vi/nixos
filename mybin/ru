@@ -71,6 +71,11 @@ then
 sudo systemctl hibernate
 
 
+elif [ "$1" == "suspend" ]
+then
+sudo systemctl suspend
+
+
 fi
 
 

@@ -1,4 +1,4 @@
-{ persistentDir, confDir, hostname, ... }:
+{ persistentDir, confDir, hostname, self, ... }:
 {
 	programs.bash = {
 
@@ -69,6 +69,7 @@
 		};
 
 		bashrcExtra = ''
+      export PATH=${self}/mybin:$PATH
 			export TERM="xterm-color"
 
 			# my prompt
@@ -273,7 +274,7 @@
 			complete -W "start stop restart status daemon-reload" stl
 
 			# run 
-			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote" ru
+			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend" ru
 
 
 		'';
