@@ -134,7 +134,7 @@
 
             users.users.nixos.openssh.authorizedKeys.keys = [
 		          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-            ]
+            ];
 
             programs.bash.loginShellInit = "nixos-wsl-welcome";
           }
