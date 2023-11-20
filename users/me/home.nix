@@ -110,6 +110,7 @@
 		xorg.xkill
     wget
     xorg.xmodmap
+    tmux
     android-studio
 
     # my own packages
