@@ -4,6 +4,7 @@
 		../common/all.nix
 		../common/nixos.nix
 		../common/nixos-graphical.nix
+    ../common/building.nix
 
 		../users/me/default.nix
 	];

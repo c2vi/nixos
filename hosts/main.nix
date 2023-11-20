@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, self, secretsDir, ... }:
+{ pkgs, lib, workDir, self, secretsDir, config,  ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -15,6 +15,7 @@
 		../common/all.nix
 		../common/nixos.nix
 		../common/nixos-graphical.nix
+    ../common/building.nix
 
 		../users/me/default.nix
 		../users/root/default.nix
@@ -34,34 +35,8 @@
     };
   };
 
-	nix.settings = {
-		trusted-public-keys = [
-			"sebastian@c2vi.dev:0tIXGRJMLaI9H1ZPdU4gh+BikUuBVHtk+e1B5HggdZo="
-		];
-      #builders = "@/etc/nix/machines";
-      trusted-users = [ "me" ];
-	};
    nix = {
       distributedBuilds = false; # false, because i can't build on hpm currently ... not signed by trusted user error
-      buildMachines = [
-         {
-            hostName = "hpm";
-            maxJobs = 8;
-            speedFactor = 5;
-            systems = [
-               "x86_64-linux"
-            ];
-         }
-         /*
-         {
-            hostName = "main";
-            maxJobs = 4;
-            systems = [
-               "x86_64-linux"
-            ];
-         }
-         */
-      ];
    };
 
 	networking.hostName = "main";
@@ -69,7 +44,13 @@
    networking.extraHosts = ''
       192.168.1.6 hpm
       192.168.1.2 rpi
+      127.0.0.1 youtube.com
+      127.0.0.1 www.youtube.com
    '';
+
+
+  # to build rpi images
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
 
 	# some bind mounts
@@ -85,6 +66,46 @@
 		device = "${workDir}/diplomarbeit";
   		options = [ "bind" ];
 	};
+
+  # my youtube blocking service
+  systemd.services.stark = 
+    let 
+    stark = pkgs.writeShellApplication {
+      name = "stark";
+
+      runtimeInputs = with pkgs; [ curl w3m ];
+
+      text = ''
+        if [ -f "/etc/host-youtube-block" ];
+        then
+          timeout=$(cat /etc/host-youtube-block)
+          if [[ "$timeout" == "1" ]]
+          then
+            rm /etc/host-youtube-block
+          else
+            timeout=$((timeout - 1))
+            echo -en $timeout > /etc/host-youtube-block
+          fi
+        else
+          rm /etc/hosts
+          ln -nsf ${config.environment.etc.hosts.source.outPath} /etc/hosts
+        fi
+      '';
+      };
+    in
+  {
+    enable = true;
+    description = "block Youtube";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = "60s";
+      ExecStart = "${stark}/bin/stark";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
 
 
 	# syncthing for main
