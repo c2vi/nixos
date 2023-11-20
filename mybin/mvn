@@ -27,8 +27,6 @@ fi
 
 
 if [ "$1" == "ignore" ]
-echo hello
-exit
 then
 	if [ -t 0 ]
 	then

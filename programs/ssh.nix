@@ -19,6 +19,11 @@
 				identityFile = "${secretsDir}/private-key-main";
         hostname = "192.168.122.56";
       };
+      acern = {
+        user = "me";
+				identityFile = "${secretsDir}/private-key-main";
+        hostname = "192.168.1.5";
+      };
 			hpm = {
 				#hostname = "192.168.1.6";
 				user = "me";

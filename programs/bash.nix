@@ -12,6 +12,8 @@
 			"ls"
 			"cd"
 			"exit"
+      "sd vim /etc/hosts"
+      "sd vim /etc/host-youtube-block"
 		];
 
 		shellOptions = [

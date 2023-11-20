@@ -6,20 +6,32 @@
 
 build_from_github(){
 	export out_path=$(nix build --refresh "github:c2vi/nixos#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
-	build_exit_code=$?
+
+  if [[ "$out_path" == "" ]]
+  then
+    build_exit_code=1
+  else
+    build_exit_code=0
+  fi
 
 	echo out_path: $out_path
-   echo build_exit_code: $build_exit_code
+  echo build_exit_code: $build_exit_code
 
 	return $build_exit_code
 }
 
 build_from_local(){
 	export out_path=$(sudo nix build "$HOME/work/config#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
-	build_exit_code=$?
 
+  if [[ "$out_path" == "" ]]
+  then
+    build_exit_code=1
+  else
+    build_exit_code=0
+  fi
+	
 	echo out_path: $out_path
-   echo build_exit_code: $build_exit_code
+  echo build_exit_code: $build_exit_code
 
 	return $build_exit_code
 }

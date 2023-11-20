@@ -50,7 +50,12 @@
 
 
   # to build rpi images
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  boot.binfmt.emulatedSystems = [ 
+    "aarch64-linux"
+    #"x86_64-unknown-linux-gnu"
+    #"armv6l-unknown-linux-gnueabihf"
+    #"armv7l-hf-multiplatform"
+  ];
 
 
 	# some bind mounts

@@ -5,6 +5,8 @@
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 		nixpkgs.url = "github:NixOS/nixpkgs/release-23.05";
 
+    rpi-nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+
 
 		firefox.url = "github:nix-community/flake-firefox-nightly";
 
@@ -26,6 +28,9 @@
      		 url = "github:nix-community/nixos-generators";
       	inputs.nixpkgs.follows = "nixpkgs";
     	};
+
+
+    nixos-hardware.url = "github:nixos/nixos-hardware";
 
 
     robotnix = {
@@ -95,7 +100,46 @@
       # my raspberry to try out stuff with
    		"luna" = nixpkgs.lib.nixosSystem {
 			  inherit specialArgs;
-      	system = "x86_64-linux";
+        system = "aarch64-linux";
+        #system = "armv7l-linux";
+        modules = [
+          "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+          #"${inputs.rpi-nixpkgs}/nixos/modules/installer/sd-card/sd-image-raspberrypi4.nix"
+          inputs.nixos-hardware.nixosModules.raspberry-pi-4
+          ./hosts/luna.nix
+          {
+	          system.stateVersion = "23.05"; # Did you read the comment?
+
+            nixpkgs.overlays = [
+              {
+                ubootRaspberryPi4_64bit = nixpkgs.legacyPackages.x86_64.pkgsCross.aarch64-multiplatform.ubootRaspberryPi4_64bit;
+                ubootRaspberryPi3_64bit = nixpkgs.legacyPackages.x86_64.pkgsCross.aarch64-multiplatform.ubootRaspberryPi3_64bit;
+
+                ubootRaspberryPi4_32bit = nixpkgs.legacyPackages.x86_64.pkgsCross.aarch64-multiplatform.ubootRaspberryPi4_32bit;
+                ubootRaspberryPi3_3264bit = nixpkgs.legacyPackages.x86_64.pkgsCross.aarch64-multiplatform.ubootRaspberryPi3_32bit;
+                raspberrypi-armstubs = nixpkgs.legacyPackages.x86_64.pkgsCross.raspberryPi.raspberrypi-armstubs;
+              }
+            ];
+
+
+            #nixpkgs.crossSystem.system = "armv7l-linux";
+            #nixpkgs.config.allowUnsupportedSystem = true;
+            #nixpkgs.hostPlatform.system = "armv7l-linux";
+            #nixpkgs.buildPlatform.system = "x86_64-linux"; #If you build on x86 other wise changes this.
+
+            # ... extra configs as above
+
+            #nixpkgs.config.allowUnsupportedSystem = true;
+            #nixpkgs.hostPlatform.system = "armv7l-linux";
+            nixpkgs.hostPlatform.system = "aarch64-linux";
+            nixpkgs.buildPlatform.system = "x86_64-linux"; #If you build on x86 other wise changes this.
+
+            #nixpkgs.crossSystem.system = "armv7l-linux";
+            # ... extra configs as above
+
+            hardware.enableRedistributableFirmware = true;
+          }
+        ];
       };
 
       # my headless nixos vm
@@ -150,6 +194,17 @@
          		./hosts/the-most-default.nix
       		];
 			};
+			"test" = nixpkgs.lib.nixosSystem {
+      		#specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+      		system = "aarch64-linux";
+      		modules = [
+            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+            {
+              nixpkgs.hostPlatform.system = "aarch64-linux";
+              nixpkgs.buildPlatform.system = "x86_64-linux";
+            }
+      		];
+      };
    	};
 
     robotnixConfigurations = rec {
@@ -183,7 +238,6 @@
       home-manager-path = inputs.home-manager.outPath;
     };
 
-
 		packages.x86_64-linux = {
 			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };
 			supabase = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/supabase.nix { };
@@ -192,7 +246,11 @@
 				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
         '';
       #wsl = inputs.nix-wsl.nixosConfigurations.modern.config.system.build.tarballBuilder;
-
+      #luna = (self.nixosConfigurations.luna.extendModules {
+        #modules = [ "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-new-kernel-no-zfs-installer.nix" ];
+      #}).config.system.build.sdImage;
+      luna = self.nixosConfigurations.luna.config.system.build.sdImage;
+      test = nixpkgs.legacyPackages.x86_64-linux.pkgsCross.raspberryPi.raspberrypi-armstubs;
 		};
 
 		apps.x86_64-linux = {
