@@ -11,7 +11,6 @@
       fsType = "ext4";
     };
 
-  /*
   boot = {
     kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
     loader = {
@@ -19,7 +18,6 @@
       grub.enable = lib.mkDefault false;
     };
   };
-  */
 
   nix.settings = {
     experimental-features = lib.mkDefault "nix-command flakes";
