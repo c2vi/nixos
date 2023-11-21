@@ -32,7 +32,7 @@
 
     nixos-hardware.url = "github:nixos/nixos-hardware";
 
-    networkmanager.url = "path:/home/me/work/config/gitignore/nixos-networkmanager-profiles";
+    networkmanager.url = "github:c2vi/nixos-networkmanager-profiles";
 
     robotnix = {
       url = "github:nix-community/robotnix";
