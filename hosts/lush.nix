@@ -1,11 +1,21 @@
-{ lib, pkgs, inputs, ... }:
+{ lib, pkgs, inputs, secretsDir, ... }:
 {
-  system.stateVersion = "23.05"; # Did you read the comment?
+  
+  #system.stateVersion = "23.05"; # Did you read the comment?
 
   imports = [
       "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
       #inputs.nixos-hardware.nixosModules.raspberry-pi-4
+      inputs.networkmanager.nixosModules.networkmanager
+
+      ../common/all.nix
+
+	  	inputs.home-manager.nixosModules.home-manager
+		  ../users/me/headless.nix
   ];
+
+ # home-manager.users.me = import ../users/me/home-headless.nix;
+
 
   #nixpkgs.hostPlatform.system = "aarch64-linux";
   #nixpkgs.buildPlatform.system = "x86_64-linux";
@@ -14,6 +24,10 @@
 
   # This causes an overlay which causes a lot of rebuilding
   environment.noXlibs = lib.mkForce false;
+
+
+  environment.systemPackages = with pkgs; [ vim git ];
+
   # "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix" creates a
   # disk with this label on first boot. Therefore, we need to keep it. It is the
   # only information from the installer image that we need to keep persistent
@@ -30,31 +44,98 @@
     };
   };
 
+  ########################### ssh ############################
   services.openssh = {
     enable = true;
     ports = [ 22 ];
 
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
+  	settings.PermitRootLogin = "no";
   };
 
-  # end of base.nix
 
-  environment.systemPackages = with pkgs; [ vim git ];
+  ####################################### networking ##########################
+
   networking.hostName = "lush";
-  users = {
-    users.me = {
-      password = "hello";
-      isNormalUser = true;
-      extraGroups = [ "wheel" ];
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden"
-      ];
+
+  networking.networkmanager.enable = true;
+
+  networking.networkmanager.profiles = {
+    main = {
+      connection = {
+        id = "main";
+        uuid = "a02273d9-ad12-395e-8372-f61129635b6f";
+        type = "ethernet";
+        autoconnect-priority = "-999";
+        interface-name = "eth0";
+      };
+      ipv4 = {
+        address1 = "192.168.1.44/24,192.168.1.1";
+        dns = "1.1.1.1;";
+        method = "manual";
+      };
     };
+
+    pw = {
+      connection = {
+        id = "pw";
+        uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
+        type = "wifi";
+        interface-name = "wlan0";
+      };
+
+      wifi = {
+        hidden = "true";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/wifi-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/wifi-password";
+      };
+
+      ipv4 = {
+        address1 = "192.168.20.21/24";
+        method = "auto";
+      };
+    };
+
+    me = {
+     connection = {
+        id = "me";
+        uuid = "fe45d3bc-21c6-41ff-bc06-c936017c6e02";
+        type = "wireguard";
+        autoconnect = "true";
+        interface-name = "me0";
+     };
+      wireguard = {
+        listen-port = "51820";
+        private-key = builtins.readFile "${secretsDir}/wg-private-lush";
+      };
+      ipv4 = {
+        address1 = "10.1.1.4/24";
+        method = "manual";
+      };
+    } // (import ../common/wg-peers.nix { inherit secretsDir; });
   };
+
+
+  systemd.services.iwd.serviceConfig.Restart = "always";
+  /*
   networking = {
     interfaces."wlan0".useDHCP = true;
+
+    interfaces."eth0" = {
+				#name = "eth0";
+				ipv4.addresses = [
+					{ address = "192.168.5.5"; prefixLength = 24;}
+				];
+    };
+    */
+
+    /*
     wireless = {
       interfaces = [ "wlan0" ];
       enable = true;
@@ -64,6 +145,24 @@
     };
   };
 
+    */
+
+
+  ####################################### wireguard ##########################
+  /*
+  systemd.network.netdevs.me0 = {
+    enable = true;
+    wireguardPeers = import ../common/wg-peers.nix { inherit secretsDir; };
+    wireguardConfig = {
+      ListenPort = 51820;
+      PrivateKeyFile = "/etc/wireguard/secret.key";
+    };
+  };
+  networking.wireguard.interfaces = {
+    me = {
+      ips = [ "10.1.1.11/24" ];
+  };
+  */
 
   /*
   boot = {

@@ -17,10 +17,5 @@
     settings.KbdInteractiveAuthentication = false;
   };
 
-  users.users.me.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden"
-  ];
-
   programs.bash.loginShellInit = "nixos-wsl-welcome";
 }

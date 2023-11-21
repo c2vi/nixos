@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, self, secretsDir, config,  ... }:
+{ pkgs, lib, workDir, self, secretsDir, config, inputs, ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -17,18 +17,17 @@
 		../common/nixos-graphical.nix
     ../common/building.nix
 
-		../users/me/default.nix
+    inputs.networkmanager.nixosModules.networkmanager
+		inputs.home-manager.nixosModules.home-manager
+		../users/me/gui.nix
 		../users/root/default.nix
 	];
-
-  services.avahi.enable = true;
 
   environment.systemPackages = with pkgs; [
     cifs-utils
     ntfs3g
   ];
 
-  virtualisation.podman.enable = true;
 
   hardware.bluetooth.settings = {
     General = {
@@ -40,22 +39,11 @@
       distributedBuilds = false; # false, because i can't build on hpm currently ... not signed by trusted user error
    };
 
-	networking.hostName = "main";
-   networking.search = [ "c2vi.local" ];
-   networking.extraHosts = ''
-      192.168.1.6 hpm
-      192.168.1.2 rpi
-      127.0.0.1 youtube.com
-      127.0.0.1 www.youtube.com
-   '';
 
 
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 
     "aarch64-linux"
-    #"x86_64-unknown-linux-gnu"
-    #"armv6l-unknown-linux-gnueabihf"
-    #"armv7l-hf-multiplatform"
   ];
 
 
@@ -73,7 +61,7 @@
   		options = [ "bind" ];
 	};
 
-  # my youtube blocking service
+  ################################ my youtube blocking service #############################
   systemd.services.stark = 
     let 
     stark = pkgs.writeShellApplication {
@@ -89,9 +77,9 @@
           then
             rm /etc/host-youtube-block
           else
-            echo old: $timeout
+            echo old: "$timeout"
             timeout=$((timeout - 1))
-            echo new: $timeout
+            echo new: "$timeout"
             echo -en $timeout > /etc/host-youtube-block
           fi
         else
@@ -116,7 +104,7 @@
   };
 
 
-	# syncthing for main
+	############################## syncthing for main #############################################
 	services.syncthing = {
    	enable = true;
    	user = "me";
@@ -146,15 +134,19 @@
 	};
 
 
+  ############################## networking ###############################################
+
+	networking.hostName = "main";
+
 	security.polkit.enable = true;
+
+  services.avahi.enable = true;
+
+  networking.networkmanager.enable = true;
 
 	networking.firewall.allowPing = true;
 	networking.firewall.enable = true;
 	services.samba.openFirewall = true;
-
-
-	# samba
-	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 
 	networking.firewall.allowedTCPPorts = [
   	5357 # wsdd
@@ -165,7 +157,144 @@
 
 	networking.firewall.allowedUDPPorts = [
   		3702 # wsdd
+      51820  # wireguard
 	];
+
+  networking.search = [ "c2vi.local" ];
+  networking.extraHosts = ''
+    192.168.1.6 hpm
+    192.168.1.2 rpi
+    127.0.0.1 youtube.com
+    127.0.0.1 www.youtube.com
+  '';
+
+  networking.networkmanager.profiles = {
+    home = {
+      connection = {
+        id = "home";
+        uuid = "a02273d9-ad12-395e-8372-f61129635b6f";
+        type = "ethernet";
+        autoconnect-priority = "-999";
+        interface-name = "enp1s0";
+      };
+      ipv4 = {
+        address1 = "192.168.1.40/24,192.168.1.1";
+        dns = "1.1.1.1;";
+        method = "manual";
+      };
+    };
+
+    htl = {
+      connection = {
+        id = "htl";
+        uuid = "0d3af539-9abd-4417-b882-cbff96fc3490";
+        type = "wifi";
+        interface-name = "wlp2s0";
+      };
+      ipv4 = {
+        method = "auto";
+      };
+      wifi = {
+        mode = "infrastructure";
+        ssid = "HTLinn";
+      };
+      wifi-security = {
+        key-mgmt = "wpa-eap";
+      };
+      "802-1x" = {
+        eap = "peap";
+        identity = builtins.readFile "${secretsDir}/school-username";
+        password = builtins.readFile "${secretsDir}/school-password";
+        phase2-auth = "mschapv2";
+      };
+    };
+
+    pt = {
+      connection = {
+        id = "pt";
+        uuid = "f028117e-9eef-47c1-8483-574f7ee798a4";
+        type = "bluetooth";
+        autoconnect = "false";
+      };
+
+      bluetooth = {
+        bdaddr = "E8:78:29:C4:BA:7C";
+        type = "panu";
+      };
+
+      ipv4 = {
+        method = "auto";
+      };
+    };
+
+    pw = {
+      connection = {
+        id = "pw";
+        uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
+        type = "wifi";
+        interface-name = "wlp2s0";
+      };
+
+      wifi = {
+        hidden = "true";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/wifi-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/wifi-password";
+      };
+
+      ipv4 = {
+        address1 = "192.168.20.20/24";
+        method = "auto";
+      };
+    };
+
+    hot = {
+      connection = {
+        id = "hot";
+        uuid = "ab51de8a-9742-465a-928b-be54a83ab6a3";
+        type = "wifi";
+        autoconnect = "false";
+        interface-name = "wlp2s0";
+      };
+      wifi = {
+        mac-address = "0C:96:E6:E3:64:03";
+        mode = "ap";
+        ssid = "c2vi-main";
+      };
+
+      ipv4 = {
+        method = "shared";
+      };
+    };
+
+    me = {
+     connection = {
+        id = "me";
+        uuid = "fe45d3bc-21c6-41ff-bc06-c936017c6e02";
+        type = "wireguard";
+        autoconnect = "true";
+        interface-name = "me0";
+     };
+      wireguard = {
+        listen-port = "12345";
+        private-key = builtins.readFile "${secretsDir}/wg-private-main";
+      };
+      ipv4 = {
+        address1 = "10.1.1.1/24";
+        method = "manual";
+      };
+    } // (import ../common/wg-peers.nix { inherit secretsDir; });
+  };
+
+
+
+	#################################### samba ######################################
+	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
+
 	services.samba = {
   		enable = true;
   		securityType = "user";
@@ -200,7 +329,9 @@
 	};
 
 
+  ######################################### virtualisation ###############################
   	virtualisation.libvirtd.enable = true;
+    virtualisation.podman.enable = true;
 
   	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
     mkdir -p /var/lib/libvirt/storage
@@ -217,7 +348,7 @@
    '';
 
 
-	# swap and hibernate
+	############################## swap and hibernate ###################################
 	swapDevices = [ { device = "/dev/lvm0/swap"; } ];
 	boot.resumeDevice = "/dev/lvm0/swap";
 	services.logind = {

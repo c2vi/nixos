@@ -32,6 +32,7 @@
 
     nixos-hardware.url = "github:nixos/nixos-hardware";
 
+    networkmanager.url = "path:/home/me/work/config/gitignore/nixos-networkmanager-profiles";
 
     robotnix = {
       url = "github:nix-community/robotnix";
@@ -70,21 +71,18 @@
 		in
 	{
    	nixosConfigurations = rec {
-
    		"main" = nixpkgs.lib.nixosSystem {
 				inherit specialArgs;
       		system = "x86_64-linux";
-
       		modules = [
          		./hosts/main.nix
-					./hardware/my-hp-laptop.nix
+					  ./hardware/my-hp-laptop.nix
       		];
    		};
 
    		"hpm" = nixpkgs.lib.nixosSystem {
 				inherit specialArgs;
       		system = "x86_64-linux";
-
       		modules = [
          		./hosts/hpm.nix
 					  ./hardware/hpm-laptop.nix
@@ -145,14 +143,18 @@
       		];
 			};
 			"test" = nixpkgs.lib.nixosSystem {
-      		#specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
       		system = "aarch64-linux";
+          #inherit specialArgs;
       		modules = [
-            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-            {
-              nixpkgs.hostPlatform.system = "aarch64-linux";
-              nixpkgs.buildPlatform.system = "x86_64-linux";
-            }
+            "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+            ./common/all.nix
+            #./common/nixos-headless.nix
+            #./common/nixos-graphical.nix
+            #./common/building.nix
+
+            inputs.home-manager.nixosModules.home-manager
+            ./users/me/headless.nix
       		];
       };
    	};
@@ -201,7 +203,7 @@
       #}).config.system.build.sdImage;
       lush = self.nixosConfigurations.lush.config.system.build.sdImage;
       rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
-      test = nixpkgs.legacyPackages.x86_64-linux.pkgsCross.raspberryPi.raspberrypi-armstubs;
+      test = self.nixosConfigurations.test.config.system.build.sdImage;
 		};
 
 		apps.x86_64-linux = {

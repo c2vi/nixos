@@ -40,26 +40,30 @@ CMD: sudo dphys-swapfile setup
 CMD: sudo dphys-swapfile swapon
 
 # things
+- mdadm
+- bcache
+- mount /home/files/storage
+    - so that other users can't read it
+
+- podman containers
+
+- me-net (wireguard)
+
+- rclone mount onedrive backups
+- borgmatic
+
+## things done
+- smb shares
+- swap
 - users
     admin - sudo without password and access to bitwarden
     files - for managing files (old: dateimanager)
     server - for deployed servers (podman)
     mamafiles - for the mamafiles share
-- swap
-- mdadm
-- bcache
-- mount /home/files/storage
-    - so that other users can't read it
-- smb shares
 - ssh acces
     - ssh config: PermitRootAccess and PasswordAuthentication
-- me-net (wireguard)
-- podman containers
 - dyndns
 - wstunnel for wireguard
-- rclone mount onedrive backups
-- borgmatic
-
 
 
 

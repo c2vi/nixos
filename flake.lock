@@ -449,6 +449,18 @@
         "type": "github"
       }
     },
+    "networkmanager": {
+      "locked": {
+        "lastModified": 1700588409,
+        "narHash": "sha256-mbQKI5yjy2fkjeJo9+EuEsEuOVu6LPyEDmrP4zsujbA=",
+        "path": "/home/me/work/config/gitignore/nixos-networkmanager-profiles",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/me/work/config/gitignore/nixos-networkmanager-profiles",
+        "type": "path"
+      }
+    },
     "nix-doom-emacs": {
       "inputs": {
         "doom-emacs": "doom-emacs",
@@ -898,6 +910,7 @@
       "inputs": {
         "firefox": "firefox",
         "home-manager": "home-manager",
+        "networkmanager": "networkmanager",
         "nix-doom-emacs": "nix-doom-emacs",
         "nix-index-database": "nix-index-database",
         "nix-on-droid": "nix-on-droid",

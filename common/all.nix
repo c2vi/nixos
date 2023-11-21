@@ -4,7 +4,6 @@
 
 {
 	imports = [
-		inputs.home-manager.nixosModules.home-manager
 		../mods/my-nixpkgs-overlay.nix
 	];
 
@@ -36,7 +35,6 @@
 
 	users.mutableUsers = true;
 
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
 
 	# This value determines the NixOS release from which the default

@@ -6,7 +6,8 @@
 		../common/nixos-graphical.nix
     ../common/building.nix
 
-		../users/me/default.nix
+		inputs.home-manager.nixosModules.home-manager
+		../users/me/gui.nix
 	];
 
 	services.openssh = {
@@ -16,6 +17,13 @@
   		settings.KbdInteractiveAuthentication = false;
   		settings.PermitRootLogin = "yes";
 	};
+
+  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+
+  # to build rpi images
+  boot.binfmt.emulatedSystems = [ 
+    "aarch64-linux"
+  ];
 
   environment.systemPackages = with pkgs; [
     ntfs3g
@@ -27,10 +35,6 @@
 		];
       trusted-users = [ "me" ];
 	};
-
-	users.users.me.openssh.authorizedKeys.keys = [
-		"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-	];
 
 	networking = {
 		#usePredictableInterfaceNames = false;

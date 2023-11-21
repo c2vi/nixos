@@ -50,6 +50,7 @@
     jq
     wget
     tmux
+    wireguard-tools
 		# python....
 		(python310.withPackages (p: with p; [
 			pandas

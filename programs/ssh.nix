@@ -2,12 +2,24 @@
 {
 	programs.ssh = {
 		enable = true;
-		includes = [ "./current_rpi_config" ];
+		#includes = [ "./current_rpi_config" ];
 		matchBlocks = {
+      "*" = {
+				identityFile = "${secretsDir}/private-key";
+      };
 			"github.com" = {
 				hostname = "github.com";
 				identityFile = "${secretsDir}/private-key-main";
 			};
+      rpi = {
+        port = 49388;
+        user = "me";
+        hostname = "192.168.1.2";
+      };
+      lush = {
+        user = "me";
+        hostname = "192.168.5.5";
+      };
       phone = {
         user = "u0_a345";
         hostname = "192.168.44.1";
@@ -23,6 +35,7 @@
         user = "me";
 				identityFile = "${secretsDir}/private-key-main";
         hostname = "192.168.1.5";
+        port = 2222;
       };
 			hpm = {
 				#hostname = "192.168.1.6";
@@ -59,7 +72,10 @@
    home.file.".ssh/known_hosts".force = true;
    home.file.".ssh/known_hosts".text = ''
       hpm ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ+FpaNOf+ao6RCa6e43vAHFcQZTGu45rIqAG3Vx0/M8
-      hpm ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDbIgfPvt3NUWLxAv0jvWv7IUXHaR7k5M7Z1Kz24K+ZYuPRboHWNbcqGjik0kWDGwXejtTLkyiThK641Q0ffYp3bumKL3b3fBNLoRwHfVMHT9ZuM7e9nALJRa+0keBPTcO9kHliYJlEBiF4jHSZhVDPnZ0Qskg2m94AipKrhUC4KIbLFAERlDnFTxw8LTnzdfzs/n/80zH5tKq1TSlYd2XBIMlzYwxTGEgItifierQhncleVVUJ8IPLsSulMgCQu3BA8cGmdApbSe41FIieIsYzLEtJVnCRt0PymdYa1NdyngJ8ZWyXo6JjTCEHWv35WW05Oiw/tMyUDQoeebACe+Ve9WsYdb+0uttAQWZauODimGY/kRrwy2jCqDRoKjq+rWmTgLsXzuTr7sZ2nmlCIs0XkTXzwduo6ZJ1uNHYWTIjnC1in5uB5TMBlVQxEOdeLOIB9reHP7dajguCGLsOg/a7W/kx181w5MdXq5e9ch7Hp2eC9wBbwcy4EtmX0GAYSPV4GWGwunU92TFE5kg7haV23sdRfLf6ARrDLtsfvTzvoWWQFiO7AgrcOdSQtMUM0/egLUj0lg/A5fxV1pfXvxAF7TquNJCXhDYczCbej4PQM2WBe2eGY+BjY3gDHtUdzWEqhH+b6/Cz78yAa4aSWDB8D+Ejv0N0BZLaImYQhma5PQ==
+      lush ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFevbQp0XTZOVFZTDMKzgsZn4NNEIN+SFMqUhSbF5WFo
+      github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+      rpi ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOX+6B6Axx7AqgCm1H1rrou/3yOLeOLcTd8s0In0mOIY
+      phone ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHxg0HKtGAkwymll8r17d9cXdt40dJgRkSAzB699pWke+edne4Ildcnbde2yle01nEL7GOg92vh5t1sh6vkCzJQ=
    '';
 
 	home.file.".ssh/rpi/local".text = ''

@@ -3,7 +3,7 @@
 
 {
 	imports = [
-    ./home-headless.nix
+    ../common/home.nix
 
     # my gui programs
 		../../programs/alacritty.nix
