@@ -1,5 +1,16 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, inputs, ... }:
 {
+  system.stateVersion = "23.05"; # Did you read the comment?
+
+  imports = [
+      "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+      #inputs.nixos-hardware.nixosModules.raspberry-pi-4
+  ];
+
+  #nixpkgs.hostPlatform.system = "aarch64-linux";
+  #nixpkgs.buildPlatform.system = "x86_64-linux";
+
+  hardware.enableRedistributableFirmware = true;
 
   # This causes an overlay which causes a lot of rebuilding
   environment.noXlibs = lib.mkForce false;
@@ -12,28 +23,34 @@
     };
 
   boot = {
-    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    #kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
     loader = {
       generic-extlinux-compatible.enable = lib.mkDefault true;
       grub.enable = lib.mkDefault false;
     };
   };
 
-  nix.settings = {
-    experimental-features = lib.mkDefault "nix-command flakes";
-    trusted-users = [ "root" "@wheel" ];
+  services.openssh = {
+    enable = true;
+    ports = [ 22 ];
+
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
   };
 
   # end of base.nix
 
   environment.systemPackages = with pkgs; [ vim git ];
-  services.openssh.enable = true;
-  networking.hostName = "luna";
+  networking.hostName = "lush";
   users = {
     users.me = {
       password = "hello";
       isNormalUser = true;
       extraGroups = [ "wheel" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden"
+      ];
     };
   };
   networking = {
@@ -50,7 +67,6 @@
 
   /*
   boot = {
-
     kernelPackages = pkgs.linuxKernel.packages.linux_rpi4;
     initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" ];
     loader = {
@@ -58,64 +74,6 @@
       generic-extlinux-compatible.enable = true;
     };
   };
-
-
-  fileSystems = {
-
-    "/" = {
-
-      device = "/dev/disk/by-label/NIXOS_SD";
-
-      fsType = "ext4";
-
-      options = [ "noatime" ];
-
-    };
-
-  };
-
-
-  networking = {
-
-    hostName = hostname;
-
-    wireless = {
-
-      enable = true;
-
-      networks."${SSID}".psk = SSIDpassword;
-
-      interfaces = [ interface ];
-
-    };
-
-  };
-
-
-  environment.systemPackages = with pkgs; [ vim ];
-
-
-  services.openssh.enable = true;
-
-
-  users = {
-
-    mutableUsers = false;
-
-    users."${user}" = {
-
-      isNormalUser = true;
-
-      password = password;
-
-      extraGroups = [ "wheel" ];
-
-    };
-
-  };
-
-
-
-  system.stateVersion = "23.11";
   */
+
 }

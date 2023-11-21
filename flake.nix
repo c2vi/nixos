@@ -87,14 +87,15 @@
 
       		modules = [
          		./hosts/hpm.nix
-					./hardware/hpm-laptop.nix
+					  ./hardware/hpm-laptop.nix
       		];
    		};
 
       # my server at home
    		"rpi" = nixpkgs.lib.nixosSystem {
-			  inherit specialArgs;
-      	system = "x86_64-linux";
+			  #inherit specialArgs;
+        specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+        system = "aarch64-linux";
         modules = [
           ./hosts/rpi.nix
         ];
@@ -103,18 +104,9 @@
       # my raspberry to try out stuff with
    		"lush" = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
+        specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
         modules = [
-          "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-          inputs.nixos-hardware.nixosModules.raspberry-pi-4
           ./hosts/lush.nix
-          {
-	          system.stateVersion = "23.05"; # Did you read the comment?
-
-            nixpkgs.hostPlatform.system = "aarch64-linux";
-            nixpkgs.buildPlatform.system = "x86_64-linux";
-
-            hardware.enableRedistributableFirmware = true;
-          }
         ];
       };
 
@@ -208,6 +200,7 @@
         #modules = [ "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-new-kernel-no-zfs-installer.nix" ];
       #}).config.system.build.sdImage;
       lush = self.nixosConfigurations.lush.config.system.build.sdImage;
+      rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
       test = nixpkgs.legacyPackages.x86_64-linux.pkgsCross.raspberryPi.raspberrypi-armstubs;
 		};
 

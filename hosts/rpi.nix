@@ -1,12 +1,23 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, inputs, ... }:
 {
   imports = [
+    "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+    inputs.nixos-hardware.nixosModules.raspberry-pi-4
+
 		../common/all.nix
 		../common/nixos-headless.nix
 
-		../users/me/default.nix
+		../users/me/headless.nix
 		../users/root/default.nix
   ];
+
+  system.stateVersion = "23.05";
+
+  # to cross compile
+  #nixpkgs.hostPlatform.system = "aarch64-linux";
+  #nixpkgs.buildPlatform.system = "x86_64-linux";
+
+  hardware.enableRedistributableFirmware = true;
 
   # This causes an overlay which causes a lot of rebuilding
   environment.noXlibs = lib.mkForce false;
@@ -20,7 +31,7 @@
     };
 
   boot = {
-    kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    #kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
     loader = {
       generic-extlinux-compatible.enable = lib.mkDefault true;
       grub.enable = lib.mkDefault false;
@@ -80,43 +91,67 @@
 		"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
 	];
 
-
-
 	################################ samba ######################################
 	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 
 	services.samba = {
-  		enable = true;
-  		securityType = "user";
-  		extraConfig = ''
-			security = user
-			map to guest = bad user
-			guest account = me
-
-			server role = standalone server
-			workgroup = WORKGROUP
-  		'';
-  		shares = {
-    		rpi_schule = {
-    			path = "${workDir}/rpi-schule/";
-	 			"guest ok" = "yes";
-    			"read only" = "no";
-    			public = "yes";
-    			writable = "yes";
-    			printable = "no";
-    			comment = "share for rpi in school wlan";
-    		};
-
-    		share = {
-    			comment = "share for sharing stuff";
-    			path = "${workDir}/share";
-    			public = "yes";
-	 			"guest ok" = "yes";
-    			"read only" = "no";
-    			writable = "yes";
-    		};
-  		};
-	};
-
-
+    enable = true;
+    securityType = "user";
+    extraConfig = ''
+      server role = standalone server
+      map to guest = bad user
+      usershare allow guests = yes
+      hosts allow = 192.168.0.0/16
+      hosts deny = 0.0.0.0
+      workgroup = WORKGROUP
+      security = user
+    '';
+    shares = {
+      files = {
+        "valid users" = "files";
+        "comment" = "all my files";
+        "path" = "/home/files/storage/files";
+        "read only" = "no";
+        "guest ok" = "no";
+        "force user" = "files";
+        "force group" = "files";
+        "force create mode" = "0777";
+        # Papierkorb
+        "vfs object" = "recycle";
+        "recycle:repository" = "/home/files/storage/files/trash-files";
+        "recycle:keeptree" = "No";
+        "recycle:versions" = "Yes";
+        "recycle:touch" = "Yes";
+        "recycle:touch_mtime" = "Yes";
+        "recycle:maxsize" = "8000";
+      };
+      lan = {
+        "comment" = "gastordner";
+        "path" = "/home/files/storage/lan";
+        "read only" = "no";
+        "guest ok" = "yes";
+        "force user" = "files";
+        "force group" = "files";
+        "force create mode" = "0777";
+        # Papierkorb
+        "vfs object" = "recycle";
+        "recycle:repository" = "/home/files/storage/files/trash-lan";
+        "recycle:keeptree" = "No";
+        "recycle:versions" = "Yes";
+        "recycle:touch" = "Yes";
+        "recycle:touch_mtime" = "Yes";
+        "recycle:maxsize" = "8000";
+      };
+      mama = {
+        "comment" = "Meine Dateien auf Mamas Laptop";
+        "path" = "/home/files/storage/files/stuff/Mamas-Laptop";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "mamafiles";
+        "force user" = "files";
+        "force group" = "files";
+        "force create mode" = "0777";
+      };
+    };
+  };
 }
