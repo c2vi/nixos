@@ -19,6 +19,17 @@
 
   #nixpkgs.hostPlatform.system = "aarch64-linux";
   #nixpkgs.buildPlatform.system = "x86_64-linux";
+  nixpkgs.overlays = [
+    {
+      openfortivpn = pkgs.openfortivpn.overrideAttrs (final: prev: {
+        configureFlags = prev.configureFlags or [] ++ [
+          "--disable-proc"
+          "--with-rt_dst=yes"
+          "--with-pppd=/usr/sbin/pppd"
+        ];
+      });
+    }
+  ];
 
   hardware.enableRedistributableFirmware = true;
 

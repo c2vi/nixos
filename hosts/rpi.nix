@@ -3,6 +3,7 @@
   imports = [
     "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
     #inputs.nixos-hardware.nixosModules.raspberry-pi-4
+    inputs.networkmanager.nixosModules.networkmanager
 
 		../common/all.nix
 		../common/nixos-headless.nix
@@ -68,30 +69,6 @@
 	services.samba.openFirewall = true;
 
   networking.hostName = "rpi";
-
-  networking = {
-		defaultGateway = {
-			address = "192.168.1.1";
-			interface = "eth0";
-		};
-
-    interfaces."eth0" = {
-				#name = "eth0";
-				ipv4.addresses = [
-					{ address = "192.168.1.2"; prefixLength = 24;}
-				];
-    };
-
-    interfaces."wlan0".useDHCP = true;
-
-    wireless = {
-      interfaces = [ "wlan0" ];
-      enable = true;
-      networks = {
-        seb-phone.psk = "hellogello";
-      };
-    };
-  };
 
 	networking.firewall.allowedTCPPorts = [
   	5357 # wsdd

@@ -164,6 +164,7 @@
   networking.extraHosts = ''
     192.168.1.6 hpm
     192.168.1.2 rpi
+    192.168.5.5 lush
     127.0.0.1 youtube.com
     127.0.0.1 www.youtube.com
   '';

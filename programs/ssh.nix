@@ -16,10 +16,10 @@
         user = "me";
         hostname = "192.168.1.2";
       };
-      lush = {
-        user = "me";
-        hostname = "192.168.5.5";
-      };
+      #lush = {
+        #user = "me";
+        #hostname = "192.168.5.5";
+      #};
       phone = {
         user = "u0_a345";
         hostname = "192.168.44.1";

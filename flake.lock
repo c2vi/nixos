@@ -451,14 +451,17 @@
     },
     "networkmanager": {
       "locked": {
-        "lastModified": 1700588409,
-        "narHash": "sha256-mbQKI5yjy2fkjeJo9+EuEsEuOVu6LPyEDmrP4zsujbA=",
-        "path": "/home/me/work/config/gitignore/nixos-networkmanager-profiles",
-        "type": "path"
+        "lastModified": 1700593965,
+        "narHash": "sha256-xvzN3iI4OuWx4/LsPxnOy/yMixlb4XD6PMcyTfRqJ38=",
+        "owner": "c2vi",
+        "repo": "nixos-networkmanager-profiles",
+        "rev": "1d759f696c237419bf25273c80a8d78e6b2b8da7",
+        "type": "github"
       },
       "original": {
-        "path": "/home/me/work/config/gitignore/nixos-networkmanager-profiles",
-        "type": "path"
+        "owner": "c2vi",
+        "repo": "nixos-networkmanager-profiles",
+        "type": "github"
       }
     },
     "nix-doom-emacs": {
