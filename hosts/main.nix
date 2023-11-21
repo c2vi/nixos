@@ -13,7 +13,7 @@
 
 	imports = [
 		../common/all.nix
-		../common/nixos.nix
+		../common/nixos-headless.nix
 		../common/nixos-graphical.nix
     ../common/building.nix
 
@@ -29,6 +29,7 @@
   ];
 
   virtualisation.podman.enable = true;
+
   hardware.bluetooth.settings = {
     General = {
       MultiProfile = "multiple";
@@ -88,7 +89,9 @@
           then
             rm /etc/host-youtube-block
           else
+            echo old: $timeout
             timeout=$((timeout - 1))
+            echo new: $timeout
             echo -en $timeout > /etc/host-youtube-block
           fi
         else
@@ -144,8 +147,9 @@
 
 
 	security.polkit.enable = true;
-	networking.firewall.enable = true;
+
 	networking.firewall.allowPing = true;
+	networking.firewall.enable = true;
 	services.samba.openFirewall = true;
 
 
@@ -153,9 +157,10 @@
 	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 
 	networking.firewall.allowedTCPPorts = [
-  		5357 # wsdd
+  	5357 # wsdd
 		8888 # for general usage
 		9999 # for general usage
+    8080 # for mitm proxy
 	];
 
 	networking.firewall.allowedUDPPorts = [

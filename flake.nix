@@ -95,20 +95,23 @@
    		"rpi" = nixpkgs.lib.nixosSystem {
 			  inherit specialArgs;
       	system = "x86_64-linux";
+        modules = [
+          ./hosts/rpi.nix
+        ];
       };
 
       # my raspberry to try out stuff with
-   		"luna" = nixpkgs.lib.nixosSystem {
+   		"lush" = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           inputs.nixos-hardware.nixosModules.raspberry-pi-4
-          ./hosts/luna.nix
+          ./hosts/lush.nix
           {
 	          system.stateVersion = "23.05"; # Did you read the comment?
 
             nixpkgs.hostPlatform.system = "aarch64-linux";
-            nixpkgs.buildPlatform.system = "x86_64-linux"; #If you build on x86 other wise changes this.
+            nixpkgs.buildPlatform.system = "x86_64-linux";
 
             hardware.enableRedistributableFirmware = true;
           }
@@ -134,29 +137,11 @@
         ];
       };
 
-   		"wsl" = nixpkgs.lib.nixosSystem {
+   		"acern" = nixpkgs.lib.nixosSystem {
 			  inherit specialArgs;
       	system = "x86_64-linux";
         modules = [
-          inputs.nix-wsl.nixosModules.wsl
-          {
-            wsl.enable = true;
-
-            services.openssh = {
-              enable = true;
-              ports = [ 2222 ];
-
-              settings.PasswordAuthentication = false;
-              settings.KbdInteractiveAuthentication = false;
-            };
-
-            users.users.nixos.openssh.authorizedKeys.keys = [
-		          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-            ];
-
-            programs.bash.loginShellInit = "nixos-wsl-welcome";
-          }
-          ./common/all.nix
+          ./hosts/acern.nix
         ];
       };
 
@@ -218,11 +203,11 @@
 			run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
 				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
         '';
-      #wsl = inputs.nix-wsl.nixosConfigurations.modern.config.system.build.tarballBuilder;
+      acern = inputs.nix-wsl.nixosConfigurations.modern.config.system.build.tarballBuilder;
       #luna = (self.nixosConfigurations.luna.extendModules {
         #modules = [ "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-new-kernel-no-zfs-installer.nix" ];
       #}).config.system.build.sdImage;
-      luna = self.nixosConfigurations.luna.config.system.build.sdImage;
+      lush = self.nixosConfigurations.lush.config.system.build.sdImage;
       test = nixpkgs.legacyPackages.x86_64-linux.pkgsCross.raspberryPi.raspberrypi-armstubs;
 		};
 

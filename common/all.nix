@@ -1,4 +1,4 @@
-{ inputs, self, secretsDir, specialArgs, ... }:
+{ lib, inputs, self, secretsDir, specialArgs, ... }:
 
 # config that i use on all my hosts
 
@@ -25,8 +25,10 @@
     export PATH=$PATH:${self}/mybin
   '';
 
-	
-	nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    experimental-features = lib.mkDefault "nix-command flakes";
+    trusted-users = [ "root" "@wheel" ];
+  };
 
 	home-manager.backupFileExtension = "backup";
 

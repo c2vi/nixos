@@ -1,4 +1,4 @@
-{ pkgs, secretsDir, inputs, config, self, lib, ... }:
+{ self, config, ... }:
 {
 	users.users.me = {
    	isNormalUser = true;
@@ -12,9 +12,6 @@
     hostname = config.networking.hostName;
   };
 
-	home-manager.users.me = import ./home.nix;
+	home-manager.users.me = import ./home-headless.nix;
 
-	fonts.fonts = with pkgs; [
-   	hack-font
-	];
 }
