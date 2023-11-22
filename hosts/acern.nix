@@ -4,6 +4,7 @@
     inputs.nix-wsl.nixosModules.wsl
     ../users/me/headless.nix
 
+		inputs.home-manager.nixosModules.home-manager
     ../common/all.nix
     ../common/nixos-headless.nix
   ];
