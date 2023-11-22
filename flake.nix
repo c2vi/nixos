@@ -169,38 +169,15 @@
     nixOnDroidConfigurations = rec {
       "phone" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
         modules = [
-          #./users/me/headless.nix
-          ({ pkgs, ... }: {
-            environment.packages = with pkgs; [ 
-              vim
-              openssh
-            ];
-            system.stateVersion = "23.05";
-            home-manager.extraSpecialArgs = {
-              inherit self;
-              hostname = "phone";
-              #pkgs = old-nixpkgs.x86_64
-              #pkgs = import inputs.old-nixpkgs { system = "aarch64-linux"; config = {
-                #allowUnfree = true;
-                #permittedInsecurePackages = [
-                  #"electron-24.8.6"
-                  #];
-              #}; };
-            };
-            home-manager.useGlobalPkgs = true;
+          ./hosts/phone/nix-on-droid.nix
+        ];
+      };
+    };
 
-            home-manager.config = {
-              home.stateVersion = "22.11";
-              home.file.".ssh/authorizedKeys".text = ''
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden"
-                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAioUu4ow6k+OMjjLdzogiQM4ZEM3TNekGNasaSDzQQE me@phone"
-              '';
-              imports = [
-                #./users/common/home.nix
-              ];
-            };
-          })
+    nixOnDroidConfigurations = rec {
+      "tab" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+        modules = [
+          ./hosts/tab/nix-on-droid.nix
         ];
       };
     };
