@@ -20,6 +20,10 @@
         user = "u0_a345";
         port = 8022;
       };
+      tab = {
+        user = "nix-on-droid";
+        port = 8022;
+      };
       uwu = {
         user = "sebastian";
 				identityFile = "${secretsDir}/private-key-main";
