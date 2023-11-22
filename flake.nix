@@ -4,6 +4,7 @@
 	inputs = {
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 		nixpkgs.url = "github:NixOS/nixpkgs/release-23.05";
+		old-nixpkgs.url = "github:NixOS/nixpkgs/release-22.11";
 
     rpi-nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
 
@@ -176,7 +177,15 @@
             home-manager.extraSpecialArgs = {
               inherit self;
               hostname = "phone";
+              #pkgs = old-nixpkgs.x86_64
+              pkgs = import inputs.old-nixpkgs { system = "aarch64-linux"; config = {
+                allowUnfree = true;
+                permittedInsecurePackages = [
+                  "electron-24.8.6"
+                  ];
+              }; };
             };
+            home-manager.useGlobalPkgs = true;
 
             home-manager.config = {
               home.stateVersion = "22.11";

@@ -881,6 +881,22 @@
         "type": "github"
       }
     },
+    "old-nixpkgs": {
+      "locked": {
+        "lastModified": 1688392541,
+        "narHash": "sha256-lHrKvEkCPTUO+7tPfjIcb7Trk6k31rz18vkyqmkeJfY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "ea4c80b39be4c09702b0cb3b42eab59e2ba4f24b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "release-22.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "org": {
       "flake": false,
       "locked": {
@@ -994,6 +1010,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-for-bootstrap": "nixpkgs-for-bootstrap_2",
+        "old-nixpkgs": "old-nixpkgs",
         "robotnix": "robotnix",
         "rpi-nixpkgs": "rpi-nixpkgs"
       }
