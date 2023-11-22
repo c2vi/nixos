@@ -165,19 +165,21 @@
 
     nixOnDroidConfigurations = rec {
       "phone" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
-        #imports = [
+        modules = [
           #./users/me/headless.nix
-        #];
-        users.users.nix-on-droid.openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAioUu4ow6k+OMjjLdzogiQM4ZEM3TNekGNasaSDzQQE me@phone"
+          {
+            users.users.nix-on-droid.openssh.authorizedKeys.keys = [
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjgXf9S9hxjyph2EEFh1el0z4OUT9fMoFAaDanjiuKa me@main"
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden"
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAioUu4ow6k+OMjjLdzogiQM4ZEM3TNekGNasaSDzQQE me@phone"
+            ];
+            environment.packages = with pkgs; [ 
+              vim
+              openssh
+            ];
+            system.stateVersion = "23.05";
+          }
         ];
-        environment.packages = with pkgs; [ 
-          vim
-          openssh
-        ];
-        system.stateVersion = "23.05";
       };
     };
 
