@@ -169,7 +169,7 @@
           ./hosts/phone/nix-on-droid.nix
           {
             home-manager.extraSpecialArgs = {
-              inherit self inputs;
+				      inherit inputs confDir workDir secretsDir persistentDir self;
               hostname = "phone";
             };
           }
@@ -184,7 +184,7 @@
           ./hosts/tab/nix-on-droid.nix
           {
             home-manager.extraSpecialArgs = {
-              inherit self inputs;
+				      inherit inputs confDir workDir secretsDir persistentDir self;
               hostname = "tab";
             };
           }
