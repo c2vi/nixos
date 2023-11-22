@@ -40,8 +40,8 @@
     };
 
     nix-on-droid = {
-      #url = "github:nix-community/nix-on-droid/release-23.05";
-      url = "github:zhaofengli/nix-on-droid";
+      url = "github:nix-community/nix-on-droid/release-23.05";
+      #url = "github:zhaofengli/nix-on-droid";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # for bootstrap zip ball creation and proot-termux builds, we use a fixed version of nixpkgs to ease maintanence.
