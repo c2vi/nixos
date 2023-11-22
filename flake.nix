@@ -4,9 +4,10 @@
 	inputs = {
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 		nixpkgs.url = "github:NixOS/nixpkgs/release-23.05";
-		old-nixpkgs.url = "github:NixOS/nixpkgs/release-22.11";
+		
+    #old-nixpkgs.url = "github:NixOS/nixpkgs/release-22.11";
 
-    rpi-nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    #rpi-nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
 
 
 		firefox.url = "github:nix-community/flake-firefox-nightly";
@@ -44,6 +45,7 @@
       url = "github:nix-community/nix-on-droid/release-23.05";
       #url = "github:zhaofengli/nix-on-droid";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
     # for bootstrap zip ball creation and proot-termux builds, we use a fixed version of nixpkgs to ease maintanence.
     # head of nixos-23.05 as of 2023-06-18
@@ -178,12 +180,12 @@
               inherit self;
               hostname = "phone";
               #pkgs = old-nixpkgs.x86_64
-              pkgs = import inputs.old-nixpkgs { system = "aarch64-linux"; config = {
-                allowUnfree = true;
-                permittedInsecurePackages = [
-                  "electron-24.8.6"
-                  ];
-              }; };
+              #pkgs = import inputs.old-nixpkgs { system = "aarch64-linux"; config = {
+                #allowUnfree = true;
+                #permittedInsecurePackages = [
+                  #"electron-24.8.6"
+                  #];
+              #}; };
             };
             home-manager.useGlobalPkgs = true;
 
