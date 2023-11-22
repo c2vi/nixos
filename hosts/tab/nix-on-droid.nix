@@ -1,4 +1,4 @@
-{ pkgs, self, config, lib, ... }:
+{ pkgs, config, ... }:
 let
   sshdTmpDirectory = "${config.user.home}/sshd-tmp";
   sshdDirectory = "${config.user.home}/sshd";
@@ -22,12 +22,7 @@ in
 	time.timeZone = "Europe/Vienna";
 
 
-	# add mybin to path
-  environment.etc.profile.text = ''
-    export PATH=$PATH:${self}/mybin
-  '';
-
-  nix.extraOptions = ''
+	  nix.extraOptions = ''
     experimental-features = nix-command flakes
     trusted-users = root @wheel me
   '';

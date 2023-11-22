@@ -182,6 +182,12 @@
       	specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
         modules = [
           ./hosts/tab/nix-on-droid.nix
+          {
+            home-manager.extraSpecialArgs = {
+              inherit self inputs;
+              hostname = "tab";
+            };
+          }
         ];
       };
     };
