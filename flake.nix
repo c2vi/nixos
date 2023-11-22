@@ -227,9 +227,11 @@
       lush = self.nixosConfigurations.lush.config.system.build.sdImage;
       rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
       test = self.nixosConfigurations.test.config.system.build.sdImage;
+      prootTermux = inputs.nix-on-droid.outputs.packages.x86_64-linux.prootTermux;
 		};
 
 		apps.x86_64-linux = {
+      test = inputs.nix-on-droid.outputs.apps.x86_64-linux.deploy;
       wsl = {
         type = "app";
         program = "${self.nixosConfigurations.wsl.config.system.build.tarballBuilder}/bin/nixos-wsl-tarball-builder";
