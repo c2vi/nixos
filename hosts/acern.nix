@@ -2,10 +2,10 @@
 {
   imports = [
     inputs.nix-wsl.nixosModules.wsl
-    ./users/me/headless.nix
+    ../users/me/headless.nix
 
-    ./common/all.nix
-    ./common/nixos-headless.nix
+    ../common/all.nix
+    ../common/nixos-headless.nix
   ];
 
   wsl.enable = true;
