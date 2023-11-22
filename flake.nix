@@ -179,7 +179,6 @@
 
     nixOnDroidConfigurations = rec {
       "tab" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
-      	specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
         modules = [
           ./hosts/tab/nix-on-droid.nix
           {
