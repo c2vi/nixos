@@ -4,7 +4,7 @@
 	home.stateVersion = "23.05";
 
   imports = [
-		inputs.nix-index-database.hmModules.nix-index
+    inputs.nix-index-database.hmModules.nix-index
 
 		# all my headless programms with their own config
 		../../programs/git.nix
@@ -14,12 +14,12 @@
 		../../programs/neovim.nix
   ];
 
-	programs.nix-index.enable = false;
-	programs.nix-index.enableBashIntegration = false;
-	programs.nix-index.enableZshIntegration = false;
+  programs.nix-index.enable = false;
+  programs.nix-index.enableBashIntegration = false;
+  programs.nix-index.enableZshIntegration = false;
 
 	home.sessionVariables = {
-		EDITOR = "nvim";
+		EDITOR = "nvim${self}";
 	};
 
 	home.sessionPath = [ "${self}/mybin" ];
@@ -74,6 +74,6 @@
 		}))
   ];
 
-
+  #*/
 
 }

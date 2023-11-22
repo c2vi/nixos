@@ -7,9 +7,6 @@
 		
     #old-nixpkgs.url = "github:NixOS/nixpkgs/release-22.11";
 
-    #rpi-nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
-
-
 		firefox.url = "github:nix-community/flake-firefox-nightly";
 
 
@@ -170,12 +167,19 @@
       "phone" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
         modules = [
           ./hosts/phone/nix-on-droid.nix
+          {
+            home-manager.extraSpecialArgs = {
+              inherit self inputs;
+              hostname = "phone";
+            };
+          }
         ];
       };
     };
 
     nixOnDroidConfigurations = rec {
       "tab" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+      	specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
         modules = [
           ./hosts/tab/nix-on-droid.nix
         ];
