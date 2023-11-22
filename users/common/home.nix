@@ -8,7 +8,7 @@
 
 		# all my headless programms with their own config
 		../../programs/git.nix
-		../../programs/lf/default.nix
+    ../../programs/lf/default.nix
 		../../programs/bash.nix
 		../../programs/ssh.nix
 		../../programs/neovim.nix
@@ -57,6 +57,7 @@
 			click
 			click-aliases
 		]))
+     /*
 		(busybox.overrideAttrs (final: prev: {
 			# get only nslookup from busybox
 			# because the less would overwrite the actuall less and the busybox does not have -r
@@ -72,6 +73,7 @@
 				mv $out/busybox $out/bin/busybox
 			'';
 		}))
+    */
   ];
 
   #*/
