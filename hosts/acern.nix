@@ -4,6 +4,7 @@
     inputs.nix-wsl.nixosModules.wsl
     ../users/me/headless.nix
 
+    inputs.networkmanager.nixosModules.networkmanager
 		inputs.home-manager.nixosModules.home-manager
     ../common/all.nix
     ../common/nixos-headless.nix
@@ -42,6 +43,7 @@
 
   networking.networkmanager.enable = true;
 
+/*
   networking.networkmanager.profiles = {
     me = {
      connection = {
@@ -61,4 +63,5 @@
       };
     } // (import ../common/wg-peers.nix { inherit secretsDir; }) ;
   };
+  */
 }

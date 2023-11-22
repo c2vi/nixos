@@ -220,7 +220,7 @@
 			run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
 				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
         '';
-      acern = inputs.nix-wsl.nixosConfigurations.modern.config.system.build.tarballBuilder;
+      acern = self.nixosConfigurations.acern.config.system.build.tarballBuilder;
       #luna = (self.nixosConfigurations.luna.extendModules {
         #modules = [ "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-new-kernel-no-zfs-installer.nix" ];
       #}).config.system.build.sdImage;
