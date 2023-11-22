@@ -39,13 +39,10 @@
       distributedBuilds = false; # false, because i can't build on hpm currently ... not signed by trusted user error
    };
 
-
-
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 
     "aarch64-linux"
   ];
-
 
 	# some bind mounts
 	fileSystems."${workDir}/priv-share/things" = {
@@ -84,7 +81,8 @@
           fi
         else
           rm /etc/hosts
-          ln -nsf ${config.environment.etc.hosts.source.outPath} /etc/hosts
+          cat ${self}/misc/my-hosts > /etc/hosts
+          cat ${self}/misc/my-hosts-"$(cat /etc/current_hosts)" >> /etc/hosts
         fi
       '';
       };
@@ -92,9 +90,10 @@
   {
     enable = true;
     description = "block Youtube";
-    unitConfig = {
-      Type = "simple";
-    };
+    #type = "simple";
+    #unitConfig = {
+      #Type = "simple";
+    #};
     serviceConfig = {
       Restart = "always";
       RestartSec = "60s";
@@ -153,6 +152,7 @@
 		8888 # for general usage
 		9999 # for general usage
     8080 # for mitm proxy
+    51820  # wireguard
 	];
 
 	networking.firewall.allowedUDPPorts = [
@@ -161,13 +161,16 @@
 	];
 
   networking.search = [ "c2vi.local" ];
+  #networking.hosts = {
+    #"10.1.1.3" = [ "phone" ];
+  #};
   networking.extraHosts = ''
-    192.168.1.6 hpm
-    192.168.1.2 rpi
-    192.168.5.5 lush
-    127.0.0.1 youtube.com
-    127.0.0.1 www.youtube.com
+    ${builtins.readFile "${self}/misc/my-hosts"}
+    ${builtins.readFile "${self}/misc/my-hosts-me"}
   '';
+  environment.etc.current_hosts.text = "me";
+  environment.etc.current_hosts.mode = "rw";
+  #environment.etc.hosts.mode = "rw";
 
   networking.networkmanager.profiles = {
     home = {
@@ -179,7 +182,7 @@
         interface-name = "enp1s0";
       };
       ipv4 = {
-        address1 = "192.168.1.40/24,192.168.1.1";
+        address1 = "192.168.1.11/24,192.168.1.1";
         dns = "1.1.1.1;";
         method = "manual";
       };
@@ -224,6 +227,7 @@
       };
 
       ipv4 = {
+        address1 = "192.168.44.11/24";
         method = "auto";
       };
     };
@@ -248,7 +252,7 @@
       };
 
       ipv4 = {
-        address1 = "192.168.20.20/24";
+        address1 = "192.168.20.11/24";
         method = "auto";
       };
     };
@@ -272,6 +276,7 @@
       };
     };
 
+    /*
     me = {
      connection = {
         id = "me";
@@ -281,14 +286,26 @@
         interface-name = "me0";
      };
       wireguard = {
-        listen-port = "12345";
+        listen-port = "51820";
         private-key = builtins.readFile "${secretsDir}/wg-private-main";
       };
       ipv4 = {
-        address1 = "10.1.1.1/24";
+        address1 = "10.1.1.11/24";
         method = "manual";
       };
     } // (import ../common/wg-peers.nix { inherit secretsDir; });
+    */
+  };
+
+  networking.wireguard.interfaces = {
+    me1 = {
+      ips = [ "10.1.1.11/24" ];
+      listenPort = 51820;
+
+      privateKeyFile = "${secretsDir}/wg-private-main";
+
+      peers = import ../common/wg-peers.nix { inherit secretsDir; };
+    };
   };
 
 

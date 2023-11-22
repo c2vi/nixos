@@ -75,6 +75,13 @@
 		8888 # for general usage
 		9999 # for general usage
     8080 # for mitm proxy
+
+    49388
+    49389
+    49390
+    49391
+    49392
+    49393
 	];
 
 	networking.firewall.allowedUDPPorts = [

@@ -16,15 +16,9 @@
         user = "me";
         hostname = "192.168.1.2";
       };
-      #lush = {
-        #user = "me";
-        #hostname = "192.168.5.5";
-      #};
       phone = {
         user = "u0_a345";
-        hostname = "192.168.44.1";
         port = 8022;
-				identityFile = "${secretsDir}/private-key-main";
       };
       uwu = {
         user = "sebastian";

@@ -140,35 +140,11 @@
 
 			# a little programm, that changes the ssh config to always be able to acces rpi
 			function rpi(){
-			ssh_dir=~/.ssh
-      rm -f $ssh_dir/current_rpi_config
-			if [ "$1" == "l" ]
-			then
-				cp $ssh_dir/rpi/local $ssh_dir/current_rpi_config
-			fi
-
-			if [ "$1" == "local" ]
-			then
-				cp $ssh_dir/rpi/local $ssh_dir/current_rpi_config
-			fi
-
-			if [ "$1" == "r" ]
-			then
-				cp $ssh_dir/rpi/remote $ssh_dir/current_rpi_config
-			fi
-
-			if [ "$1" == "remote" ]
-			then
-				cp $ssh_dir/rpi/remote $ssh_dir/current_rpi_config
-			fi
-
-			if [ "$1" == "w" ]
-			then
-				cp $ssh_dir/rpi/wstunnel $ssh_dir/current_rpi_config
-			fi
-
+        sudo rm /etc/hosts
+        sudo su -c "cat ${self}/misc/my-hosts > /etc/hosts"
+        sudo su -c "cat ${self}/misc/my-hosts-$1 >> /etc/hosts"
+        sudo su -c "echo -en "$1" > /etc/current_hosts"
 			}
-
 
 
          # git commit func

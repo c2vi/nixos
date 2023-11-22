@@ -4,7 +4,7 @@
    	isNormalUser = true;
    	#passwordFile = "${secretsDir}/me-pwd";
 		password = "changeme";
-   	extraGroups = [ "networkmanager" "wheel" "libvirtd" ]; # Enable ‘sudo’ for the user.
+   	extraGroups = [ "networkmanager" "wheel" "libvirtd" "plugdev" ]; # Enable ‘sudo’ for the user.
 	};
 
   home-manager.extraSpecialArgs = {

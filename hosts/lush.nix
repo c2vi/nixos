@@ -17,10 +17,14 @@
  # home-manager.users.me = import ../users/me/home-headless.nix;
 
 
+  /* for cross compiling
   #nixpkgs.hostPlatform.system = "aarch64-linux";
   #nixpkgs.buildPlatform.system = "x86_64-linux";
   nixpkgs.overlays = [
+
     (outerFinal: outerPrev: {
+    #https://github.com/adrienverge/openfortivpn/issues/446
+    #https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/tools/networking/openfortivpn/default.nix#L47
       openfortivpn = outerPrev.openfortivpn.overrideAttrs (final: prev: {
         configureFlags = prev.configureFlags or [] ++ [
           "--disable-proc"
@@ -30,6 +34,7 @@
       });
     })
   ];
+  */
 
   hardware.enableRedistributableFirmware = true;
 
@@ -112,6 +117,27 @@
         method = "auto";
       };
     };
+
+
+    pt = {
+      connection = {
+        id = "pt";
+        uuid = "f028117e-9eef-47c1-8483-574f7ee798a4";
+        type = "bluetooth";
+        autoconnect = "false";
+      };
+
+      bluetooth = {
+        bdaddr = "E8:78:29:C4:BA:7C";
+        type = "panu";
+      };
+
+      ipv4 = {
+        address1 = "192.168.20.21/24";
+        method = "auto";
+      };
+    };
+
 
     me = {
      connection = {
