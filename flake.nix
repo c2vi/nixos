@@ -55,10 +55,10 @@
 
 	outputs = { self, nixpkgs, ... }@inputs: 
 		let 
-			confDir = "/home/me/work/config";
-			workDir = "/home/me/work";
-			secretsDir = "/home/me/.mysecrets";
-			persistentDir = "/home/me/work/app-data";
+			confDir = "~/work/config";
+			workDir = "~/work";
+			secretsDir = "~/.mysecrets";
+			persistentDir = "~/work/app-data";
       specialArgs = {
 				inherit inputs confDir workDir secretsDir persistentDir self;
 				pkgs = import nixpkgs { system = "x86_64-linux"; config = {
