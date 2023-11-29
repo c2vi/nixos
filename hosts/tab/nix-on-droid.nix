@@ -6,6 +6,7 @@ let
 in
 {
   environment.packages = with pkgs; [ 
+    rsync
     vim
     openssh
     (pkgs.writeScriptBin "ssd" ''
@@ -49,7 +50,6 @@ in
       ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWsqiz0gEepvPONYxqhKKq4Vxfe1h+jo11k88QozUch me@bitwarden
       ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAioUu4ow6k+OMjjLdzogiQM4ZEM3TNekGNasaSDzQQE me@phone
     '';
-    #home.file.".ssh/authorized_keys".mode = "0600";
     imports = [
       ../../users/common/home.nix
     ];
