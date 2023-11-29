@@ -77,11 +77,11 @@
 			export TERM="xterm-color"
 
 			# my prompt
-			if [[ "${config.hostname}" == "main" ]]
+			if [[ "${hostname}" == "main" ]]
 			then
 				export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
 			else
-				export PS1="\033[1;32m${config.hostname}❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+				export PS1="\033[1;32m${hostname}❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
 			fi
 
 
