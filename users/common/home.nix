@@ -32,6 +32,7 @@
   };
 
    home.packages = with pkgs; [
+    hostname
 		vim
 		tree
 		htop
@@ -57,7 +58,7 @@
 			click
 			click-aliases
 		]))
-     /*
+     #/*
 		(busybox.overrideAttrs (final: prev: {
 			# get only nslookup from busybox
 			# because the less would overwrite the actuall less and the busybox does not have -r
@@ -73,9 +74,9 @@
 				mv $out/busybox $out/bin/busybox
 			'';
 		}))
-    */
+     # */
   ];
 
-  #*/
+  # */
 
 }

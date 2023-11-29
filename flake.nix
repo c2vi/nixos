@@ -175,9 +175,6 @@
           }
         ];
       };
-    };
-
-    nixOnDroidConfigurations = rec {
       "tab" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
         modules = [
           ./hosts/tab/nix-on-droid.nix
@@ -189,29 +186,30 @@
           }
         ];
       };
+
+      test = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+        modules = [ ./hosts/nix-on-phone.nix ];
+
+        # list of extra special args for Nix-on-Droid modules
+        extraSpecialArgs = {
+          # rootPath = ./.;
+        };
+
+        # set nixpkgs instance, it is recommended to apply `nix-on-droid.overlays.default`
+        pkgs = import nixpkgs {
+          system = "aarch64-linux";
+
+          overlays = [
+            inputs.nix-on-droid.overlays.default
+            # add other overlays
+          ];
+        };
+
+        # set path to home-manager flake
+        home-manager-path = inputs.home-manager.outPath;
+      };
     };
 
-    nixOnDroidConfigurations.default = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
-      modules = [ ./hosts/nix-on-phone.nix ];
-
-      # list of extra special args for Nix-on-Droid modules
-      extraSpecialArgs = {
-        # rootPath = ./.;
-      };
-
-      # set nixpkgs instance, it is recommended to apply `nix-on-droid.overlays.default`
-      pkgs = import nixpkgs {
-        system = "aarch64-linux";
-
-        overlays = [
-          inputs.nix-on-droid.overlays.default
-          # add other overlays
-        ];
-      };
-
-      # set path to home-manager flake
-      home-manager-path = inputs.home-manager.outPath;
-    };
 
 		packages.x86_64-linux = {
 			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };

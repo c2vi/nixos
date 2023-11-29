@@ -46,7 +46,7 @@
 				 style = "Bold Italic";
 			  };
 
-			  size = 9;
+			  size = 8;
 			};
 
 			# Dracula theme for alacritty

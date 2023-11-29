@@ -59,6 +59,13 @@
 	};
 
   ################################ my youtube blocking service #############################
+  environment.etc."host.conf" = {
+    # needed so that firefox does not ignore the hosts file
+    text = ''
+      multi off
+      order hosts,bind,nis
+    '';
+  };
   systemd.services.stark = 
     let 
     stark = pkgs.writeShellApplication {
@@ -67,20 +74,18 @@
       runtimeInputs = with pkgs; [ curl w3m ];
 
       text = ''
-        if [ -f "/etc/host-youtube-block" ];
+        if [ -f "/etc/hosts-youtube-block" ];
         then
-          timeout=$(cat /etc/host-youtube-block)
-          if [[ "$timeout" == "1" ]]
+          timeout=$(cat /etc/hosts-youtube-block)
+          if [[ "$timeout" == "1" ]] || [[ "$timeout" == "1\n" ]]
           then
             rm /etc/host-youtube-block
           else
-            echo old: "$timeout"
             timeout=$((timeout - 1))
-            echo new: "$timeout"
-            echo -en $timeout > /etc/host-youtube-block
+            echo -en $timeout > /etc/hosts-youtube-block
           fi
         else
-          rm /etc/hosts
+          rm -rf /etc/hosts
           cat ${self}/misc/my-hosts > /etc/hosts
           cat ${self}/misc/my-hosts-"$(cat /etc/current_hosts)" >> /etc/hosts
         fi
@@ -252,7 +257,7 @@
       };
 
       ipv4 = {
-        address1 = "192.168.20.11/24";
+        #address1 = "192.168.20.11/24";
         method = "auto";
       };
     };

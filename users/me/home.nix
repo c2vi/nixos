@@ -99,6 +99,64 @@
 		libvirt
 		virt-manager
 		freerdp
+    (pkgs.writeShellApplication {
+      name = "rpi";
+      text = let 
+        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" {} ''
+          # flake8: noqa
+          import os
+          import sys
+          import subprocess
+
+          mac_map = {
+            "tab": "";
+            "phone": "86:9d:6a:bc:ca:1b"
+          }
+
+
+          if len(sys.argv) == 1:
+            print("one arg needed")
+            exit()
+          net = sys.argv[1]
+
+          if net == "pw":
+            ips = subprocess.run(["${pkgs.arp-scan}/bin/arp-scan", "-l", "-x", "-I", "wlp2s0"])
+            for line in ips.split("\n"):
+              split = line.split(" ")
+              ip = split[0]
+              mac = split[1]
+
+          old = {}
+          with open(f"/etc/hosts", "r") as file:
+            for line in file.readlines():
+              if line == "\n":
+                continue
+              split = line.split(" ")
+              try:
+                old[split[1].strip()] = split[0].strip()
+              except:
+                print("error with: ", split)
+
+          #to_update = {}
+          with open(f"${self}/misc/my-hosts-{net}", "r") as file:
+            for line in file.readlines():
+              split = line.split(" ")
+              try:
+                old[split[1].strip()] = split[0].strip()
+              except:
+                print("error with: ", split)
+
+          with open("/etc/hosts", "w") as file:
+            lines = []
+            for key, val in old.items():
+              lines.append(val + " " + key)
+            file.write("\n".join(lines) + "\n")
+  
+          with open("/etc/current_hosts", "w") as file:
+            file.write(net)
+        '';
+      in ''sudo ${myPythonRpi}/bin/myPythonRpi "$@"'';
+    })
 	];
 }
 

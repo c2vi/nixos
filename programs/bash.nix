@@ -1,4 +1,4 @@
-{ persistentDir, confDir, hostname, self, ... }:
+{ persistentDir, confDir, hostname, self, pkgs, config, ... }:
 {
 	programs.bash = {
 
@@ -42,6 +42,8 @@
 		};
 
 		shellAliases = {
+      cdd = "/sdcard";
+      n = "${pkgs.python3} ${self}/scripts/nav/main.py";
 			shutdown = "echo try harder.... xD";
 			npw = "nmcli c up pw";
 			flex = "neofetch | lolcat";
@@ -75,16 +77,21 @@
 			export TERM="xterm-color"
 
 			# my prompt
-			if [[ "$(hostname)" == "main" ]]
+			if [[ "${config.hostname}" == "main" ]]
 			then
 				export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
 			else
-				export PS1="\033[1;32m$(hostname)❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+				export PS1="\033[1;32m${config.hostname}❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
 			fi
 
 
+      # source lfcd
+      source ${pkgs.lf.src}/etc/lfcd.sh
+      alias lf="lfcd"
+
+
 			# so that programms i spawn from my shell don't have so high cpu priority
-			renice -n 9 $$ > /dev/null
+			[[ which renice 2>/dev/null ]] && renice -n 9 $$ > /dev/null
 
 
 			# If not running interactively, don't do anything
@@ -102,6 +109,38 @@
 
 
 			#################### functions ####################
+
+
+      # shortcut for copying over to tab
+      tta(){
+        if [[ "$1" == "" ]]
+        then
+          scp -O ~/work/priv-share/fast tab:/sdcard/fast
+        elif [[ "$1" == "p" ]]
+        then
+          scp -O tab:/sdcard/fast ~/work/priv-share/fast
+        elif [[ "$1" == "k" ]]
+        then
+          scp -O "$1" tab:/sdcard/keep
+        else
+          scp -O "$1" tab:/sdcard/fast/
+        fi
+      }
+
+      tph(){
+        if [[ "$1" == "" ]]
+        then
+          scp ~/work/priv-share/fast phone:/sdcard/fast
+        elif [[ "$1" == "p" ]]
+        then
+          scp phone:/sdcard/fast ~/work/priv-share/fast
+        elif [[ "$1" == "k" ]]
+        then
+          scp -O "$1" tab:/sdcard/keep
+        else
+          scp "$1" phone:/sdcard/fast/
+        fi
+      }
 
 			# A shortcut function that simplifies usage of xclip.
 			# - Accepts input from either stdin (pipe), or params.
@@ -139,12 +178,12 @@
 
 
 			# a little programm, that changes the ssh config to always be able to acces rpi
-			function rpi(){
-        sudo rm /etc/hosts
-        sudo su -c "cat ${self}/misc/my-hosts > /etc/hosts"
-        sudo su -c "cat ${self}/misc/my-hosts-$1 >> /etc/hosts"
-        sudo su -c "echo -en "$1" > /etc/current_hosts"
-			}
+			#function rpi(){
+        ##sudo rm /etc/hosts
+        #sudo su -c "cat ${self}/misc/my-hosts > /etc/hosts"
+        #sudo su -c "cat ${self}/misc/my-hosts-$1 >> /etc/hosts"
+        #sudo su -c "echo -en "$1" > /etc/current_hosts"
+			#}
 
 
          # git commit func
