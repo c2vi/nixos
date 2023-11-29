@@ -24,7 +24,7 @@
       atool # (archives)
       gnupg # (PGP encrypted files)
       man # (troff manuals)
-      busybox # other
+      coreutils #busybox # other
     ];
     text = builtins.readFile "${self}/programs/lf/previewer";
   };
