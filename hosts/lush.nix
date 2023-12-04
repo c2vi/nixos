@@ -139,6 +139,7 @@
     };
 
 
+    /*
     me = {
      connection = {
         id = "me";
@@ -156,6 +157,7 @@
         method = "manual";
       };
     } // (import ../common/wg-peers.nix { inherit secretsDir; });
+    */
   };
 
 

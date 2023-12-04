@@ -8,6 +8,7 @@
       systems = [
         "x86_64-linux"
       ];
+      supportedFeatures = [ "big-parallel" ];
     }
     {
       hostName = "acern";

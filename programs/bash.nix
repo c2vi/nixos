@@ -91,7 +91,7 @@
 
 
 			# so that programms i spawn from my shell don't have so high cpu priority
-			[[ which renice 2>/dev/null ]] && renice -n 9 $$ > /dev/null
+			[ which renice 2>/dev/null ] && renice -n 9 $$ > /dev/null
 
 
 			# If not running interactively, don't do anything
@@ -115,10 +115,10 @@
       tta(){
         if [[ "$1" == "" ]]
         then
-          scp -O ~/work/priv-share/fast tab:/sdcard/fast
+          rsync ~/work/priv-share/fast tab:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
-          scp -O tab:/sdcard/fast ~/work/priv-share/fast
+          rsync tab:/sdcard/fast ~/work/priv-share/fast
         elif [[ "$1" == "k" ]]
         then
           scp -O "$1" tab:/sdcard/keep
@@ -130,10 +130,10 @@
       tph(){
         if [[ "$1" == "" ]]
         then
-          scp ~/work/priv-share/fast phone:/sdcard/fast
+          rsync ~/work/priv-share/fast phone:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
-          scp phone:/sdcard/fast ~/work/priv-share/fast
+          rsync phone:/sdcard/fast ~/work/priv-share/fast
         elif [[ "$1" == "k" ]]
         then
           scp -O "$1" tab:/sdcard/keep
@@ -175,16 +175,6 @@
 				 fi
 			  fi
 			}
-
-
-			# a little programm, that changes the ssh config to always be able to acces rpi
-			#function rpi(){
-        ##sudo rm /etc/hosts
-        #sudo su -c "cat ${self}/misc/my-hosts > /etc/hosts"
-        #sudo su -c "cat ${self}/misc/my-hosts-$1 >> /etc/hosts"
-        #sudo su -c "echo -en "$1" > /etc/current_hosts"
-			#}
-
 
          # git commit func
          function gc(){

@@ -55,10 +55,10 @@
 
 	outputs = { self, nixpkgs, ... }@inputs: 
 		let 
-			confDir = "~/work/config";
-			workDir = "~/work";
-			secretsDir = "~/.mysecrets";
-			persistentDir = "~/work/app-data";
+			confDir = "/home/me/work/config";
+			workDir = "/home/me/work";
+			secretsDir = "/home/me/.mysecrets";
+			persistentDir = "/home/me/work/app-data";
       specialArgs = {
 				inherit inputs confDir workDir secretsDir persistentDir self;
 				pkgs = import nixpkgs { system = "x86_64-linux"; config = {
@@ -169,7 +169,11 @@
           ./hosts/phone/nix-on-droid.nix
           {
             home-manager.extraSpecialArgs = {
-				      inherit inputs confDir workDir secretsDir persistentDir self;
+				      inherit inputs self;
+              confDir = "/data/data/com.termux.nix/files/home/work/config";
+              workDir = "/data/data/com.termux.nix/files/home/work";
+              secretsDir = "/data/data/com.termux.nix/files/home/secrets";
+              persistentDir = "/data/data/com.termux.nix/files/home/work/app-data/";
               hostname = "phone";
             };
           }
@@ -180,7 +184,11 @@
           ./hosts/tab/nix-on-droid.nix
           {
             home-manager.extraSpecialArgs = {
-				      inherit inputs confDir workDir secretsDir persistentDir self;
+				      inherit inputs self;
+              confDir = "/data/data/com.termux.nix/files/home/work/config";
+              workDir = "/data/data/com.termux.nix/files/home/work";
+              secretsDir = "/data/data/com.termux.nix/files/home/secrets";
+              persistentDir = "/data/data/com.termux.nix/files/home/work/app-data/";
               hostname = "tab";
             };
           }
@@ -212,6 +220,20 @@
 
 
 		packages.x86_64-linux = {
+      #test = self.nixosConfigurations.test.config.system.build.sdImage;
+      testing = nixpkgs.legacyPackages.x86_64-linux;
+      test = nixpkgs.legacyPackages.x86_64-linux.firefox-devedition-unwrapped.overrideAttrs (old: {
+        NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
+        #hi = builtins.trace ("hello world: " + old.passthru.unwrapped.name) 4;
+        #passthru.unwrapped = old.passthru.unwrapped.overrideAttrs (innerOld: {
+          #NIX_CFLAGS_COMPILE = [ (innerOld.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
+        #});
+      });
+     
+      #test = inputs.firefox.packages.${nixpkgs.legacyPackages.x86_64-linux.pkgs.system}; #.firefox-nightly-bin.overrideAttrs (old: {
+        #NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
+      #});
+
 			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };
 			supabase = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/supabase.nix { };
 			#default... TODO
@@ -224,12 +246,22 @@
       #}).config.system.build.sdImage;
       lush = self.nixosConfigurations.lush.config.system.build.sdImage;
       rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
-      test = self.nixosConfigurations.test.config.system.build.sdImage;
       prootTermux = inputs.nix-on-droid.outputs.packages.x86_64-linux.prootTermux;
+
+      docker = let pkgs = nixpkgs.legacyPackages.x86_64-linux.pkgs; in pkgs.dockerTools.buildImage {
+        name = "hello";
+        tag = "0.1.0";
+
+        config = { Cmd = [ "${pkgs.bash}/bin/bash" ]; };
+
+        created = "now";
+        };
+
 		};
 
 		apps.x86_64-linux = {
       test = inputs.nix-on-droid.outputs.apps.x86_64-linux.deploy;
+
       wsl = {
         type = "app";
         program = "${self.nixosConfigurations.wsl.config.system.build.tarballBuilder}/bin/nixos-wsl-tarball-builder";

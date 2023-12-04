@@ -81,7 +81,9 @@
     # my own packages
     supabase-cli
 
-		inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin
+		(inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin.overrideAttrs (old: {
+      NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
+    }))
 
 		# base-devel
 		gcc
@@ -102,15 +104,17 @@
     (pkgs.writeShellApplication {
       name = "rpi";
       text = let 
-        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" {} ''
+        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" { libraries = [pkgs.python310Packages.dnspython]; } ''
           # flake8: noqa
           import os
           import sys
           import subprocess
 
-          mac_map = {
-            "tab": "";
-            "phone": "86:9d:6a:bc:ca:1b"
+          import dns.resolver
+
+          pw_map = {
+            "tab": "00:0a:50:90:f1:00",
+            "phone": "86:9d:6a:bc:ca:1b",
           }
 
 
@@ -119,12 +123,6 @@
             exit()
           net = sys.argv[1]
 
-          if net == "pw":
-            ips = subprocess.run(["${pkgs.arp-scan}/bin/arp-scan", "-l", "-x", "-I", "wlp2s0"])
-            for line in ips.split("\n"):
-              split = line.split(" ")
-              ip = split[0]
-              mac = split[1]
 
           old = {}
           with open(f"/etc/hosts", "r") as file:
@@ -140,12 +138,40 @@
           #to_update = {}
           with open(f"${self}/misc/my-hosts-{net}", "r") as file:
             for line in file.readlines():
-              split = line.split(" ")
+              split = line.strip().split(" ")
               try:
-                old[split[1].strip()] = split[0].strip()
-              except:
+                if split[0][0] not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]:
+                  print("looking up: ", split[1])
+                  result = dns.resolver.resolve(split[0].strip(), "A")
+                  ips = list(map(lambda ip: ip.to_text(), result))
+                  print("got:", ips)
+                  old[split[1].strip()] = str(ips[0])
+                else:
+                  old[split[1].strip()] = split[0].strip()
+              except Exception as e:
                 print("error with: ", split)
+                print(e)
 
+
+          if net == "pw":
+            ips = subprocess.run(["sudo", "${pkgs.arp-scan}/bin/arp-scan", "-l", "-x", "-I", "wlp2s0"], capture_output=True)
+            for line in ips.stdout.decode("utf-8").split("\n"):
+              try:
+                split = line.split("\t")
+                ip = split[0]
+                mac = split[1]
+              except:
+                print("error on line:", line)
+                continue
+
+              for name, mac_table in pw_map.items():
+                if mac == mac_table:
+                  # found name
+                  print(f"found {name} with ip {ip}")
+                  old[name] = ip
+
+
+          os.system("rm -rf /etc/hosts")
           with open("/etc/hosts", "w") as file:
             lines = []
             for key, val in old.items():
@@ -153,7 +179,11 @@
             file.write("\n".join(lines) + "\n")
   
           with open("/etc/current_hosts", "w") as file:
-            file.write(net)
+            lines = []
+            for key, val in old.items():
+              lines.append(val + " " + key)
+            file.write("\n".join(lines) + "\n")
+
         '';
       in ''sudo ${myPythonRpi}/bin/myPythonRpi "$@"'';
     })

@@ -28,6 +28,38 @@
     ntfs3g
   ];
 
+  ################################### optimisations ####################################
+  #boot.kernelPackages = pkgs.linuxPackages; # .overrideAttrs (old: {
+    #NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" ];
+  /*
+  #});
+  boot.kernelPackages = pkgs.recurseIntoAttrs (pkgs.linuxPackagesFor (pkgs.linux_6_1.overrideAttrs (old: {
+    NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" ];
+  })));
+  */
+  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
+    argsOverride = rec {
+      NIX_CFLAGS_COMPILE = [ "-O3" "-march=native" ];
+    };
+  });
+  #*/
+#(old: {
+  #}));
+
+  nixpkgs.overlays = [
+    (final: prev: {
+      optimizeWithFlags = pkg: flags:
+        pkg.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ flags;
+        });
+
+      optimizeForThisHost = pkg:
+        final.optimizeWithFlags pkg [ "-O3" "-march=native" "-fPIC" ];
+
+      firefox = final.optimizeForThisHost prev.firefox;
+    })
+  ];
+
 
   hardware.bluetooth.settings = {
     General = {
@@ -63,7 +95,7 @@
     # needed so that firefox does not ignore the hosts file
     text = ''
       multi off
-      order hosts,bind,nis
+      order hosts,nis,bind
     '';
   };
   systemd.services.stark = 
@@ -77,17 +109,21 @@
         if [ -f "/etc/hosts-youtube-block" ];
         then
           timeout=$(cat /etc/hosts-youtube-block)
+          echo "read timeout $timeout"
           if [[ "$timeout" == "1" ]] || [[ "$timeout" == "1\n" ]]
           then
-            rm /etc/host-youtube-block
+            rm -rf /etc/hosts-youtube-block
           else
             timeout=$((timeout - 1))
             echo -en $timeout > /etc/hosts-youtube-block
+            echo "new timeout: $timeout"
           fi
         else
+          echo "updateing hosts file"
           rm -rf /etc/hosts
           cat ${self}/misc/my-hosts > /etc/hosts
-          cat ${self}/misc/my-hosts-"$(cat /etc/current_hosts)" >> /etc/hosts
+          cat /etc/current_hosts >> /etc/hosts
+          #cat ${self}/misc/my-hosts-"$(cat /etc/current_hosts)" >> /etc/hosts
         fi
       '';
       };
@@ -106,36 +142,6 @@
     };
     wantedBy = [ "multi-user.target" ];
   };
-
-
-	############################## syncthing for main #############################################
-	services.syncthing = {
-   	enable = true;
-   	user = "me";
-   	#dataDir = "/home/";
-   	configDir = "/home/me/.config/syncthing";
-		extraFlags = ["-no-browser"];
-		openDefaultPorts = true;
-   	overrideDevices = true;     # overrides any devices added or deleted through the WebUI
-   	overrideFolders = true;     # overrides any folders added or deleted through the WebUI
-   	devices = {
-   		"seb-phone" = { 
-				id = builtins.readFile "${secretsDir}/syncthing-id-phone";
-				#addresses = [ "tcp://192.168.200.24:22000" ];
-			};
-   		"seb-tab" = { 
-				id = builtins.readFile "${secretsDir}/syncthing-id-tab";
-				#addresses = [ "tcp://192.168.200.26:22000" ];
-			};
-    	};
-    	folders = {
-      	"priv-share" = {        # Name of folder in Syncthing, also the folder ID
-        		path = "/home/me/work/priv-share";    # Which folder to add to Syncthing
-        		#devices = [ "seb-phone" "seb-tab" ];      # Which devices to share the folder with
-        		devices = [ "seb-phone" "seb-tab" ];      # Which devices to share the folder with
-      	};
-   	};
-	};
 
 
   ############################## networking ###############################################
@@ -173,7 +179,7 @@
     ${builtins.readFile "${self}/misc/my-hosts"}
     ${builtins.readFile "${self}/misc/my-hosts-me"}
   '';
-  environment.etc.current_hosts.text = "me";
+  environment.etc.current_hosts.text = builtins.readFile "${self}/misc/my-hosts-me";
   environment.etc.current_hosts.mode = "rw";
   #environment.etc.hosts.mode = "rw";
 
@@ -258,6 +264,7 @@
 
       ipv4 = {
         #address1 = "192.168.20.11/24";
+        dns = "1.1.1.1;8.8.8.8;";
         method = "auto";
       };
     };
