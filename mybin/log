@@ -1,6 +1,0 @@
-#!/bin/bash
-
-export SUPABASE_KEY=$(cat ~/.mysecrets/log-supabase-key)
-export SUPABASE_URL=$(cat ~/.mysecrets/log-supabase-url)
-
-python3 ~/work/log/new/client.py $@
