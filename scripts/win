@@ -9,7 +9,7 @@ default_vm_uuid=win
 #default_vm_uuid=6a412143-871f-4838-bacd-5dcfa5fa95c3
 
 username=me
-password=$(cat ~/.mysecrets/win-vm-pwd)
+password=$(cat ~/work/here/secrets/win-vm-pwd)
 
 if [ "$1" == "-o" ];then
 	cmd=$5

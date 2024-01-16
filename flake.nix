@@ -2,16 +2,24 @@
 	description = "Sebastian (c2vi)'s NixOS";
 
 	inputs = {
+    # don't forget to also change the hash of the used nixpkgs in programs/bash.nix the export nip
+		nixpkgs.url = "github:NixOS/nixpkgs/release-23.11";
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-		nixpkgs.url = "github:NixOS/nixpkgs/release-23.05";
+
+		nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 		
     #old-nixpkgs.url = "github:NixOS/nixpkgs/release-22.11";
 
 		firefox.url = "github:nix-community/flake-firefox-nightly";
+    firefox-addons = {
+      # ref: https://github.com/Misterio77/nix-config/blob/main/flake.nix#L66
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
 
 		home-manager = {
-			url = "github:nix-community/home-manager/release-23.05";
+			url = "github:nix-community/home-manager/release-23.11";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
 
@@ -51,20 +59,27 @@
 
     nix-wsl.url = "github:nix-community/NixOS-WSL";
 
+    my-log.url = "path:/home/me/work/log/new";
+    #my-log.inputs.nixpkgs.follows = "nixpkgs";
+
+    podman.url = "github:ES-Nix/podman-rootless";
+
 	};
 
-	outputs = { self, nixpkgs, ... }@inputs: 
+	outputs = { self, nixpkgs, nixos-generators, ... }@inputs: 
 		let 
 			confDir = "/home/me/work/config";
 			workDir = "/home/me/work";
-			secretsDir = "/home/me/.mysecrets";
+			secretsDir = "/home/me/work/here/secrets";
 			persistentDir = "/home/me/work/app-data";
       specialArgs = {
 				inherit inputs confDir workDir secretsDir persistentDir self;
+        system = "x86_64-linux";
 				pkgs = import nixpkgs { system = "x86_64-linux"; config = {
 					allowUnfree = true;
 					permittedInsecurePackages = [
 	 					"electron-24.8.6"
+            "electron-25.9.0"
   					];
 				}; };
 			};
@@ -89,10 +104,47 @@
       		];
    		};
 
+   		"gui" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+            nixos-generators.nixosModules.all-formats
+            ({ ... }: {
+              boot.kernelParams = [ "console=tty0" ];
+              boot.loader.grub.device = "nodev";
+  	          virtualisation.libvirtd.enable = true;
+              fileSystems = {
+                "/" = {
+                  label = "nixos";
+                  fsType = "ext4";
+                };
+              };
+            })
+            #"${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-x86_64.nix"
+            ./common/all.nix
+            ./common/nixos.nix
+            ./common/nixos-graphical.nix
+            ./common/building.nix
+
+            inputs.home-manager.nixosModules.home-manager
+            ./users/me/gui.nix
+            ./users/root/default.nix
+      		];
+   		};
+
+   		"fusu" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/fusu.nix
+					  ./hardware/fusu.nix
+      		];
+   		};
+
       # my server at home
-   		"rpi" = nixpkgs.lib.nixosSystem {
+   		"rpi" = nixpkgs.lib.nixosSystem rec {
 			  #inherit specialArgs;
-        specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+        specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
         system = "aarch64-linux";
         modules = [
           ./hosts/rpi.nix
@@ -100,11 +152,12 @@
       };
 
       # my raspberry to try out stuff with
-   		"lush" = nixpkgs.lib.nixosSystem {
+   		"lush" = nixpkgs.lib.nixosSystem rec {
         system = "aarch64-linux";
-        specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+        specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
         modules = [
           ./hosts/lush.nix
+
         ];
       };
 
@@ -135,15 +188,37 @@
         ];
       };
 
-			"the-most-default" = nixpkgs.lib.nixosSystem {
+			"the-most-default" = nixpkgs.lib.nixosSystem rec {
       		system = "x86_64-linux";
-      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
       		modules = [
-         		./hosts/the-most-default.nix
+         		#./hosts/the-most-default.nix
+            ./users/root/default.nix
+            ./users/me/headless.nix
+            ({ ... }: {
+              fileSystems."/" = {
+                device = "/dev/disk/by-uuid/6518e61e-7120-48ef-81a3-5eae0f67297e";
+                fsType = "btrfs";
+               };
+
+               system.stateVersion = "23.05"; # Did you read the comment?
+              boot.loader.grub = {
+                  enable = true;
+                  device = "nodev";
+                  efiSupport = true;
+                extraConfig = ''
+                  set timeout=2
+                '';
+              };
+            })
+            #./users/me/headless.nix
+		        inputs.home-manager.nixosModules.home-manager
+		        ./common/all.nix
       		];
 			};
-			"test" = nixpkgs.lib.nixosSystem {
-      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self; };
+
+			"test" = nixpkgs.lib.nixosSystem rec {
+      		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
       		system = "aarch64-linux";
           #inherit specialArgs;
       		modules = [
@@ -195,33 +270,23 @@
         ];
       };
 
-      test = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
-        modules = [ ./hosts/nix-on-phone.nix ];
-
-        # list of extra special args for Nix-on-Droid modules
-        extraSpecialArgs = {
-          # rootPath = ./.;
-        };
-
-        # set nixpkgs instance, it is recommended to apply `nix-on-droid.overlays.default`
-        pkgs = import nixpkgs {
-          system = "aarch64-linux";
-
-          overlays = [
-            inputs.nix-on-droid.overlays.default
-            # add other overlays
-          ];
-        };
-
-        # set path to home-manager flake
-        home-manager-path = inputs.home-manager.outPath;
-      };
     };
 
+    homeModules = {
+      #me-headless = import ./users/me/headless.nix;
+      me-headless = import ./users/common/home.nix;
+    };
 
 		packages.x86_64-linux = {
-      #test = self.nixosConfigurations.test.config.system.build.sdImage;
-      testing = nixpkgs.legacyPackages.x86_64-linux;
+			hi = self.nixosConfigurations.the-most-default.config.system.build.toplevel;
+      #testing = nixpkgs.legacyPackages.x86_64-linux;
+      testing = (nixpkgs.legacyPackages.x86_64-linux.writeShellApplication {
+        name = "log";
+        #runtimeInputs = [ inputs.my-log.packages.${system}.pythonForLog ];
+        #text = "cd /home/me/work/log/new; nix develop -c 'python ${workDir}/log/new/client.py'";
+        text = ''${inputs.my-log.packages.x86_64-linux.pythonForLog}/bin/python ${workDir}/log/new/client.py "$@"'';
+      });
+
       test = nixpkgs.legacyPackages.x86_64-linux.firefox-devedition-unwrapped.overrideAttrs (old: {
         NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
         #hi = builtins.trace ("hello world: " + old.passthru.unwrapped.name) 4;
@@ -235,19 +300,19 @@
       #});
 
 			cbm = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/cbm.nix { };
-			supabase = nixpkgs.legacyPackages.x86_64-linux.callPackage ./mods/supabase.nix { };
-			#default... TODO
 			run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
 				${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
         '';
-      acern = self.nixosConfigurations.acern.config.system.build.tarballBuilder;
       #luna = (self.nixosConfigurations.luna.extendModules {
         #modules = [ "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-new-kernel-no-zfs-installer.nix" ];
       #}).config.system.build.sdImage;
+
+      acern = self.nixosConfigurations.acern.config.system.build.tarballBuilder;
       lush = self.nixosConfigurations.lush.config.system.build.sdImage;
       rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
-      prootTermux = inputs.nix-on-droid.outputs.packages.x86_64-linux.prootTermux;
 
+
+      prootTermux = inputs.nix-on-droid.outputs.packages.x86_64-linux.prootTermux;
       docker = let pkgs = nixpkgs.legacyPackages.x86_64-linux.pkgs; in pkgs.dockerTools.buildImage {
         name = "hello";
         tag = "0.1.0";
@@ -264,7 +329,7 @@
 
       wsl = {
         type = "app";
-        program = "${self.nixosConfigurations.wsl.config.system.build.tarballBuilder}/bin/nixos-wsl-tarball-builder";
+        program = "${self.nixosConfigurations.acern.config.system.build.tarballBuilder}/bin/nixos-wsl-tarball-builder";
       };
 		  default = {
         type = "app";

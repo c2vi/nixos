@@ -2,7 +2,19 @@
 
 if [ "$1" == "sync-school" ]
 then
-~/work/config/rclone/sync-school.sh
+~/work/config/scripts/sync-school.sh
+
+elif [ "$1" == "rm-last-char" ]
+then
+truncate -s-1 $2
+
+# total rubish
+# cat $1 | xxd -ps | sed '$ s/.$//' $2 | xxd -r -ps > /tmp/1234; mv /tmp/1234 $2
+
+
+elif [ "$1" == "rm-tab-cur" ]
+then
+ssh tab "rm /sdcard/note/CUR/*"
 
 
 elif [ "$1" == "mnt-wechner" ]
@@ -29,7 +41,7 @@ ping orf.at
 
 elif [ "$1" == "mnt-files-local" ]
 then
-sudo mount -t cifs //192.168.1.2/files /home/me/files -o x-gvfs-hide,rw,defaults,nofail,credentials=/home/me/.mysecrets/rpi-share-files,uid=1000,iocharset=utf8,gid=1000
+sudo mount -t cifs //192.168.1.2/files /home/me/files -o x-gvfs-hide,rw,defaults,nofail,credentials=/home/me/work/here/secrets/rpi-share-files,uid=1000,iocharset=utf8,gid=1000
 
 
 

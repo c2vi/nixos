@@ -1,7 +1,8 @@
-{ config, pkgs, self, secretsDir, inputs, persistentDir, ... }:
+{ config, pkgs, self, secretsDir, inputs, hostname, ... }:
 {
 	# The home.stateVersion option does not have a default and must be set
 	home.stateVersion = "23.05";
+  nixpkgs.config.allowUnfree = true;
 
   imports = [
     inputs.nix-index-database.hmModules.nix-index
@@ -24,15 +25,21 @@
 
 	home.sessionPath = [ "${self}/mybin" ];
   home.file = {
-    ".rclone.conf".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf";
+     
     ".subversion/config".text = ''
       [miscellany]
       global-ignores = node_modules target
     ''; # documentation for this config file: https://svnbook.red-bean.com/en/1.7/svn.advanced.confarea.html
-  };
+
+    # rclone.conf only on main
+  } // (if hostname == "main" then { ".rclone.conf".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/rclone-conf"; } else {});
 
    home.packages = with pkgs; [
-    hostname
+    borgbackup
+    rclone
+    archivemount
+    nmon
+    pkgs.hostname
 		vim
 		tree
 		htop
@@ -52,6 +59,9 @@
     wget
     tmux
     wireguard-tools
+    xorg.xauth
+    wakeonlan
+
 		# python....
 		(python310.withPackages (p: with p; [
 			pandas
@@ -75,6 +85,10 @@
 			'';
 		}))
      # */
+
+    # self packaged colored bandwith meter
+    (pkgs.callPackage ../../mods/cbm.nix {})
+
   ];
 
   # */

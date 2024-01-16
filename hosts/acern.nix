@@ -20,7 +20,7 @@
     settings.KbdInteractiveAuthentication = false;
   };
 
-  programs.bash.loginShellInit = "nixos-wsl-welcome";
+  programs.bash.loginShellInit = "";
 
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 
@@ -30,6 +30,7 @@
 
   ######################### networking #####################################
 
+  networking.hostName = "acern";
 	networking.firewall.allowPing = true;
 	networking.firewall.enable = true;
 	networking.firewall.allowedUDPPorts = [

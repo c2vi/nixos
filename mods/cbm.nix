@@ -1,6 +1,7 @@
 { stdenv
 , fetchFromGitHub
 , ncurses
+, autoreconfHook
 }:
 
 stdenv.mkDerivation rec {
@@ -16,5 +17,6 @@ stdenv.mkDerivation rec {
 
 	nativeBuildInputs = [
 		ncurses
+    autoreconfHook
 	];
 }

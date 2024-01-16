@@ -7,37 +7,43 @@
 	modules.battery_monitor.enable = true;
 
 	# Enable the X11 windowing system.
-	services.xserver = {
-		enable = true;
-   	displayManager = {
-		defaultSession = "none+xmonad";
-   	sessionCommands = ''
-			xmobar ${self}/misc/xmobar.hs &
+  services.xserver = {
+	  enable = true;
+    displayManager = {
+	    defaultSession = "none+xmonad";
+   	  sessionCommands = ''
+			  xmobar ${self}/misc/xmobar.hs &
 
-			# aparently needed, so that xmonad works
-			sleep 2 && \
-			${pkgs.xorg.xmodmap}/bin/xmodmap \
-				-e "clear control" \
-				-e "clear mod1" \
-				-e "keycode 64 = Control_L" \
-				-e "keycode 37 = Alt_L" \
-				-e "add control = Control_L" \
-				-e "add mod1 = Alt_L" \
-				&
-   	'';
-	};
+			  # aparently needed, so that xmonad works
+			  sleep 2 && \
+			  ${pkgs.xorg.xmodmap}/bin/xmodmap \
+				  -e "clear control" \
+				  -e "clear mod1" \
+				  -e "keycode 64 = Control_L" \
+				  -e "keycode 37 = Alt_L" \
+				  -e "add control = Control_L" \
+				  -e "add mod1 = Alt_L" \
+				  &
+   	  '';
+	  };
+    
+    #displayManager.gdm = {
+      #enable = true;
+    #};
 
-   displayManager.lightdm = {
-		enable = true;
-		greeters.enso = {
-			enable = true;
-			blur = true;
-			extraConfig = ''
-				default-wallpaper=/usr/share/streets_of_gruvbox.png
-			'';
-		};
-	};
-	layout = "at";
+    #/*
+    displayManager.lightdm = {
+      enable = true;
+      greeters.enso = {
+        enable = true;
+        blur = true;
+        extraConfig = ''
+          default-wallpaper=/usr/share/streets_of_gruvbox.png
+        '';
+      };
+    };
+    # */
+    layout = "at";
 	};
 
 	# xdg portals
@@ -61,7 +67,7 @@
 	sound.enable = true;
 	hardware.pulseaudio.enable = true;
 
-  	services.blueman.enable = true;
+  services.blueman.enable = true;
 	hardware.bluetooth.enable = true;
 
 	# Enable touchpad support (enabled default in most desktopManager).

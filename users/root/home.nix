@@ -7,5 +7,4 @@
       ../../programs/ssh.nix
    ];
    
-   home.file.test.text = "hello world\n";
 }

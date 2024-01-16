@@ -1,5 +1,5 @@
 
-{ config, pkgs, self, secretsDir, inputs, persistentDir, ... }:
+{ config, pkgs, self, workDir, inputs, persistentDir, system, ... }:
 
 {
 	imports = [
@@ -7,9 +7,11 @@
 
     # my gui programs
 		../../programs/alacritty.nix
-		../../programs/emacs/default.nix
+    # stalls the build
+    #../../programs/emacs/default.nix
 		../../programs/rofi/default.nix
 		../../programs/zathura.nix
+    ../../programs/firefox/default.nix
 	];
 
 	gtk.cursorTheme = {
@@ -23,19 +25,24 @@
 	  };
 	};
 
+  home.sessionVariables = {
+    inherit system;
+  };
+
 	services.dunst.enable = true;
 
 
   home.file = {
-    ".mysecrets/root-pwd".text = "changeme";
+    ".mysecrets/root-pwd".text = "changemehiiii";
     ".mysecrets/me-pwd".text = "changeme";
 
-    ".mozilla/firefox".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/firefox";
+    #".mozilla/firefox".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/firefox";
     ".cache/rofi-3.runcache".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/rofi-run-cache";
   };
 
 
 	home.packages = with pkgs; [
+    btrfs-progs
 
     # packages that i might not need everywhere??
 		wstunnel
@@ -77,13 +84,10 @@
 		gparted
 		xorg.xkill
     xorg.xmodmap
+    inkscape
 
     # my own packages
     supabase-cli
-
-		(inputs.firefox.packages.${pkgs.system}.firefox-nightly-bin.overrideAttrs (old: {
-      NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
-    }))
 
 		# base-devel
 		gcc
@@ -91,6 +95,7 @@
 		# rust
 		cargo
 		rust-analyzer
+    rustc
 
 		#localPacketTracer8
 
@@ -102,25 +107,51 @@
 		virt-manager
 		freerdp
     (pkgs.writeShellApplication {
+      name = "log";
+      #runtimeInputs = [ inputs.my-log.packages.${system}.pythonForLog ];
+      #text = "cd /home/me/work/log/new; nix develop -c 'python ${workDir}/log/new/client.py'";
+      text = ''${inputs.my-log.packages.${system}.pythonForLog}/bin/python ${workDir}/log/new/client.py "$@"'';
+    })
+    (pkgs.writeShellApplication {
       name = "rpi";
       text = let 
-        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" { libraries = [pkgs.python310Packages.dnspython]; } ''
+        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" { libraries = [pkgs.python311Packages.dnspython]; } ''
           # flake8: noqa
           import os
+          import re
           import sys
           import subprocess
 
           import dns.resolver
 
+          import socket, struct
+
+          def get_default_gateway_linux():
+            """Read the default gateway directly from /proc."""
+            with open("/proc/net/route") as fh:
+              for line in fh:
+                fields = line.strip().split()
+                if fields[1] != '00000000' or not int(fields[3], 16) & 2:
+                  # If not default route or not RTF_GATEWAY, skip it
+                  continue
+                if fields[0] != "wlp2s0":
+                  # only check on wlan interface
+                  continue
+
+                return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+
           pw_map = {
             "tab": "00:0a:50:90:f1:00",
-            "phone": "86:9d:6a:bc:ca:1b",
+            # "phone": "86:9d:6a:bc:ca:1b", # can't do that, because phone changes mac address on reactivation of hotspot
+            "lush": "dc:a6:32:cb:4d:5f",
           }
 
-
           if len(sys.argv) == 1:
-            print("one arg needed")
+            with open("/etc/hosts", "r") as file:
+              for line in file.readlines():
+                print(line, end="")
             exit()
+
           net = sys.argv[1]
 
 
@@ -154,8 +185,32 @@
 
 
           if net == "pw":
+            # get phone from default route
+            old["phone"] = get_default_gateway_linux()
+            print("default route: phone with ip ", old["phone"])
+
+            # search arp table
+            with os.popen('arp -a') as f:
+              data = f.read()
+            for line in data.split("\n"):
+              try:
+                parts = line.split(" ")
+                mac = parts[3]
+                ip = parts[1][1:-1]
+                for name, mac_table in pw_map.items():
+                  #print("trying mac:", mac, "from arp table:", parts)
+                  if mac == mac_table:
+                    # found name
+                    print(f"arp table: {name} with ip {ip}")
+                    old[name] = ip
+              except:
+                print("arp table line failed:", line)
+                continue
+
+            # do arp scan
             ips = subprocess.run(["sudo", "${pkgs.arp-scan}/bin/arp-scan", "-l", "-x", "-I", "wlp2s0"], capture_output=True)
             for line in ips.stdout.decode("utf-8").split("\n"):
+              #print("arp-scan line:", line)
               try:
                 split = line.split("\t")
                 ip = split[0]
@@ -167,8 +222,13 @@
               for name, mac_table in pw_map.items():
                 if mac == mac_table:
                   # found name
-                  print(f"found {name} with ip {ip}")
+                  print(f"arp-scan: {name} with ip {ip}")
                   old[name] = ip
+
+
+
+
+          
 
 
           os.system("rm -rf /etc/hosts")

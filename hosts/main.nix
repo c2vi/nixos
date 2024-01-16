@@ -10,6 +10,9 @@
   # ??????????? TODO
   # fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
 
+  services.nscd.enable = lib.mkForce false;
+  system.nssModules = lib.mkForce [];
+
 
 	imports = [
 		../common/all.nix
@@ -23,10 +26,21 @@
 		../users/root/default.nix
 	];
 
+
+
+
+
   environment.systemPackages = with pkgs; [
     cifs-utils
     ntfs3g
+    dhcpcd
+    looking-glass-client
   ];
+
+  # enable ntp
+  #services.ntp.enable = true;
+  # if i hibernate and ren unhibernate in the school network ... the time will be off, because 0.nixos.pool.ntp.org can't be reached
+  services.timesyncd.enable = true;
 
   ################################### optimisations ####################################
   #boot.kernelPackages = pkgs.linuxPackages; # .overrideAttrs (old: {
@@ -37,15 +51,16 @@
     NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" ];
   })));
   */
-  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
-    argsOverride = rec {
-      NIX_CFLAGS_COMPILE = [ "-O3" "-march=native" ];
-    };
-  });
+  #boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_1.override {
+    #argsOverride = rec {
+      #NIX_CFLAGS_COMPILE = [ "-O3" "-march=native" ];
+    #};
+  #});
   #*/
 #(old: {
   #}));
 
+  /*
   nixpkgs.overlays = [
     (final: prev: {
       optimizeWithFlags = pkg: flags:
@@ -59,6 +74,7 @@
       firefox = final.optimizeForThisHost prev.firefox;
     })
   ];
+  */
 
 
   hardware.bluetooth.settings = {
@@ -77,6 +93,7 @@
   ];
 
 	# some bind mounts
+  /*
 	fileSystems."${workDir}/priv-share/things" = {
 		device = "${workDir}/things";
   		options = [ "bind" ];
@@ -89,6 +106,7 @@
 		device = "${workDir}/diplomarbeit";
   		options = [ "bind" ];
 	};
+  # */
 
   ################################ my youtube blocking service #############################
   environment.etc."host.conf" = {
@@ -109,8 +127,19 @@
         if [ -f "/etc/hosts-youtube-block" ];
         then
           timeout=$(cat /etc/hosts-youtube-block)
+
+          # check our daily limit
+          if [ -f "/etc/hosts-youtube-daily" ];
+          then
+          echo hi
+          #today=$(cat /etc/hosts-youtube-daily)
+
+          # set timeout to 0 when dayli limit is over 90m
+          # and also write 
+          fi
+
           echo "read timeout $timeout"
-          if [[ "$timeout" == "1" ]] || [[ "$timeout" == "1\n" ]]
+          if [[ "$timeout" == "1" ]] || [[ "$timeout" == "1\n" ]] || [[ "$timeout" == "-1" ]] || [[ "$timeout" == "0" ]]
           then
             rm -rf /etc/hosts-youtube-block
           else
@@ -153,9 +182,15 @@
   services.avahi.enable = true;
 
   networking.networkmanager.enable = true;
+  #networking.networkmanager.extraConfig = ''
+  #[main]
+  #dhcp=dhcpcd
+  #'';
+  #networking.useDHCP = lib.mkForce true;
 
 	networking.firewall.allowPing = true;
 	networking.firewall.enable = true;
+
 	services.samba.openFirewall = true;
 
 	networking.firewall.allowedTCPPorts = [
@@ -215,6 +250,7 @@
       };
       wifi-security = {
         key-mgmt = "wpa-eap";
+        auth-alg = "open";
       };
       "802-1x" = {
         eap = "peap";
@@ -288,6 +324,24 @@
       };
     };
 
+    dhcp = {
+      connection = {
+        id = "dhcp";
+        uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
+        type = "ethernet";
+        autoconnect = "false";
+        interface-name = "enp1s0";
+      };
+
+      ethernet = {
+        mac-address = "F4:39:09:4A:DF:0E";
+      };
+
+      ipv4 = {
+        method = "auto";
+      };
+    };
+
     /*
     me = {
      connection = {
@@ -309,6 +363,7 @@
     */
   };
 
+  /*
   networking.wireguard.interfaces = {
     me1 = {
       ips = [ "10.1.1.11/24" ];
@@ -319,6 +374,7 @@
       peers = import ../common/wg-peers.nix { inherit secretsDir; };
     };
   };
+  # */
 
 
 
@@ -363,19 +419,34 @@
   	virtualisation.libvirtd.enable = true;
     virtualisation.podman.enable = true;
 
-  	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
-    mkdir -p /var/lib/libvirt/storage
-		ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
-    rm -rf /var/lib/libvirt/qemu/networks
-    ls ${workDir}/vm/qemu | while read path
-    do
-		  ln -nsf ${workDir}/vm/qemu/$path /var/lib/libvirt/qemu/$path
-    done
+    virtualisation.kvmgt.enable = true;
+    boot.extraModprobeConfig = "options i915 enable_guc=2";
+    boot.kernelParams = [ "intel_iommu=on" ];
 
+    virtualisation.kvmgt.vgpus = {
+      "i915-GVTg_V5_8" = {
+        uuid = [ "1382e8c5-b033-481b-99b8-e553ef6a0056" ];
+      };
+    };
+
+    # /*
+  	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
+      mkdir -p /var/lib/libvirt/storage
+      ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
+      rm -rf /var/lib/libvirt/qemu/networks
+      ls ${workDir}/vm/qemu | while read path
+      do
+        ln -nsf ${workDir}/vm/qemu/$path /var/lib/libvirt/qemu/$path
+      done
+    '';
+
+    # */
+  	system.activationScripts.makeBinBash = lib.stringAfter [ "var" ] ''
 		# there is no /bin/bash
 		# https://discourse.nixos.org/t/add-bin-bash-to-avoid-unnecessary-pain/5673
 		ln -nsf /run/current-system/sw/bin/bash /bin/bash
    '';
+   # */
 
 
 	############################## swap and hibernate ###################################

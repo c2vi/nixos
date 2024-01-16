@@ -14,5 +14,11 @@
 		#keyMap = "at";
 		useXkbConfig = true; # use xkbOptions in tty.
 	};
+
+  system.activationScripts.addBinBash = lib.stringAfter [ "var" ] ''
+    # there is no /bin/bash
+    # https://discourse.nixos.org/t/add-bin-bash-to-avoid-unnecessary-pain/5673
+    ln -nsf /run/current-system/sw/bin/bash /bin/bash
+ '';
 }
 

@@ -113,6 +113,10 @@
 
 
 		keybindings = {
+      # sort by time
+      mt = ":set sortby time; set info time; set reverse"; 
+      # sort normally
+      ms = ":set sortby natural; set info; set reverse!";
       F = "setfilter";
       P = "%pwd";
       W = "nav-work";

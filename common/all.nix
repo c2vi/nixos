@@ -28,6 +28,7 @@
     experimental-features = lib.mkDefault "nix-command flakes";
     trusted-users = [ "root" "@wheel" ];
   };
+  nixpkgs.config.allowUnfree = true;
 
 	home-manager.backupFileExtension = "backup";
 

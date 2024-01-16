@@ -1,4 +1,4 @@
-{ persistentDir, confDir, hostname, self, pkgs, config, ... }:
+{ persistentDir, confDir, hostname, self, pkgs, config, system, inputs, workDir, ... }:
 {
 	programs.bash = {
 
@@ -30,6 +30,7 @@
 		];
 
 		sessionVariables = {
+      inherit system;
 			# this does not work aparently....
 
 			# is needed to that ssh works
@@ -39,9 +40,20 @@
 			PS1 = ''\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ '';
 
 			TEST = "hiiiiiiiiiiiiiiiiiiiiiiiiiii";
+
 		};
 
 		shellAliases = {
+      losetup = "${pkgs.util-linux}/bin/losetup";
+      log = let
+        log = pkgs.writeShellApplication {
+          name = "log";
+          #runtimeInputs = [ inputs.my-log.packages.${system}.pythonForLog ];
+          #text = "cd /home/me/work/log/new; nix develop -c 'python ${workDir}/log/new/client.py'";
+          text = if system == "x86_64-linux" then ''${inputs.my-log.packages.${system}.pythonForLog}/bin/python ${workDir}/log/new/client.py "$@"'' else "echo system not x86_84-linux";
+        };
+        in "${log}/bin/log";
+      mi = "${workDir}/mize/run";
       cdd = "/sdcard";
       n = "${pkgs.python3} ${self}/scripts/nav/main.py";
 			shutdown = "echo try harder.... xD";
@@ -75,6 +87,18 @@
 		bashrcExtra = ''
       export PATH=${self}/mybin:$PATH
 			export TERM="xterm-color"
+      export system=${system}
+
+      # the commit hash of nixpkgs 23.11
+      export nip="nixpkgs/71db8c7a02f3be7cb49b495786050ce1913246d3"
+
+      # needed to make ssh -X work
+      # see: https://unix.stackexchange.com/questions/412065/ssh-connection-x11-connection-rejected-because-of-wrong-authentication
+      export XAUTHORITY=$HOME/.Xauthority
+
+      export nl="--log-format bar-with-logs"
+      export acern="ssh://acern x86_64-linux,aarch64-linux - 20 10 big-parallel - -"
+      export hpm="ssh://hpm x86_64-linux,aarch64-linux - 8 5 big-parallel - -"
 
 			# my prompt
 			if [[ "${hostname}" == "main" ]]
@@ -115,10 +139,10 @@
       tta(){
         if [[ "$1" == "" ]]
         then
-          rsync ~/work/priv-share/fast tab:/sdcard/fast
+          rsync -rv --delete ~/work/priv-share/fast/* tab:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
-          rsync tab:/sdcard/fast ~/work/priv-share/fast
+          rsync -rv tab:/sdcard/fast/* ~/work/priv-share/fast
         elif [[ "$1" == "k" ]]
         then
           scp -O "$1" tab:/sdcard/keep
@@ -130,10 +154,10 @@
       tph(){
         if [[ "$1" == "" ]]
         then
-          rsync ~/work/priv-share/fast phone:/sdcard/fast
+          rsync -rv --delete ~/work/priv-share/fast/* phone:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
-          rsync phone:/sdcard/fast ~/work/priv-share/fast
+          rsync -rv phone:/sdcard/fast/* ~/work/priv-share/fast
         elif [[ "$1" == "k" ]]
         then
           scp -O "$1" tab:/sdcard/keep
@@ -281,7 +305,7 @@
 			complete -W "start stop restart status daemon-reload" stl
 
 			# run 
-			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend" ru
+			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char" ru
 
 
 		'';

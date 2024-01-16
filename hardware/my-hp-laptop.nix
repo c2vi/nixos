@@ -4,21 +4,57 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-	imports = [
-		(modulesPath + "/installer/scan/not-detected.nix")
-   ];
+  imports = [
+	  (modulesPath + "/installer/scan/not-detected.nix")
+  ];
 
-  	# Setup keyfile
-  	boot.initrd.secrets = {
-    	"/crypto_keyfile.bin" = null;
-  	};
+  # Setup keyfile
+  #boot.initrd.secrets = {
+    #"/crypto_keyfile.bin" = null;
+  #};
 
-  	fileSystems."/home/me/work" = {
-		#label = "work";
-		device = "/dev/disk/by-uuid/fd3c6393-b6fd-4065-baf9-5690eb6ebbed";
-		fsType = "btrfs";
-		neededForBoot = false;
-	};
+  swapDevices = [ ];
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  ######################## filesystems #########################
+
+  fileSystems = {
+    "/" = {
+      label = "main";
+   	  fsType = "btrfs";
+      options = [ "compress=zstd" "subvol=root" ];
+    };
+
+    "/home" = {
+      label = "main";
+   	  fsType = "btrfs";
+      options = [ "compress=zstd" "subvol=home" ];
+    };
+    "/nix" = {
+      label = "main";
+   	  fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "subvol=nix" ];
+    };
+
+    "/home/me/work" = {
+      fsType = "btrfs";
+      neededForBoot = false;
+      label = "main";
+      options = [ "compress=zstd" "noatime" "subvol=work" ];
+    };
+
+	  "/boot" = {
+  		device = "/dev/disk/by-uuid/2588-2509";
+      fsType = "vfat";
+    };
+  };
+
+
+
+##################### bootloader #################################
 
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
@@ -33,10 +69,12 @@
 
 	boot.loader.efi.canTouchEfiVariables = true;
 
+##################### misc #################################
+
 	boot.initrd.luks.devices = {
    	root = {
    		#name = "root";
-      	device = "/dev/disk/by-uuid/142d2d21-2998-4eb7-9853-ab6554ba061f";
+      	device = "/dev/disk/by-label/crypt";
       	preLVM = true;
       	allowDiscards = true;
    	};
@@ -47,27 +85,4 @@
 	boot.kernelModules = [ "kvm-intel" ];
 	boot.extraModulePackages = [ ];
 
-	fileSystems."/" = {
-		device = "/dev/disk/by-uuid/d4ca1ea3-4b73-45e8-8575-560ade53cade";
-   	fsType = "btrfs";
-   };
-
-	fileSystems."/boot" = {
-  		device = "/dev/disk/by-uuid/2588-2509";
-      fsType = "vfat";
-   };
-
-  	swapDevices = [ ];
-
-  	# Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-  	# (the default) this is the recommended approach. When using systemd-networkd it's
-  	# still possible to use this option, but it's recommended to use it in conjunction
-  	# with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  	networking.useDHCP = lib.mkDefault true;
-  	# networking.interfaces.enp1s0.useDHCP = lib.mkDefault true;
-  	# networking.interfaces.wlp2s0.useDHCP = lib.mkDefault true;
-
-  	nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  	powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-  	hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

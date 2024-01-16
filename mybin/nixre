@@ -5,7 +5,8 @@
 
 
 build_from_github(){
-	export out_path=$(nix build --refresh "github:c2vi/nixos#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
+  export NIXPKGS_ALLOW_UNFREE=1
+	export out_path=$(nix build --refresh "github:c2vi/nixos#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths "${args_to_pass[@]}")
 
   if [[ "$out_path" == "" ]]
   then
@@ -21,7 +22,8 @@ build_from_github(){
 }
 
 build_from_local(){
-	export out_path=$(sudo nix build "$HOME/work/config#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths $args_to_pass)
+  export NIXPKGS_ALLOW_UNFREE=1
+	export out_path=$(nix build "$HOME/work/config#nixosConfigurations.$host.config.system.build.toplevel" --impure --no-link --print-out-paths "${args_to_pass[@]}")
 
   if [[ "$out_path" == "" ]]
   then
@@ -42,11 +44,18 @@ do_switch(){
 		[[ "$boot" == "false" ]] && sudo $out_path/bin/switch-to-configuration switch
 		[[ "$boot" == "true" ]] && sudo $out_path/bin/switch-to-configuration boot
 	else
-		nix path-info $out_path -r | xargs sudo nix store sign -k ~/.mysecrets/nix-private-key
+		nix path-info $out_path -r | xargs sudo nix store sign -k ~/work/here/secrets/nix-private
 		nix copy --no-check-sigs --no-require-sigs --to ssh-ng://$host $out_path 
 		[[ "$boot" == "false" ]] && ssh $host "sudo $out_path/bin/switch-to-configuration switch"
 		[[ "$boot" == "true" ]] && ssh $host "sudo $out_path/bin/switch-to-configuration boot"
 	fi
+}
+
+function test(){
+  for arg in "$@";
+  do
+    echo got: $arg
+  done
 }
 
 
@@ -63,9 +72,17 @@ while getopts ':gbh:' flag; do
     h) host="${OPTARG}";;
     b) boot=true;;
     g) use_github=true;;
-    *) break;; # makes it so, that at the first unknown option we start passing the rest of the arguments to the nix build command....
+    *) export args_to_pass=( "${@:OPTIND}" ); break;; # makes it so, that at the first unknown option we start passing the rest of the arguments to the nix build command....
   esac
 done
+
+# mahem with correctly passing args to the nix build command
+#args_to_pass=$(for arg in "${args_to_pass[@]}"; do echo -en " \\\"$arg\\\""; done)
+#for arg in "${args_to_pass[@]}"; do echo loop: "$arg"; done
+#echo hiii: $args_to_pass
+#test "${args_to_pass[@]}"
+#exit
+
 
 if [[ "$use_github" == "true" ]]
 then

@@ -1,4 +1,4 @@
-{ lib, pkgs, inputs, secretsDir, ... }:
+{ lib, pkgs, inputs, secretsDir, workDir, ... }:
 {
   
   #system.stateVersion = "23.05"; # Did you read the comment?
@@ -11,7 +11,15 @@
       ../common/all.nix
 
 	  	inputs.home-manager.nixosModules.home-manager
-		  ../users/me/headless.nix
+		  #../users/me/headless.nix
+
+      ##### project modules
+
+      # the module for the zwave setup
+      #"${workDir}/htl/labor/hackl/zwave.nix"
+
+      # labor nas project
+      "${workDir}/htl/labor/nas/nixos/lush-module.nix"
   ];
 
  # home-manager.users.me = import ../users/me/home-headless.nix;
@@ -36,13 +44,19 @@
   ];
   */
 
+  services.blueman.enable = true;
+	hardware.bluetooth.enable = true;
   hardware.enableRedistributableFirmware = true;
 
   # This causes an overlay which causes a lot of rebuilding
   environment.noXlibs = lib.mkForce false;
 
 
-  environment.systemPackages = with pkgs; [ vim git ];
+  environment.systemPackages = with pkgs; [
+    vim
+    bluez
+    git
+  ];
 
   # "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix" creates a
   # disk with this label on first boot. Therefore, we need to keep it. It is the
@@ -124,7 +138,7 @@
         id = "pt";
         uuid = "f028117e-9eef-47c1-8483-574f7ee798a4";
         type = "bluetooth";
-        autoconnect = "false";
+        autoconnect = "true";
       };
 
       bluetooth = {
@@ -133,7 +147,7 @@
       };
 
       ipv4 = {
-        address1 = "192.168.20.21/24";
+        address1 = "192.168.44.22/24";
         method = "auto";
       };
     };

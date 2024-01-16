@@ -10,11 +10,12 @@
 			# typst ... TODO
 			rust-vim
 			dracula-vim
-         lf-vim
+      lf-vim
 		];
 
 		coc.enable = true;
 		coc.settings = {
+      "rust-analyzer.cargo.sysroot" = "discover";
 		  "rust-analyzer.server.path" = "/etc/profiles/per-user/me/bin/rust-analyzer";
 		  "coc.preferences.extensionUpdateCheck" = "never";
 		  "cSpellExt.enableDictionaries" = [ "german" ];
@@ -442,15 +443,26 @@
 			function Cargo_jump()
 				local line,c = unpack(vim.api.nvim_win_get_cursor(0))
 				local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+				print("hiiiiiiiiiii")
+				print("hiiiiiiiiiii")
+				print("hiiiiiiiiiii")
+				print("hiiiiiiiiiii")
+				print("hiiiiiiiiiii")
+        		print("lines", lines)
+        		print("line", line)
 
 				local line_iter = line
 				local line_to_jump = nil
 				local file_to_jump = nil
+				if line == 1 then
+					line_iter = 2
+				end
 				while true do
-					if (lines[line_iter]:sub(1,6) == "error[") then
+					if (lines[line_iter]:sub(1,5) == "error") then
 						local split_line = mysplit(lines[line_iter +1], ":")
 						line_to_jump = split_line[2]
-						file_to_jump = split_line[1]:sub(6, -1)
+						file_to_jump = split_line[1]:sub(7, -1)
+            file_to_jump = file_to_jump:gsub("%s+", "")
 						break
 					end
 					line_iter = line_iter - 1
@@ -460,26 +472,50 @@
 				local abs_file_to_jump = vim.fn.getcwd() .. "/" .. file_to_jump
 
 				for i,buf in pairs(buffers) do
-					local name = vim.api.nvim_buf_get_name(buf)
-					if name == abs_file_to_jump then
+					-- local status, name = pcall(function () vim.api.nvim_buf_get_name(buf) end)
+					-- if status then print("error getting buf name"); goto continue else print("got name: " .. name) end
+
+					local name = vim.fn["bufname"](buf)
+					if name == "" then
+            -- print("buf name empty")
+            goto continue
+          end
+
+					-- print("name: " .. name .. "  file_to_jump: " .. file_to_jump)
+					if name == file_to_jump then
 						local tab_num = get_tab(name)
-						--vim.cmd("tabn 2")
+						print("jumping to" .. tostring(tab_num))
+						-- vim.cmd(tab_num .. "gt")
+						-- local keys = vim.api.nvim_replace_termcodes("<ENTER>"..tab_num.."gt", false, false, false)
+						-- vim.api.nvim_feedkeys("<ENTER>", "m", true)
+						vim.cmd("q")
+						vim.api.nvim_feedkeys(tab_num .. "gt", "m", false)
+						vim.api.nvim_feedkeys(line_to_jump .. "G", "m", false)
 						return
 					else
 					end
+
+					::continue::
 				end
-				vim.cmd(":tabnew" .. abs_file_to_jump)
+				-- vim.cmd(":tabnew" .. abs_file_to_jump)
 			end
 
 			function get_tab(name)
-				print("there")
+				print("the messssssssssssssssss")
 				local listing = vim.api.nvim_command_output("tabs")
+				local tab
+				local file
 				for i,line in pairs(mysplit(listing, "\n")) do
+					print("line: " .. line)
 					if line:sub(1,8) == "Tab page" then
-						local tab = line:sub(-1)
+						tab = line:sub(-1)
 						print("tab:", tab)
 					else
-						local file = line:sub(5,-1)
+						file = line:sub(5,-1)
+						print("file: " .. file .. " on tab: " .. tostring(tab))
+						if file == name then
+							return tab
+						end
 					end
 				end
 			end
@@ -520,6 +556,7 @@
 
 				 return buffers
 			end
+
 
 		'';
 	};

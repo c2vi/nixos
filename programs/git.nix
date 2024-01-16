@@ -3,7 +3,7 @@
 	programs.git = {
 		enable = true;
 		userName  = "Sebastian Moser";
-		userEmail = "me@c2vi.dev";
+		userEmail = "sebastian@c2vi.dev";
 	
 		extraConfig = {
 			core.editor = "nvim";

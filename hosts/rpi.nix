@@ -1,4 +1,4 @@
-{ lib, pkgs, inputs, secretsDir, ... }:
+{ lib, pkgs, inputs, secretsDir, system, ... }:
 {
   imports = [
     "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
@@ -7,6 +7,7 @@
 
 		../common/all.nix
 		../common/nixos-headless.nix
+    ../common/nixos.nix
 
 		inputs.home-manager.nixosModules.home-manager
 		../users/me/headless.nix
@@ -14,8 +15,6 @@
     ../users/server/headles.nix
     ../users/files/headless.nix
   ];
-
-  system.stateVersion = "23.05";
 
   # to cross compile
   #nixpkgs.hostPlatform.system = "aarch64-linux";
@@ -31,12 +30,24 @@
 
   environment.systemPackages = with pkgs; [
     bcache-tools
+    su
+    fuse3
   ];
 
   fileSystems."/" =
     { device = "/dev/disk/by-label/NIXOS_SD";
       fsType = "ext4";
     };
+
+  fileSystems."/home/files/storage" =
+    { device = "/dev/bcache0p1";
+      fsType = "ext4";
+    };
+
+  fileSystems."/svn" = {
+		device = "/home/files/storage/files/stuff/svn";
+  	options = [ "bind" ];
+  };
 
  swapDevices = [ {
     device = "/swapfile";
@@ -98,7 +109,7 @@
         uuid = "a02273d9-ad12-395e-8372-f61129635b6f";
         type = "ethernet";
         autoconnect-priority = "-999";
-        interface-name = "eth0";
+        interface-name = "end0";
       };
       ipv4 = {
         address1 = "192.168.1.2/24,192.168.1.1";
@@ -107,6 +118,7 @@
       };
     };
 
+  /*
     me = {
      connection = {
         id = "me";
@@ -124,6 +136,7 @@
         method = "manual";
       };
     } // (import ../common/wg-peers.nix { inherit secretsDir; }) ;
+  */
   };
 
   ######################################### wstunnel #######################################
@@ -155,13 +168,14 @@
         ip=$(curl my.ip.fi)
         curl "http://dynv6.com/api/update?hostname=${builtins.readFile "${secretsDir}/dns-name-two"}&ipv4=$ip&token=${builtins.readFile "${secretsDir}/dns-name-two-token"}"
         curl "https://dynamicdns.park-your-domain.com/update?host=@&domain=${builtins.readFile "${secretsDir}/dns-name"}&password=${builtins.readFile "${secretsDir}/dns-name-token"}&ip=$ip"
+
         # https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-to-dynamically-update-the-hosts-ip-with-an-https-request/
       '';
       };
     in
   {
     enable = true;
-    description = "block Youtube";
+    description = "dyndns ip updates";
     unitConfig = {
       Type = "simple";
     };
@@ -249,4 +263,164 @@
       };
     };
   };
+
+  ############################## files backup ##################################
+  # needs that
+  programs.fuse.userAllowOther = true;
+  systemd.services.rclone-mount-backup = {
+    enable = true;
+    description = "Mount rclone backup folder";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      ExecStart = "${pkgs.bash}/bin/bash -c 'export PATH=/run/wrappers/bin:$PATH; id; ${pkgs.rclone}/bin/rclone mount --allow-non-empty --allow-other --vfs-cache-max-size 2G --vfs-cache-mode full backup: /home/files/backup'";
+      User = "files";
+      Group = "files";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  services.borgbackup.jobs.files = {
+    #user = "files";
+    extraCreateArgs = "--verbose --list --filter=AMECbchfsx --stats --checkpoint-interval 600";
+    extraArgs = "--progress";
+    paths = "/home/files/storage";
+    doInit = false;
+    repo = "/home/files/backup/dateien-backup-borg-repo";
+    compression = "lzma,9";
+    startAt = "weekly";
+    user = "files";
+    group = "files";
+    postCreate = ''
+      echo create done!!!!!
+    '';
+    extraPruneArgs = "--stats --list --save-space";
+    patterns = [
+      "- /home/files/storage/files/no-backup"
+    ];
+
+    encryption.mode = "repokey-blake2";
+    encryption.passCommand = "cat /home/files/secrets/borg-passphrase";
+
+    environment.BORG_KEY_FILE = "/home/files/secrets/borg-key";
+
+    prune.keep = {
+      #within = "1w"; # Keep all archives from the last day
+      daily = 7;
+      weekly = 7;
+      monthly = -1;  # Keep at least one archive for each month
+    };
+
+  };
+
+
+	################################ server ######################################
+  /*
+  systemd.services.nginx-pod = {
+    enable = true;
+    description = "pod for nginx proxy manager";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      ExecStart = let prg = pkgs.writeShellApplication {
+        name = "nginx-pod";
+        runtimeInputs = with pkgs; [ su shadow ];
+        text = lib.strings.concatStringsSep " " [
+          "${inputs.podman.packages.${system}.podman}/bin/podman" "pod" "create"
+          "--name=nginx"
+          "--share net"
+          "-p 81:81"
+          "-p 80:80"
+          "-p 443:443"
+        ];
+      }; in "${prg}/bin/nginx-pod";
+      User = "server";
+      Group = "server";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  systemd.services.nginx-db = {
+    enable = true;
+    description = "bar";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      ExecStart = let prg = pkgs.writeShellApplication {
+        name = "nginx-db";
+        runtimeInputs = with pkgs; [ su shadow ];
+        text = lib.strings.concatStringsSep " " [
+          # make data dir if non existent
+          "${pkgs.coreutils}/bin/mkdir -p /home/server/here/nginx/data;"
+
+          "${inputs.podman.packages.${system}.podman}/bin/podman" "container" "run"
+          "--name=nginx_db"
+          "--pod=nginx"
+          "-e MYSQL_ROOT_PASSWORD=HAg!HZiZQ9ydGlFK7KP4"
+          "-e MYSQL_DATABASE=nginx-proxy-manager"
+          "-e MYSQL_USER=webserver"
+          ''"-e MYSQL_PASSWORD=n1jK69EQEBOiJ&YPmbeW"''
+          "-v /home/server/here/nginx/data/mysql:/var/lib/mysql:Z"
+          "--add-host app:127.0.0.1"
+          "--add-host nginx_app:127.0.0.1"
+          "--add-host db:127.0.0.1"
+          "--add-host nginx_db:127.0.0.1"
+          "--restart unless-stopped"
+
+          # last image name
+          "nginx-proxy-manager"
+        ];
+      }; in "${prg}/bin/nginx-db";
+      User = "server";
+      Group = "server";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  systemd.services.nginx = {
+    enable = true;
+    description = "bar";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      ExecStart = let prg = pkgs.writeShellApplication {
+        name = "nginx";
+        runtimeInputs = with pkgs; [ su shadow ];
+        text = lib.strings.concatStringsSep " " [
+          # make data dir if non existent
+          "${pkgs.coreutils}/bin/mkdir -p /home/server/here/nginx/data;"
+
+          "${inputs.podman.packages.${system}.podman}/bin/podman" "container" "run"
+          "--name=nginx_app"
+          "--pod=nginx"
+
+          "-e DB_MYSQL_HOST=db"
+          "-e DB_MYSQL_PORT=3306"
+          "-e DB_MYSQL_USER=webserver"
+          ''"e DB_MYSQL_PASSWORD=n1jK69EQEBOiJ&YPmbeW"''
+          "-e DB_MYSQL_NAME=nginx-proxy-manager"
+          "-v /home/server/here/nginx/data:/data"
+          "-v /home/server/here/nginx/data/letsencrypt:/etc/letsencrypt"
+          "--add-host app:127.0.0.1"
+          "--add-host nginx_app:127.0.0.1"
+          "--add-host db:127.0.0.1"
+          "--add-host nginx_db:127.0.0.1"
+
+          "--restart unless-stopped"
+
+          # last image name
+          "mariadb-aria"
+        ];
+      }; in "${prg}/bin/nginx";
+      User = "server";
+      Group = "users";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
+*/
 }
