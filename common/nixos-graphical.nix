@@ -14,7 +14,7 @@
    	  sessionCommands = ''
 			  xmobar ${self}/misc/xmobar.hs &
 
-			  # aparently needed, so that xmonad works
+			  # the sleep is aparently needed, so that xmonad is already fully started up??
 			  sleep 2 && \
 			  ${pkgs.xorg.xmodmap}/bin/xmodmap \
 				  -e "clear control" \
@@ -66,7 +66,6 @@
 	# Enable sound.
 	sound.enable = true;
 	hardware.pulseaudio.enable = true;
-
   services.blueman.enable = true;
 	hardware.bluetooth.enable = true;
 

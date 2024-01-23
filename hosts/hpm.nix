@@ -1,9 +1,11 @@
 { inputs, pkgs, ... }:
 {
 	imports = [
+    #"${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-x86_64.nix"
 		../common/all.nix
 		../common/nixos.nix
 		../common/nixos-graphical.nix
+    ../mods/hec-server.nix
     ../common/building.nix
 
 		inputs.home-manager.nixosModules.home-manager
@@ -19,6 +21,7 @@
 	};
 
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  virtualisation.podman.enable = true;
 
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 

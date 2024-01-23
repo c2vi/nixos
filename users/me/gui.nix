@@ -14,6 +14,7 @@
 
 	home-manager.users.me = import ./gui-home.nix;
   #home-manager.useGlobalPkgs = true;
+
   nixpkgs.config.allowUnfree = true;
 
 	fonts.fonts = with pkgs; [

@@ -9,6 +9,11 @@
 			"github.com" = {
 				hostname = "github.com";
 			};
+      here = {
+        port = 8888;
+        hostname = "127.0.0.1";
+        user = "me";
+      };
       rpi = {
         port = 49388;
         user = "me";

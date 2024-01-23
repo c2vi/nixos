@@ -98,6 +98,9 @@
     rustc
 
 		#localPacketTracer8
+		(ciscoPacketTracer8.overrideAttrs (prev: final: {
+      src = /home/me/work/software/CiscoPacketTracer_821_Ubuntu_64bit.deb;
+    }))
 
 		#ciscoPacketTracer8
 
@@ -144,6 +147,7 @@
             "tab": "00:0a:50:90:f1:00",
             # "phone": "86:9d:6a:bc:ca:1b", # can't do that, because phone changes mac address on reactivation of hotspot
             "lush": "dc:a6:32:cb:4d:5f",
+            "hpm": "bc:17:b8:27:26:5d",
           }
 
           if len(sys.argv) == 1:

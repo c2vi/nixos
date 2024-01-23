@@ -266,7 +266,7 @@
 
   ############################## files backup ##################################
   # needs that
-  programs.fuse.userAllowOther = true;
+  programs.fuse.userAllowOther = true; # otherwise the root user has no acces to the mount
   systemd.services.rclone-mount-backup = {
     enable = true;
     description = "Mount rclone backup folder";

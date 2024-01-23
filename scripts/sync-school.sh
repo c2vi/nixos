@@ -9,6 +9,11 @@ filter=--exclude="./Forms"
 echo "########################## DE ##########################"
 rclone copy -vv $filter share-de-class-materials: ~/work/htl/de/class-materials/ 2>&1 >/dev/null | grep Copied --color=never | awk -F':' '{print $4}' | cut -c 2- | sed 's/^/class-materials:    /'
 
+# Labor
+echo "########################## Labor ##########################"
+rclone copy -vv $filter --exclude="ubuntu-22.04.3-desktop-amd64.iso" share-klotz-class-materials: ~/work/htl/labor/klotz/class-materials/ 2>&1 >/dev/null | grep Copied --color=never | awk -F':' '{print $4}' | cut -c 2- | sed 's/^/class-materials:    /'
+
+
 
 # HWE
 #echo "########################## HWE #########################"

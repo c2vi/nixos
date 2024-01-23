@@ -72,16 +72,26 @@
 			workDir = "/home/me/work";
 			secretsDir = "/home/me/work/here/secrets";
 			persistentDir = "/home/me/work/app-data";
+
+      mypkgs = import nixpkgs { 
+        system = "x86_64-linux"; 
+        config = {
+          allowUnfree = true;
+          permittedInsecurePackages = [
+            "electron-24.8.6"
+            "electron-25.9.0"
+            ];
+        }; 
+        overlays = [ 
+          ( import ./mods/my-nixpkgs-overlay.nix { inherit nixpkgs; } )
+          ( import ./mods/second-overlay.nix { inherit nixpkgs; } )
+        ];
+      };
+
       specialArgs = {
 				inherit inputs confDir workDir secretsDir persistentDir self;
         system = "x86_64-linux";
-				pkgs = import nixpkgs { system = "x86_64-linux"; config = {
-					allowUnfree = true;
-					permittedInsecurePackages = [
-	 					"electron-24.8.6"
-            "electron-25.9.0"
-  					];
-				}; };
+        pkgs = mypkgs;
 			};
 		in
 	{
@@ -100,7 +110,7 @@
       		system = "x86_64-linux";
       		modules = [
          		./hosts/hpm.nix
-					  ./hardware/hpm-laptop.nix
+					  #./hardware/hpm-laptop.nix
       		];
    		};
 
@@ -311,6 +321,15 @@
       lush = self.nixosConfigurations.lush.config.system.build.sdImage;
       rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
 
+      hec-img = nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        modules = [
+          ./hosts/hpm.nix
+        ];
+        format = "raw";
+				inherit specialArgs;
+      };
+
 
       prootTermux = inputs.nix-on-droid.outputs.packages.x86_64-linux.prootTermux;
       docker = let pkgs = nixpkgs.legacyPackages.x86_64-linux.pkgs; in pkgs.dockerTools.buildImage {
@@ -336,5 +355,8 @@
         program = "${self.packages.x86_64-linux.run-vm}/bin/run-vm";
       };
 		};
+
+    pkgs = mypkgs;
+    home.me = import ./users/me/gui-home.nix;
 	};
 }

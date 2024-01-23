@@ -11,9 +11,9 @@
       ../common/all.nix
 
 	  	inputs.home-manager.nixosModules.home-manager
-		  #../users/me/headless.nix
+		  ../users/me/headless.nix
 
-      ##### project modules
+      ##### project modules #####
 
       # the module for the zwave setup
       #"${workDir}/htl/labor/hackl/zwave.nix"
