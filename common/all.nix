@@ -4,7 +4,7 @@
 
 {
 	imports = [
-		../mods/my-nixpkgs-overlay.nix
+		#../mods/my-nixpkgs-overlay.nix
 	];
 
 

@@ -92,6 +92,7 @@
       ];
       patches = [
         ./static/python311Packages-lxml.patch
+        # built without any extensions ... hardcoded with a patch
       ];
 
       STATICBUILD = true;
@@ -110,6 +111,14 @@
         #mv ./libs/libxml2-2.10.4.tar.xz ./libs/libxml2-2.10.4.tar.gz
     });
   };
+
+  pkgsStatic = prev.pkgsStatic // {
+    libglvnd = prev.libglvnd;
+    gonme2.libIDL = prev.gnome2.libIDL;
+    libjpeg-turbe = prev.libjpeg-turbo;
+  };
+
+
 }
 
 

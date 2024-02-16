@@ -18,6 +18,10 @@
   		settings.PasswordAuthentication = false;
   		settings.KbdInteractiveAuthentication = false;
   		settings.PermitRootLogin = "yes";
+      settings.X11Forwarding = true;
+      extraConfig = ''
+        X11UseLocalhost no
+      '';
 	};
 
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.

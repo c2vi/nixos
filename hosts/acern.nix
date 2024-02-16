@@ -18,6 +18,10 @@
 
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
+    settings.X11Forwarding = true;
+    extraConfig = ''
+      X11UseLocalhost no
+    '';
   };
 
   programs.bash.loginShellInit = "";

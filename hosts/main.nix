@@ -27,15 +27,14 @@
 	];
 
 
-
-
-
   environment.systemPackages = with pkgs; [
     cifs-utils
+    nfs-utils
     ntfs3g
     dhcpcd
     looking-glass-client
   ];
+
 
   # enable ntp
   #services.ntp.enable = true;
@@ -180,6 +179,7 @@
 	security.polkit.enable = true;
 
   services.avahi.enable = true;
+  services.avahi.hostName = "c2vi";
 
   networking.networkmanager.enable = true;
   #networking.networkmanager.extraConfig = ''
@@ -421,7 +421,7 @@
 
     virtualisation.kvmgt.enable = true;
     boot.extraModprobeConfig = "options i915 enable_guc=2";
-    boot.kernelParams = [ "intel_iommu=on" ];
+    boot.kernelParams = [ "intel_iommu=on" "pcie_aspm=force" ];
 
     virtualisation.kvmgt.vgpus = {
       "i915-GVTg_V5_8" = {

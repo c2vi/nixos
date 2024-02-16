@@ -82,6 +82,10 @@
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
   	settings.PermitRootLogin = "no";
+    settings.X11Forwarding = true;
+    extraConfig = ''
+      X11UseLocalhost no
+    '';
   };
 
 

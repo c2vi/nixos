@@ -9,6 +9,9 @@
 			"github.com" = {
 				hostname = "github.com";
 			};
+      sepp = {
+        user = "seb";
+      };
       here = {
         port = 8888;
         hostname = "127.0.0.1";
@@ -57,9 +60,8 @@
 			};
 
 			ocia = {
-				hostname = "140.238.212.229";
-				user = "root";
-				#identityFile = "${secretsDir}/private-key-ocia";
+				hostname = "140.238.173.196";
+				user = "ubuntu";
 			};
 
 			ocib = {

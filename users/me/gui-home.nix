@@ -62,6 +62,7 @@
 
     # gui packages
 		obsidian
+    gnome.eog
 		xorg.xkbcomp
 		haskellPackages.xmonad-extras
 		haskellPackages.xmonad-contrib

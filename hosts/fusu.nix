@@ -49,9 +49,11 @@
   		settings.KbdInteractiveAuthentication = false;
   		settings.PermitRootLogin = "yes";
 
-      #settings.X11UseLocalhost = "no";
       settings.X11Forwarding = true;
-      #settings.AddressFamily = "inet";
+
+      extraConfig = ''
+        X11UseLocalhost no
+      '';
 	};
 
 	networking.firewall.allowPing = true;

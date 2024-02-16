@@ -83,8 +83,8 @@
             ];
         }; 
         overlays = [ 
-          ( import ./mods/my-nixpkgs-overlay.nix { inherit nixpkgs; } )
-          ( import ./mods/second-overlay.nix { inherit nixpkgs; } )
+          #( import ./mods/my-nixpkgs-overlay.nix { inherit nixpkgs; } )
+          #( import ./mods/second-overlay.nix { inherit nixpkgs; } )
         ];
       };
 
@@ -195,6 +195,14 @@
       	system = "x86_64-linux";
         modules = [
           ./hosts/acern.nix
+        ];
+      };
+
+   		"acern-real" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+        modules = [
+          ./hosts/acern-real.nix
         ];
       };
 

@@ -88,6 +88,7 @@
       export PATH=${self}/mybin:$PATH
 			export TERM="xterm-color"
       export system=${system}
+      export NIX_PATH=$NIX_PATH:nixpkgs=${self}
 
       # the commit hash of nixpkgs 23.11
       export nip="nixpkgs/71db8c7a02f3be7cb49b495786050ce1913246d3"
@@ -139,7 +140,7 @@
       tta(){
         if [[ "$1" == "" ]]
         then
-          rsync -rv --delete ~/work/priv-share/fast/* tab:/sdcard/fast
+          rsync -rv --delete ~/work/priv-share/fast/ tab:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
           rsync -rv tab:/sdcard/fast/* ~/work/priv-share/fast
@@ -154,7 +155,7 @@
       tph(){
         if [[ "$1" == "" ]]
         then
-          rsync -rv --delete ~/work/priv-share/fast/* phone:/sdcard/fast
+          rsync -rv --delete ~/work/priv-share/fast/ phone:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
           rsync -rv phone:/sdcard/fast/* ~/work/priv-share/fast
@@ -305,7 +306,7 @@
 			complete -W "start stop restart status daemon-reload" stl
 
 			# run 
-			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char" ru
+			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso speed-test-upload speed-test-download bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char mnt-school" ru
 
 
 		'';

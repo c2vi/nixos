@@ -116,6 +116,29 @@
         dns = "1.1.1.1;";
         method = "manual";
       };
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/wifi-rpi-password";
+      };
+    };
+
+    hot = {
+      connection = {
+        id = "hot";
+        uuid = "ab51de8a-9742-465a-928b-be54a83ab6a3";
+        type = "wifi";
+        autoconnect = "false";
+        interface-name = "wlan0";
+      };
+      wifi = {
+        mac-address = "0C:96:E6:E3:64:03";
+        mode = "ap";
+        ssid = "c2vi-rpi";
+      };
+
+      ipv4 = {
+        method = "shared";
+      };
     };
 
   /*
@@ -196,6 +219,10 @@
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
   	settings.PermitRootLogin = "no";
+    settings.X11Forwarding = true;
+    extraConfig = ''
+      X11UseLocalhost no
+    '';
   };
 
 	################################ samba ######################################
@@ -283,7 +310,7 @@
 
   services.borgbackup.jobs.files = {
     #user = "files";
-    extraCreateArgs = "--verbose --list --filter=AMECbchfsx --stats --checkpoint-interval 600";
+    extraCreateArgs = "--verbose --list --filter=AMECbchfs --stats --checkpoint-interval 600";
     extraArgs = "--progress";
     paths = "/home/files/storage";
     doInit = false;
