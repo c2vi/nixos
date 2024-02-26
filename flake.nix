@@ -110,7 +110,8 @@
       		system = "x86_64-linux";
       		modules = [
          		./hosts/hpm.nix
-					  #./hardware/hpm-laptop.nix
+					  ./hardware/hpm-laptop.nix
+            #./mods/hec-server.nix
       		];
    		};
 
@@ -210,16 +211,45 @@
       		system = "x86_64-linux";
       		specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
       		modules = [
-         		#./hosts/the-most-default.nix
-            ./users/root/default.nix
-            ./users/me/headless.nix
+
+
+            # sample de
+            ({
+              #services.xserver.enable = true;
+              #services.xserver.desktopManager.plasma5.enable = true;
+
+              #services.xserver.desktopManager.xterm.enable = false;
+              #services.xserver.desktopManager.xfce.enable = treu;
+
+              #services.xserver.desktopManager.gnome.enable = true;
+            })
+
+            # ssh server
+            # /*
+            ({
+              services.openssh = {
+                enable = true;
+                ports = [ 22 ];
+
+                settings.PasswordAuthentication = false;
+                settings.KbdInteractiveAuthentication = false;
+                settings.X11Forwarding = true;
+                extraConfig = ''
+                  X11UseLocalhost no
+                '';
+              };
+            })
+            # */
+
+            # boot loader and filesystem
+            /*
             ({ ... }: {
               fileSystems."/" = {
                 device = "/dev/disk/by-uuid/6518e61e-7120-48ef-81a3-5eae0f67297e";
                 fsType = "btrfs";
                };
 
-               system.stateVersion = "23.05"; # Did you read the comment?
+              system.stateVersion = "23.05"; # Did you read the comment?
               boot.loader.grub = {
                   enable = true;
                   device = "nodev";
@@ -229,7 +259,16 @@
                 '';
               };
             })
+            # */
+
+            # sdcard
+            "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-x86_64.nix"
+
+            # modules
+         		#./hosts/the-most-default.nix
+            #./users/root/default.nix
             #./users/me/headless.nix
+            ./users/me/headless.nix
 		        inputs.home-manager.nixosModules.home-manager
 		        ./common/all.nix
       		];
@@ -366,5 +405,6 @@
 
     pkgs = mypkgs;
     home.me = import ./users/me/gui-home.nix;
+    top = builtins.mapAttrs (name: value: value.config.system.build.toplevel) (self.nixOnDroidConfigurations // self.nixosConfigurations);
 	};
 }

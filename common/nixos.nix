@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, self, ... }:
 
 # config that i use on all my hosts, that run native nixos
 # excluding for example my phone phone
@@ -20,5 +20,13 @@
     # https://discourse.nixos.org/t/add-bin-bash-to-avoid-unnecessary-pain/5673
     ln -nsf /run/current-system/sw/bin/bash /bin/bash
  '';
+
+  # the hosts file
+  networking.extraHosts = ''
+    ${builtins.readFile "${self}/misc/my-hosts"}
+    ${builtins.readFile "${self}/misc/my-hosts-me"}
+  '';
+  environment.etc.current_hosts.text = builtins.readFile "${self}/misc/my-hosts-me";
+  environment.etc.current_hosts.mode = "rw";
 }
 

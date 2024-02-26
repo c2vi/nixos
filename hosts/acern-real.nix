@@ -6,8 +6,14 @@
     inputs.networkmanager.nixosModules.networkmanager
 		inputs.home-manager.nixosModules.home-manager
     ../common/all.nix
+    ../common/nixos.nix
     ../common/nixos-headless.nix
   ];
+
+  # hack fix
+  #home-manager.users.me.programs.firefox.
+  #home-manager.users.me.programs.firefox.
+  nixpkgs.config.allowUnfree = true;
 
   services.xserver = {
     desktopManager.gnome.enable = true;

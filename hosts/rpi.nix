@@ -32,6 +32,7 @@
     bcache-tools
     su
     fuse3
+    terraform
   ];
 
   fileSystems."/" =
@@ -206,6 +207,44 @@
       Restart = "always";
       RestartSec = "500s";
       ExecStart = "${update-ip}/bin/update-ip";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
+
+
+  ###################################### get oci ampere vm ####################################
+
+  systemd.services.oci-ampere = 
+    let 
+    oci-ampere = pkgs.writeShellApplication {
+      name = "oci-ampere";
+
+      runtimeInputs = with pkgs; [ terraform ];
+
+      text = ''
+        if [[ -f /home/me/here/oci-ampere-vm/not_gotten ]]
+        then
+          echo not gotten....................................
+          pwd
+          cd /home/me/here/oci-ampere-vm
+          terraform apply -auto-approve && rm /home/me/here/oci-ampere-vm/not_gotten
+        else
+          echo gotten!!!!!!!!!!!!!!!!!!!!!
+        fi
+      '';
+      };
+    in
+  {
+    enable = false;
+    description = "get a oci ampere vm";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = "500s";
+      ExecStart = "${oci-ampere}/bin/oci-ampere";
     };
     wantedBy = [ "multi-user.target" ];
   };

@@ -86,6 +86,7 @@
 		xorg.xkill
     xorg.xmodmap
     inkscape
+    kazam
 
     # my own packages
     supabase-cli

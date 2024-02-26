@@ -89,9 +89,11 @@
 			export TERM="xterm-color"
       export system=${system}
       export NIX_PATH=$NIX_PATH:nixpkgs=${self}
+      export NIXPKGS_ALLOW_UNFREE=1
 
       # the commit hash of nixpkgs 23.11
       export nip="nixpkgs/71db8c7a02f3be7cb49b495786050ce1913246d3"
+      export nup="nixpkgs/2a34566b67bef34c551f204063faeecc444ae9da"
 
       # needed to make ssh -X work
       # see: https://unix.stackexchange.com/questions/412065/ssh-connection-x11-connection-rejected-because-of-wrong-authentication

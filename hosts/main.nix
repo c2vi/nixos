@@ -33,6 +33,8 @@
     ntfs3g
     dhcpcd
     looking-glass-client
+    swtpm
+    win-virtio
   ];
 
 
@@ -177,6 +179,7 @@
 	networking.hostName = "main";
 
 	security.polkit.enable = true;
+  services.rpcbind.enable = true;
 
   services.avahi.enable = true;
   services.avahi.hostName = "c2vi";
@@ -210,12 +213,6 @@
   #networking.hosts = {
     #"10.1.1.3" = [ "phone" ];
   #};
-  networking.extraHosts = ''
-    ${builtins.readFile "${self}/misc/my-hosts"}
-    ${builtins.readFile "${self}/misc/my-hosts-me"}
-  '';
-  environment.etc.current_hosts.text = builtins.readFile "${self}/misc/my-hosts-me";
-  environment.etc.current_hosts.mode = "rw";
   #environment.etc.hosts.mode = "rw";
 
   networking.networkmanager.profiles = {
@@ -416,7 +413,13 @@
 
 
   ######################################### virtualisation ###############################
-  	virtualisation.libvirtd.enable = true;
+  	virtualisation.libvirtd = {
+      enable = true;
+      qemuOvmf = true;
+      qemuSwtpm = true;
+      #qemuOvmfPackage = pkgs.OVMFFull;
+    };
+
     virtualisation.podman.enable = true;
 
     virtualisation.kvmgt.enable = true;

@@ -5,7 +5,6 @@
 		../common/all.nix
 		../common/nixos.nix
 		../common/nixos-graphical.nix
-    ../mods/hec-server.nix
     ../common/building.nix
 
 		inputs.home-manager.nixosModules.home-manager

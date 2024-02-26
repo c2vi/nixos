@@ -59,16 +59,15 @@
 				user = "me";
 			};
 
-			ocia = {
-				hostname = "140.238.173.196";
+			ocih = {
+				hostname = "152.67.70.13";
+				user = "ubuntu";
+			};
+			ocib = {
+				hostname = "140.238.213.48";
 				user = "ubuntu";
 			};
 
-			ocib = {
-				hostname = "140.238.211.43";
-				user = "root";
-				#identityFile = "${secretsDir}/private-key-ocib";
-			};
 		};
 	};
 

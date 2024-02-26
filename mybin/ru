@@ -42,12 +42,14 @@ rm /tmp/speed-test.iso
 
 elif [ "$1" == "speed-test-upload" ]
 then
-host=$1
+host=$2
+echo upload to $host
 cat /dev/random | pv | ssh $host "cat > /dev/null"
 
 elif [ "$1" == "speed-test-download" ]
 then
-host=$1
+host=$2
+echo download from $host
 ssh $host "cat /dev/random" | pv > /dev/null
 
 
