@@ -142,10 +142,10 @@
       tta(){
         if [[ "$1" == "" ]]
         then
-          rsync -rv --delete ~/work/priv-share/fast/ tab:/sdcard/fast
+          rsync -rv --delete ~/work/fast/ tab:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
-          rsync -rv tab:/sdcard/fast/* ~/work/priv-share/fast
+          rsync -rv tab:/sdcard/fast/* ~/work/fast
         elif [[ "$1" == "k" ]]
         then
           scp -O "$1" tab:/sdcard/keep
@@ -157,10 +157,10 @@
       tph(){
         if [[ "$1" == "" ]]
         then
-          rsync -rv --delete ~/work/priv-share/fast/ phone:/sdcard/fast
+          rsync -rv --delete ~/work/fast/ phone:/sdcard/fast
         elif [[ "$1" == "p" ]]
         then
-          rsync -rv phone:/sdcard/fast/* ~/work/priv-share/fast
+          rsync -rv phone:/sdcard/fast/* ~/work/fast
         elif [[ "$1" == "k" ]]
         then
           scp -O "$1" tab:/sdcard/keep
