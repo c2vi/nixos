@@ -262,15 +262,16 @@
             # */
 
             # sdcard
-            "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-x86_64.nix"
+            #"${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-x86_64.nix"
 
             # modules
          		#./hosts/the-most-default.nix
             #./users/root/default.nix
-            #./users/me/headless.nix
             ./users/me/headless.nix
 		        inputs.home-manager.nixosModules.home-manager
 		        ./common/all.nix
+            ./common/nixos.nix
+            "${workDir}/htl/net-ksn/AA07/http-server.nix"
       		];
 			};
 

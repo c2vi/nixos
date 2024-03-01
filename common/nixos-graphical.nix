@@ -50,7 +50,7 @@
 	xdg.portal = {
 		enable = true;
 		extraPortals = [
-			#pkgs.xdg-desktop-portal-gtk
+			pkgs.xdg-desktop-portal-gtk
 			#pkgs.xdg-desktop-portal-termfilechooser
 			(pkgs.callPackage ../mods/xdg-desktop-portal-termfilechooser/default.nix {})
 		];

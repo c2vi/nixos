@@ -67,10 +67,13 @@
       source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/firefox-data/onetab-folder";
     };
 
-    # bitwareden storage path
+    # bitwarden storage path
+    # makes bitwarden keep loading forever
+    /*
     ".mozilla/firefox/me/storage/default/moz-extension+++e563a533-4e66-4b75-bbec-176bb803d96c^userContextId=4294967295" = {
       force = true;
       source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/firefox-bitwarden-folder";
     };
+    # */
   };
 }

@@ -38,9 +38,6 @@
         user = "nix-on-droid";
         port = 8022;
       };
-      uwu = {
-        user = "sebastian";
-      };
       acern = {
         user = "me";
         port = 2222;

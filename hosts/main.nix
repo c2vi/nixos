@@ -35,6 +35,7 @@
     looking-glass-client
     swtpm
     win-virtio
+    todoist-electron
   ];
 
 
@@ -419,6 +420,8 @@
       qemuSwtpm = true;
       #qemuOvmfPackage = pkgs.OVMFFull;
     };
+
+    virtualisation.incus.enable = true;
 
     virtualisation.podman.enable = true;
 
