@@ -20,7 +20,7 @@
   programs.nix-index.enableZshIntegration = false;
 
 	home.sessionVariables = {
-		EDITOR = "nvim${self}";
+		EDITOR = "nvim";
 	};
 
 	home.sessionPath = [ "${self}/mybin" ];
