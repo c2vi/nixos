@@ -110,6 +110,14 @@
 	};
   # */
 
+    # */
+  	system.activationScripts.makeBinBash = lib.stringAfter [ "var" ] ''
+		# there is no /bin/bash
+		# https://discourse.nixos.org/t/add-bin-bash-to-avoid-unnecessary-pain/5673
+		ln -nsf /run/current-system/sw/bin/bash /bin/bash
+   '';
+   # */
+
   ################################ my youtube blocking service #############################
   environment.etc."host.conf" = {
     # needed so that firefox does not ignore the hosts file
@@ -435,7 +443,7 @@
       };
     };
 
-    # /*
+     /*
   	system.activationScripts.setupLibvirt = lib.stringAfter [ "var" ] ''
       mkdir -p /var/lib/libvirt/storage
       ln -nsf ${workDir}/vm/libvirt/my-image-pool.xml /var/lib/libvirt/storage/my-image-pool.xml
@@ -445,14 +453,8 @@
         ln -nsf ${workDir}/vm/qemu/$path /var/lib/libvirt/qemu/$path
       done
     '';
-
     # */
-  	system.activationScripts.makeBinBash = lib.stringAfter [ "var" ] ''
-		# there is no /bin/bash
-		# https://discourse.nixos.org/t/add-bin-bash-to-avoid-unnecessary-pain/5673
-		ln -nsf /run/current-system/sw/bin/bash /bin/bash
-   '';
-   # */
+
 
 
 	############################## swap and hibernate ###################################
