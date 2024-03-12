@@ -87,6 +87,7 @@
     xorg.xmodmap
     inkscape
     kazam
+    onlyoffice-bin
 
     # my own packages
     supabase-cli
