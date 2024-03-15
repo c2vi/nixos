@@ -216,6 +216,8 @@
 	networking.firewall.allowedUDPPorts = [
   		3702 # wsdd
       51820  # wireguard
+      67 # allow DHCP traffic
+      53 # allow dns
 	];
 
   networking.search = [ "c2vi.local" ];
