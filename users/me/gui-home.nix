@@ -78,7 +78,9 @@
 		xclip
 		stalonetray
 		killall
-		signal-desktop
+
+    # use signal from unstable, because the app itself says it would to update to be usable
+		self.inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.signal-desktop
 		element-desktop
 		discord
 		wireshark
