@@ -335,6 +335,10 @@
       me-headless = import ./users/common/home.nix;
     };
 
+		packages.aarch64-linux = {
+      cbm = nixpkgs.legacyPackages.aarch64-linux.callPackage ./mods/cbm.nix { };
+    };
+
 		packages.x86_64-linux = {
 			hi = self.nixosConfigurations.the-most-default.config.system.build.toplevel;
       #testing = nixpkgs.legacyPackages.x86_64-linux;
