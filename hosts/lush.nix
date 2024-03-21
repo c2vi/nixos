@@ -19,8 +19,23 @@
       #"${workDir}/htl/labor/hackl/zwave.nix"
 
       # labor nas project
-      "${workDir}/htl/labor/nas/nixos/lush-module.nix"
+      # with this moduel it does not boot, it waits for /dev/disk/by-label/nas-storage
+      # "${workDir}/htl/labor/nas/nixos/lush-module.nix"
   ];
+
+  # fix bluetooth
+  hardware = {
+    bluetooth = {
+      package = pkgs.bluez;
+      enable = true;
+      powerOnBoot = false;
+    };
+  };
+  
+  boot.kernelParams = lib.mkForce ["console=ttyS0,115200n8" "console=tty0" "nohibernate" "loglevel=7" ];
+	# hardware.bluetooth.enable = true;
+
+
 
  # home-manager.users.me = import ../users/me/home-headless.nix;
 
@@ -45,7 +60,6 @@
   */
 
   services.blueman.enable = true;
-	hardware.bluetooth.enable = true;
   hardware.enableRedistributableFirmware = true;
 
   # This causes an overlay which causes a lot of rebuilding
