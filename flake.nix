@@ -64,15 +64,33 @@
 
     podman.url = "github:ES-Nix/podman-rootless";
 
+ 		flake-utils.url = "github:numtide/flake-utils";
+    systems.url = "github:nix-systems/default";
+
 	};
 
-	outputs = { self, nixpkgs, nixos-generators, ... }@inputs: 
+	outputs = { self, nixpkgs, nixos-generators, flake-utils, systems, ... }@inputs: 
 		let 
 			confDir = "/home/me/work/config";
 			workDir = "/home/me/work";
 			secretsDir = "/home/me/work/here/secrets";
 			persistentDir = "/home/me/work/app-data";
 
+      tunepkgs = import nixpkgs {
+
+        localSystem = {
+          gcc.arch = "kabylake";
+          gcc.tune = "kabylake";
+          system = "x86_64-linux";
+        };
+        
+        #system = "x86_64-linux"; 
+        #overlays = [
+          #(self: super: {
+            #stdenv = super.impureUseNativeOptimizations super.stdenv;
+          #})
+        #];
+      };
       mypkgs = import nixpkgs { 
         system = "x86_64-linux"; 
         config = {
@@ -89,7 +107,7 @@
       };
 
       specialArgs = {
-				inherit inputs confDir workDir secretsDir persistentDir self;
+				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs;
         system = "x86_64-linux";
         pkgs = mypkgs;
 			};
@@ -340,6 +358,16 @@
     };
 
 		packages.x86_64-linux = {
+      tunefox = mypkgs.firefox-unwrapped.overrideAttrs (final: prev: {
+        NIX_CFLAGS_COMPILE = [ (prev.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
+        requireSigning = false;
+      });
+
+      pkgsWithOverlays = import nixpkgs {
+        system = "x86_64-linux";
+        overlays = [ ./overlays/static-overlay.nix ./overlays/my-overlay.nix ];
+      };
+
 			hi = self.nixosConfigurations.the-most-default.config.system.build.toplevel;
       #testing = nixpkgs.legacyPackages.x86_64-linux;
       testing = (nixpkgs.legacyPackages.x86_64-linux.writeShellApplication {
@@ -347,14 +375,6 @@
         #runtimeInputs = [ inputs.my-log.packages.${system}.pythonForLog ];
         #text = "cd /home/me/work/log/new; nix develop -c 'python ${workDir}/log/new/client.py'";
         text = ''${inputs.my-log.packages.x86_64-linux.pythonForLog}/bin/python ${workDir}/log/new/client.py "$@"'';
-      });
-
-      test = nixpkgs.legacyPackages.x86_64-linux.firefox-devedition-unwrapped.overrideAttrs (old: {
-        NIX_CFLAGS_COMPILE = [ (old.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
-        #hi = builtins.trace ("hello world: " + old.passthru.unwrapped.name) 4;
-        #passthru.unwrapped = old.passthru.unwrapped.overrideAttrs (innerOld: {
-          #NIX_CFLAGS_COMPILE = [ (innerOld.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
-        #});
       });
      
       #test = inputs.firefox.packages.${nixpkgs.legacyPackages.x86_64-linux.pkgs.system}; #.firefox-nightly-bin.overrideAttrs (old: {
@@ -408,8 +428,10 @@
       };
 		};
 
+    tunepkgs = tunepkgs;
     pkgs = mypkgs;
     home.me = import ./users/me/gui-home.nix;
     top = builtins.mapAttrs (name: value: value.config.system.build.toplevel) (self.nixOnDroidConfigurations // self.nixosConfigurations);
+    #nur = let nur-systems = [ "x86_64-linux" "aarch64-linux" ]; in flake-utils.eachDefaultSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.callPackage ./nur.nix {});
 	};
 }
