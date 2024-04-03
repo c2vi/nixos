@@ -3,8 +3,8 @@ final: prev: {
 
   # talloc for proot
   talloc = prev.talloc.overrideAttrs (innerFinal: innerPrev: {
-    wafConfigureFlags = innerPrev.wafConfigureFlags ++ [ "--disable-python" ];
-    patches = innerPrev.patches ++ [ ./patches/talloc-satic.patch ];
+    wafConfigureFlags = innerPrev.wafConfigureFlags or [] ++ [ "--disable-python" ];
+    patches = innerPrev.patches or [] ++ [ ./patches/talloc-satic.patch ];
   });
 
   # for static builds
