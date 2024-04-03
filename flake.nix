@@ -365,7 +365,7 @@
 
       pkgsWithOverlays = import nixpkgs {
         system = "x86_64-linux";
-        overlays = [ ./overlays/static-overlay.nix ./overlays/my-overlay.nix ];
+        overlays = [ (import ./overlays/static-overlay.nix) (import ./overlays/my-overlay.nix) ];
       };
 
 			hi = self.nixosConfigurations.the-most-default.config.system.build.toplevel;
