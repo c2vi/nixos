@@ -5,6 +5,15 @@ final: prev: {
   talloc = prev.talloc.overrideAttrs (innerFinal: innerPrev: {
     wafConfigureFlags = innerPrev.wafConfigureFlags or [] ++ [ "--disable-python" ];
     patches = innerPrev.patches or [] ++ [ ./patches/talloc-satic.patch ];
+    postBuild = ''
+      # talloc's Waf setup doesn't build static libraries, so we do it manually
+      # from: https://git.alpinelinux.org/aports/tree/main/talloc/APKBUILD
+      ar qf libtalloc.a bin/default/talloc.c*.o
+    '';
+    postInstall = ''
+      mkdir -p $out/lib/
+      install -Dm644 libtalloc.a "$out"/lib/libtalloc.a
+    '';
   });
 
   # for static builds
