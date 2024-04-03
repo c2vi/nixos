@@ -1,5 +1,5 @@
 
-{ nixpkgs, ... }: final: prev: {
+final: prev: {
 
   # talloc for proot
   talloc = prev.talloc.overrideAttrs (innerFinal: innerPrev: {
@@ -25,7 +25,7 @@
       install -d $out/lib/pkgconfig
       install -d $out/include
       make -f dist-files/Makefile.staticlibrary install INSTALL_PREFIX=$out
-      substituteAll ${nixpkgs}/pkgs/development/interpreters/duktape/duktape.pc.in $out/lib/pkgconfig/duktape.pc
+      substituteAll ${prev}/pkgs/development/interpreters/duktape/duktape.pc.in $out/lib/pkgconfig/duktape.pc
     '';
   });
 

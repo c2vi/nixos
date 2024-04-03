@@ -1,5 +1,5 @@
 
-{ nixpkgs, ... }: final: prev: {
+final: prev: {
 		#{
 			#localPacketTracer8 = (pkgs.callPackage ../../prebuilt/packetTracer/default.nix {confDir = confDir;});
 			#xdg-desktop-portal-termfilechooser = (pkgs.callPackage ../../mods/xdg-desktop-portal-termfilechooser/default.nix {});
