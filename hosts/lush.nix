@@ -110,14 +110,16 @@
   networking.networkmanager.enable = true;
 
   networking.networkmanager.profiles = {
-    main = {
+    home = {
       connection = {
         id = "main";
         uuid = "a02273d9-ad12-395e-8372-f61129635b6f";
         type = "ethernet";
         autoconnect-priority = "-999";
         interface-name = "eth0";
+        autoconnect = true;
       };
+
       ipv4 = {
         address1 = "192.168.1.44/24,192.168.1.1";
         dns = "1.1.1.1;";
@@ -150,13 +152,36 @@
       };
     };
 
+    share = {
+      connection = {
+        id = "share";
+        uuid = "f55f34e3-4595-4642-b1f6-df3185bc0a04";
+        type = "ethernet";
+        autoconnect = false;
+        interface-name = "eth0";
+      };
+
+      ethernet = {
+        mac-address = "F4:39:09:4A:DF:0E";
+      };
+
+      ipv4 = {
+        address1 = "192.168.4.1/24";
+        method = "shared";
+      };
+
+      ipv6 = {
+        addr-gen-mode = "stable-privacy";
+        method = "auto";
+      };
+    };
 
     pt = {
       connection = {
         id = "pt";
         uuid = "f028117e-9eef-47c1-8483-574f7ee798a4";
         type = "bluetooth";
-        autoconnect = "true";
+        autoconnect = true;
       };
 
       bluetooth = {
