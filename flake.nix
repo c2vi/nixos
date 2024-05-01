@@ -43,7 +43,7 @@
 
     robotnix = {
       #url = "github:nix-community/robotnix";
-      url = "github:c2vi/robotnix/c9e9d9ae8cfe444bee2c0f64a17500bbaf37e4b3";
+      url = "github:c2vi/robotnix/1f848f248ae6901d4336221febc86c14e60de85e";
       #inputs.nixpkgs.follows = "nixpkgs";
     };
 
