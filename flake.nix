@@ -476,5 +476,6 @@
     overlays = {
       static = import ./overlays/static-overlay.nix;
     };
+    inherit inputs;
 	};
 }
