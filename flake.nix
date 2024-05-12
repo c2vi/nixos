@@ -335,6 +335,15 @@
           (import ./hosts/phone/default.nix)
         ];
       };
+      "s9" = inputs.robotnix.lib.robotnixSystem {
+        device = "starlte";
+        flavor = "lineageos";
+      };
+      "vanilla" = inputs.robotnix.lib.robotnixSystem {
+        device = "x86_64";
+        productName = "sdk_x86_64";
+        flavor = "lineageos";
+      };
     };
 
     nixOnDroidConfigurations = rec {
