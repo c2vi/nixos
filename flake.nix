@@ -43,7 +43,7 @@
 
     robotnix = {
       #url = "github:nix-community/robotnix";
-      url = "github:c2vi/robotnix/two_lineageos_fixes";
+      url = "github:c2vi/robotnix";
       #inputs.nixpkgs.follows = "nixpkgs";
     };
 
