@@ -342,7 +342,7 @@
       "vanilla" = inputs.robotnix.lib.robotnixSystem {
         device = "x86_64";
         productName = "sdk_x86_64";
-        flavor = "lineageos";
+        flavor = "vanilla";
       };
     };
 
