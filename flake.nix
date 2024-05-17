@@ -157,6 +157,21 @@
       overlays = [ inputs.nur.overlay ];
     }; in builtins.mapAttrs (name: value: value.inputDerivation.urls) tmp.nur.repo-sources;
 
+    nurAll = let tmp = import inputs.nixpkgs-unstable {
+      inherit system;
+      overlays = [ inputs.nur.overlay ];
+    }; in tmp.nur.repos;
+
+    nurSrcs = let tmp = import inputs.nixpkgs-unstable {
+      inherit system;
+      overlays = [ inputs.nur.overlay ];
+    }; in tmp.nur.repo-sources;
+
+    nurSrcUrls = let tmp = import inputs.nixpkgs-unstable {
+      inherit system;
+      overlays = [ inputs.nur.overlay ];
+    }; in builtins.mapAttrs (name: value: value.inputDerivation.urls) tmp.nur.repo-sources;
+
     # collection of random things I played around with /built once
     # in seperate path to keep this flake cleaner
     random = import ./random-pkgs.nix {
