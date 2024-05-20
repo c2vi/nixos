@@ -387,7 +387,7 @@
 
 				vnoremap s :call Rust_toggle_comment()<Enter>
 
-				cnoreabbrev c call Cargo_ceck()
+				cnoreabbrev c call Cargo_check()
 				cnoreabbrev r call Cargo_run()
 				cnoreabbrev b call Cargo_build()
 
@@ -411,9 +411,14 @@
 			  autocmd TermOpen * nnoremap <buffer> J :lua Cargo_jump()<Enter>
 			augroup END
 
-			function Cargo_ceck()
+			function Cargo_check()
 				:w
 				:belowright 20split term://cargo check
+			endfunction
+
+			function Cargo_check_mize()
+				:w
+				:belowright 20split term://cargo check --bin mize --features os-binary
 			endfunction
 
 			function Rust_toggle_comment()
