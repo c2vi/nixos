@@ -84,10 +84,7 @@
       '';
     };
   in pkgs.qemu.overrideAttrs {
-      # ln -sf ${libblkio} $(pwd)/subprojects/libblkio
     preConfigure = ''
-      cpp --version
-      echo hooooooooooooooooooooo
       ln -sf ${keycodemapdb} $(pwd)/subprojects/keycodemapdb
       ln -sf ${berkeley-softfloat-3-patched} $(pwd)/subprojects/berkeley-softfloat-3
       ln -sf ${berkeley-testfloat-3-patched} $(pwd)/subprojects/berkeley-testfloat-3
