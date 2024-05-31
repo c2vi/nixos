@@ -18,8 +18,10 @@ stdenv.mkDerivation rec {
 
 	nativeBuildInputs = [
     autoreconfHook
-    openssl
 	];
+  buildInputs = [
+    openssl
+  ];
 
   configureFlags = [
     "--without-config"
