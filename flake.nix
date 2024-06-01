@@ -62,6 +62,8 @@
 
  		flake-utils.url = "github:numtide/flake-utils";
     systems.url = "github:nix-systems/default";
+    victorinix.url = "github:c2vi/victorinix";
+    victorinix.inputs.nixpkgs.follows = "nixpkgs";
 	};
 
 	outputs = { self, nixpkgs, nixpkgs-unstable, nixos-generators, flake-utils, systems, ... }@inputs: 
@@ -118,11 +120,13 @@
   ############ packages ################
   packages = {
 
+    # nixpkgs with my overlays applied, for convenience
     pkgsOverlay = import nixpkgs {
       inherit system;
       overlays = [ (import ./overlays/static-overlay.nix) (import ./overlays/my-overlay.nix) ];
     };
 
+    # same with nixpkgs-unstable
     pkgsOverlayUnstable = import nixpkgs-unstable {
       inherit system;
       overlays = [ (import ./overlays/static-overlay.nix) (import ./overlays/my-overlay.nix) ];
@@ -168,10 +172,19 @@
 			inherit confDir workDir secretsDir persistentDir tunepkgs mypkgs specialArgs eachSystem allSystems;
     };
 
+    pkgsCross.aarch64-multiplatform = (import ./nur.nix {pkgs = nixpkgs.legacyPackages.${system}.pkgsCross."aarch64-multiplatform";});
+
+    test-cbm = nixpkgs.legacyPackages.${system}.pkgsCross.aarch64-multiplatform.callPackage ./mods/cbm.nix {};
+
+
   }
   // # include nur packages from ./nur.nix
   # my nur is unstable by default
   (import ./nur.nix {pkgs = nixpkgs-unstable.legacyPackages.${system};})
+
+  #// # my idea on how to do cross compilaton with flakes....
+  #eachSystem allSystems (crossSystem: {
+  #})
   ;
 
   ############ apps ################
@@ -216,6 +229,23 @@
       #me-headless = import ./users/me/headless.nix;
       me-headless = import ./users/common/home.nix;
       me = import ./users/me/gui-home.nix;
+    };
+    
+    lib = {
+      flakeAddCross = config: pkgs-lambda: let
+        hostSystemShortString = config.system;
+        hostSystem = nixpkgs.lib.systems.parse.mkSystemFromString hostSystemShortString;
+        hostSystemFullString = "${hostSystem.cpu.name}-${hostSystem.vendor.name}-${hostSystem.kernel.name}-${hostSystem.abi.name}";
+      in
+      # we call the lambda like this to get the host packages
+      pkgs-lambda { crossSystemFullString = hostSystemFullString; }
+      # and then add the pkgsCross, where we call it for every cross system
+      // {
+        pkgsCross = {
+          aarch64-linux = pkgs-lambda { crossSystemFullString = "aarch64-unknown-linux-gnu"; };
+          x86_64-linux = pkgs-lambda { crossSystemFullString = "x86_64-unknown-linux-gnu"; };
+        };
+      };
     };
 
   ############ nixosConfigurations ################
