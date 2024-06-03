@@ -95,6 +95,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     ((modm              , xK_d), spawn "xrandr --output eDP-1 --auto"),
 
+    -- launch mshot
+    ((modm .|. shiftMask, xK_m), spawn "mshot"),
+
 
     -- launch dmenu
     ((modm,               xK_p     ), spawn "nice -n 7 rofi -show run"),
