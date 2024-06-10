@@ -2,6 +2,46 @@
   system, inputs, nixpkgs, self,
   ... 
 }:{
+  usbip-kernel = self.nixosConfigurations.main.config.system.build.kernel.overrideAttrs (prev: {
+    kernelPatches = prev.kernelPatches or [] ++ [ {
+      name = "usbip";
+      patch = "null";
+      extraConfig = ''
+        USB_ACM y
+        USBIP_CORE y
+        USBIP_VHCI_HCD y
+        USBIP_VHCI_HC PORTS 8
+        USBIP_VHCI_NR_HCS 1
+        USBIP_DEBUG y
+        USBIP_SERIAL y
+      '';
+      } ];
+  });
+  kernel-test = (nixpkgs.lib.nixosSystem {
+    system = "x86_64-linux";
+		inherit specialArgs;
+    modules = [
+      ./hosts/main.nix
+      ./hardware/hpm-laptop.nix
+      #self.nixosConfigurations.main._module
+      {
+        boot.kernelPatches = [ {
+          name = "usbip";
+          patch = null;
+          extraConfig = ''
+            USB_ACM m
+            USBIP_CORE m
+            USBIP_VHCI_HCD m
+            USBIP_VHCI_NR_HCS 1
+          '';
+            #USBIP_VHCI_HC PORTS 8
+            #USBIP_DEBUG y
+            #USBIP_SERIAL y
+          } ];
+      }
+    ];
+  }).config.system.build.kernel;
+
   tunefox = mypkgs.firefox-unwrapped.overrideAttrs (final: prev: {
     NIX_CFLAGS_COMPILE = [ (prev.NIX_CFLAGS_COMPILE or "") ] ++ [ "-O3" "-march=native" "-fPIC" ];
     requireSigning = false;
