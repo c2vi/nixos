@@ -14,4 +14,29 @@
       rev = "nix-support";
       hash = "sha256-xFc8J8tlw6i+FbTC05nrlvQIXRmguFzDqh+SQOR54TE=";
     }; in pkgs.callPackage "${repo}/default.nix" {};
+
+  csv2vcf = let 
+    src = pkgs.fetchFromGitHub {
+      repo = "csv2vcf";
+      owner = "mridah";
+      rev = "a6e04999f9cfe350cf59107ea8fc17dad1e43bca";
+      hash = "sha256-WrlHVQggfU6y7EGLhGR1k5bDyRLp7FUGRdN/8QK9C+o=";
+    };
+  in pkgs.writeShellApplication {
+    name = "csv2vcf"; 
+    text = ''
+      ${pkgs.python3}/bin/python ${src}/csv2vcf.py "$@"
+    '';
+    meta = with pkgs.lib; {
+      description = "A small command line tool to convert CSV files to VCard (.vcf) files.";
+      longDescription = ''
+        see repo's README.md
+      '';
+      homepage = "https://github.com/mridah/csv2vcf";
+      license = licenses.mit;
+      maintainers = with lib.maintainers; [ c2vi ];
+      platforms = platforms.all;
+    };
+  };
+
 }
