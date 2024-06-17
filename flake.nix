@@ -64,6 +64,20 @@
     systems.url = "github:nix-systems/default";
     victorinix.url = "github:c2vi/victorinix";
     victorinix.inputs.nixpkgs.follows = "nixpkgs";
+
+    ####### keyboard
+    zephyr-nix = {
+      url = "github:adisbladis/zephyr-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    zmk-nix = {
+      url = "github:lilyinstarlight/zmk-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    keyboard-config = {
+      url = "github:eigatech/zmk-config/charybdis-3.5";
+      flake = false;
+    };
 	};
 
 	outputs = { self, nixpkgs, nixpkgs-unstable, nixos-generators, flake-utils, systems, ... }@inputs: 

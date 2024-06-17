@@ -1497,6 +1497,23 @@
         "type": "github"
       }
     },
+    "keyboard-config": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1711025888,
+        "narHash": "sha256-TYzL9WNRdaGEEGjA/oX3964vJCovEiSbqI7th02uuys=",
+        "owner": "eigatech",
+        "repo": "zmk-config",
+        "rev": "6f1358bc34f9c97e32533ba11f4e4020507709ff",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eigatech",
+        "ref": "charybdis-3.5",
+        "repo": "zmk-config",
+        "type": "github"
+      }
+    },
     "lib-aggregate": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -1551,6 +1568,33 @@
       "original": {
         "owner": "nix-community",
         "repo": "lib-aggregate",
+        "type": "github"
+      }
+    },
+    "mdbook-nixdoc": {
+      "inputs": {
+        "nix-github-actions": [
+          "zephyr-nix",
+          "pyproject-nix",
+          "nix-github-actions"
+        ],
+        "nixpkgs": [
+          "zephyr-nix",
+          "pyproject-nix",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1708395692,
+        "narHash": "sha256-smf0VmxGbjJDZqKvxxG3ZVqubgbVwAWG26wPo+BT/A0=",
+        "owner": "adisbladis",
+        "repo": "mdbook-nixdoc",
+        "rev": "d6a71b114b9221c0b4f20d31b81766d072cc26be",
+        "type": "github"
+      },
+      "original": {
+        "owner": "adisbladis",
+        "repo": "mdbook-nixdoc",
         "type": "github"
       }
     },
@@ -1860,6 +1904,28 @@
       "original": {
         "owner": "Gerschtli",
         "repo": "nix-formatter-pack",
+        "type": "github"
+      }
+    },
+    "nix-github-actions": {
+      "inputs": {
+        "nixpkgs": [
+          "zephyr-nix",
+          "pyproject-nix",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1701208414,
+        "narHash": "sha256-xrQ0FyhwTZK6BwKhahIkUVZhMNk21IEI1nUcWSONtpo=",
+        "owner": "nix-community",
+        "repo": "nix-github-actions",
+        "rev": "93e39cc1a087d65bcf7a132e75a650c44dd2b734",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-github-actions",
         "type": "github"
       }
     },
@@ -3388,6 +3454,29 @@
         "type": "github"
       }
     },
+    "pyproject-nix": {
+      "inputs": {
+        "mdbook-nixdoc": "mdbook-nixdoc",
+        "nix-github-actions": "nix-github-actions",
+        "nixpkgs": [
+          "zephyr-nix",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1708414356,
+        "narHash": "sha256-neHF92cht4G94Ye1j9YgLeqdE0dGL920lQQMLTqNm9A=",
+        "owner": "nix-community",
+        "repo": "pyproject.nix",
+        "rev": "f75d39ce888632500bf4cff2197784929d3ed265",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "pyproject.nix",
+        "type": "github"
+      }
+    },
     "revealjs": {
       "flake": false,
       "locked": {
@@ -3502,6 +3591,7 @@
         "firefox-addons": "firefox-addons",
         "flake-utils": "flake-utils_3",
         "home-manager": "home-manager",
+        "keyboard-config": "keyboard-config",
         "networkmanager": "networkmanager",
         "nix-doom-emacs": "nix-doom-emacs",
         "nix-index-database": "nix-index-database",
@@ -3516,7 +3606,9 @@
         "podman": "podman",
         "robotnix": "robotnix",
         "systems": "systems_5",
-        "victorinix": "victorinix"
+        "victorinix": "victorinix",
+        "zephyr-nix": "zephyr-nix",
+        "zmk-nix": "zmk-nix"
       }
     },
     "rotate-text": {
@@ -4028,6 +4120,65 @@
       "original": {
         "owner": "hlissner",
         "repo": "ws-butler",
+        "type": "github"
+      }
+    },
+    "zephyr": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1708734632,
+        "narHash": "sha256-iwEXEIA63JWSB6GcTNHHMZAEfMEwEfqcIWetF7VD2tU=",
+        "owner": "zephyrproject-rtos",
+        "repo": "zephyr",
+        "rev": "468eb56cf242eedba62006ee758700ee6148763f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zephyrproject-rtos",
+        "ref": "v3.6.0",
+        "repo": "zephyr",
+        "type": "github"
+      }
+    },
+    "zephyr-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "pyproject-nix": "pyproject-nix",
+        "zephyr": "zephyr"
+      },
+      "locked": {
+        "lastModified": 1712044799,
+        "narHash": "sha256-OHBz1mVLAzNY3OoB3Xqy5hMDgOODfAoas3aGph5y86g=",
+        "owner": "adisbladis",
+        "repo": "zephyr-nix",
+        "rev": "6a007cf4effdd9092e8a8d103c643ee1e26f720e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "adisbladis",
+        "repo": "zephyr-nix",
+        "type": "github"
+      }
+    },
+    "zmk-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1718497863,
+        "narHash": "sha256-xwqAxxp096kGS1sKu1Ll+wtp2U2KzRROY/mwPPKLkqg=",
+        "owner": "lilyinstarlight",
+        "repo": "zmk-nix",
+        "rev": "b320d245a2e8ef8d8c39901d0738d63d6878c64f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lilyinstarlight",
+        "repo": "zmk-nix",
         "type": "github"
       }
     }
