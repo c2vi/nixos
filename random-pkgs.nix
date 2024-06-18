@@ -1,7 +1,45 @@
 { mypkgs, specialArgs, nixos-generators,
   system, inputs, nixpkgs, self,
   ... 
-}:{
+}: let
+  pkgs = import nixpkgs { inherit system; };
+in rec {
+  zephyr = inputs.zephyr-nix.packages.${system};
+  one = inputs.zephyr-nix;
+  two-shell = pkgs.mkShell {
+    packages = with pkgs; [
+      (zephyr.sdk.override {
+        targets = [
+          "arm-zephyr-eabi"
+          "x86_64-zephyr-elf"
+        ];
+      })
+      zephyr.pythonEnv
+      zephyr.hosttools-nix
+      cmake
+      ninja
+    ];
+
+    shellHook = ''
+      echo hiiiiiiiiiiiiiiiii
+      export ZEPHYR_BASE=${inputs.zephyr-nix.inputs.zephyr};
+    '';
+  };
+  three = inputs.zmk-nix.legacyPackages.${system}.fetchZephyrDeps {};
+
+  keyboard = inputs.zmk-nix.legacyPackages.${system}.buildKeyboard {
+    name = "firmware";
+
+    src = inputs.keyboard-config;
+
+    board = "nice_nano_v2";
+
+    # the charybdis has a left and right, so the default parts works
+    shield = "charybdis_%PART%";
+
+    zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
+  };
+
   usbip-kernel = self.nixosConfigurations.main.config.system.build.kernel.overrideAttrs (prev: {
     kernelPatches = prev.kernelPatches or [] ++ [ {
       name = "usbip";
@@ -17,6 +55,7 @@
       '';
       } ];
   });
+
   kernel-test = (nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
 		inherit specialArgs;
