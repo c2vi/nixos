@@ -7,6 +7,8 @@
 
   mac-telnet = pkgs.callPackage ./mods/mac-telnet.nix {};
 
+  vis = pkgs.callPackage ./mods/vis.nix {};
+
   iio-hyprland = let
     repo = pkgs.fetchFromGitHub {
       owner = "yassineibr";
