@@ -67,7 +67,8 @@
 
     ####### keyboard
     zephyr-nix = {
-      url = "github:adisbladis/zephyr-nix";
+      #url = "github:adisbladis/zephyr-nix";
+      url = "/home/me/work/config/gitignore/zephyr-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     zmk-nix = {
@@ -211,7 +212,7 @@
     };
     default = {
       type = "app";
-      program = "${self.packages.x86_64-linux.run-vm}/bin/run-vm";
+      program = "${self.packages.x86_64-linux.random.run-vm}/bin/run-vm";
     };
   };
 

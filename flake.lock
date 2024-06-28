@@ -4149,17 +4149,16 @@
         "zephyr": "zephyr"
       },
       "locked": {
+        "dirtyRev": "6a007cf4effdd9092e8a8d103c643ee1e26f720e-dirty",
+        "dirtyShortRev": "6a007cf-dirty",
         "lastModified": 1712044799,
-        "narHash": "sha256-OHBz1mVLAzNY3OoB3Xqy5hMDgOODfAoas3aGph5y86g=",
-        "owner": "adisbladis",
-        "repo": "zephyr-nix",
-        "rev": "6a007cf4effdd9092e8a8d103c643ee1e26f720e",
-        "type": "github"
+        "narHash": "sha256-TAjq0whUvReSrj2v9YcwMjl7Jh7r6tIVr9ZUQ+JSjQA=",
+        "type": "git",
+        "url": "file:///home/me/work/config/gitignore/zephyr-nix"
       },
       "original": {
-        "owner": "adisbladis",
-        "repo": "zephyr-nix",
-        "type": "github"
+        "type": "git",
+        "url": "file:///home/me/work/config/gitignore/zephyr-nix"
       }
     },
     "zmk-nix": {
