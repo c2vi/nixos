@@ -167,6 +167,8 @@
 
   ######################################### wstunnel #######################################
 
+  # broken with 24.05 and currently not used anyway
+  /*
   systemd.services.wstunnel = {
     enable = true;
     description = "WStunnel for SSH connections and Wireguard VPN";
@@ -180,6 +182,7 @@
     };
     wantedBy = [ "multi-user.target" ];
   };
+  */
 
   ###################################### dyndns ####################################
 
@@ -295,11 +298,11 @@
         # Papierkorb
         "vfs object" = "recycle";
         "recycle:repository" = "/home/files/storage/files/trash-files";
-        "recycle:keeptree" = "No";
+        "recycle:keeptree" = "Yes";
         "recycle:versions" = "Yes";
         "recycle:touch" = "Yes";
         "recycle:touch_mtime" = "Yes";
-        "recycle:maxsize" = "8000";
+        "recycle:maxsize" = "80000";
       };
       lan = {
         "comment" = "gastordner";
