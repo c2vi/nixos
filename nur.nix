@@ -3,11 +3,11 @@
 
 { pkgs ? import <nixpkgs> { } }: {
 
-  cbm = pkgs.callPackage ./mods/cbm.nix {};
+  cbm = pkgs.callPackage ./mods/nurPkgs/cbm.nix {};
 
-  mac-telnet = pkgs.callPackage ./mods/mac-telnet.nix {};
+  mac-telnet = pkgs.callPackage ./mods/nurPkgs/mac-telnet.nix {};
 
-  vis = pkgs.callPackage ./mods/vis.nix {};
+  vis = pkgs.callPackage ./mods/nurPkgs/vis.nix {};
 
   iio-hyprland = let
     repo = pkgs.fetchFromGitHub {
