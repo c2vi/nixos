@@ -134,7 +134,7 @@
         interface-name = "wlan0";
       };
       wifi = {
-        mac-address = "0C:96:E6:E3:64:03";
+        #mac-address = "92:A7:92:FD:3C:EA";
         mode = "ap";
         ssid = "c2vi-rpi";
       };
