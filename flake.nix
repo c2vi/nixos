@@ -67,8 +67,8 @@
 
     ####### keyboard
     zephyr-nix = {
-      #url = "github:adisbladis/zephyr-nix";
-      url = "/home/me/work/config/gitignore/zephyr-nix";
+      url = "github:adisbladis/zephyr-nix";
+      #url = "/home/me/work/config/gitignore/zephyr-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     zmk-nix = {
