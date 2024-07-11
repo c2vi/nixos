@@ -13,6 +13,12 @@
   services.nscd.enable = lib.mkForce false;
   system.nssModules = lib.mkForce [];
 
+  services.xserver.enableTCP = true;
+  services.xserver.displayManager.lightdm.extraSeatDefaults = ''
+    xserver-allow-tcp=true
+  '';
+  services.xserver.displayManager.xserverArgs = [ "-listen tcp" ];
+
 
   programs.nix-ld.enable = true;
 
@@ -224,6 +230,7 @@
 		9999 # for general usage
     8080 # for mitm proxy
     51820  # wireguard
+    6000 # Xserver
 	];
 
 	networking.firewall.allowedUDPPorts = [
