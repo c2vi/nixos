@@ -16,6 +16,7 @@
 		coc.enable = true;
 		coc.settings = {
       "rust-analyzer.cargo.sysroot" = "discover";
+      "rust-analyzer.cargo.features" = "all";
 		  "rust-analyzer.server.path" = "/etc/profiles/per-user/me/bin/rust-analyzer";
 		  "coc.preferences.extensionUpdateCheck" = "never";
 		  "cSpellExt.enableDictionaries" = [ "german" ];
