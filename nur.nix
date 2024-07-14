@@ -1,13 +1,15 @@
 # This is the file for my NUR Repo
 # Reminder for myself: Any package here should not import <nixpkgs>, but use the pkgs
 
-{ pkgs ? import <nixpkgs> { } }: {
+{ pkgs ? import <nixpkgs> { } }:
 
-  cbm = pkgs.callPackage ./mods/nurPkgs/cbm.nix {};
-
-  mac-telnet = pkgs.callPackage ./mods/nurPkgs/mac-telnet.nix {};
-
-  vis = pkgs.callPackage ./mods/nurPkgs/vis.nix {};
+let
+  files = builtins.readDir ./mods/nurPkgs;
+  names = pkgs.lib.attrsets.mapAttrsToList (name: value: pkgs.lib.strings.removeSuffix ".nix" name) files;
+  pwd = builtins.toString ./.;
+in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkgs/${name}.nix" {}))
+//
+{
 
   iio-hyprland = let
     repo = pkgs.fetchFromGitHub {
