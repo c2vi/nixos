@@ -1,11 +1,11 @@
 { pkgs
 , ...
 }: let
-  python = pkgs.python3.withPackages (ps: with ps; [pkgs.python311Pacakges.cryptography]);
-	python_script = pkgs.writeText (builtins.readFile ./main.py);
+  python = pkgs.python3.withPackages (ps: with ps; [pkgs.python311Packages.cryptography]);
+	python_script = pkgs.writeText "main-py" (builtins.readFile ./main.py);
 in pkgs.writeShellApplication {
-  name = "yt-block";
+  name = "yt_block";
   text = ''
-    ${python}/bin/python ${python_script}
+    ${python}/bin/python ${python_script} "$@"
   '';
 }

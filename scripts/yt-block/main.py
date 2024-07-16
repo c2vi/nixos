@@ -67,7 +67,8 @@ def cmd_guard():
         unblock_yt()
 
     # decrement time_current
-    state["yt_time_current"] -= 1
+    if state["yt_time_current"] > 0:
+        state["yt_time_current"] -= 1
 
     write_state(state, pwd)
 
