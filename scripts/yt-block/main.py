@@ -164,6 +164,7 @@ def get_hosts():
 
 
 def write_hosts(hosts):
+    os.system("rm -rf /etc/hosts")
     with open("/etc/hosts", "w") as file:
         lines = []
         for entry in hosts:
