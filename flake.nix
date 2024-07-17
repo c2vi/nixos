@@ -7,6 +7,7 @@
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
 		nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+		nixpkgs-old.url = "github:NixOS/nixpkgs/release-23.11";
 		
     nur.url = "github:nix-community/NUR";
 
@@ -19,6 +20,11 @@
 
 		home-manager = {
 			url = "github:nix-community/home-manager/release-24.05";
+			inputs.nixpkgs.follows = "nixpkgs";
+		};
+
+		home-manager-old = {
+			url = "github:nix-community/home-manager/release-23.11";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
 
@@ -322,7 +328,7 @@
    		};
 
       # my server at home
-   		"rpi" = nixpkgs.lib.nixosSystem rec {
+   		"rpi" = inputs.nixpkgs-old.lib.nixosSystem rec {
 			  #inherit specialArgs;
         specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
         system = "aarch64-linux";
