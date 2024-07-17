@@ -3569,11 +3569,11 @@
         "nixpkgsUnstable": "nixpkgsUnstable"
       },
       "locked": {
-        "lastModified": 1711974003,
-        "narHash": "sha256-15RJWkQnckkU18K7vybuIbhw4d4RssMJyvFAa6XRkYk=",
+        "lastModified": 1720788641,
+        "narHash": "sha256-Afj16G4DxwIueKxv602uYIm56QCTTvT6hxyrhI/qSjo=",
         "owner": "c2vi",
         "repo": "robotnix",
-        "rev": "41b186273bd0ef95cc13942c5cdca461ac65b5fa",
+        "rev": "17904d5868a52640368daef973a03f4985ee22ad",
         "type": "github"
       },
       "original": {
