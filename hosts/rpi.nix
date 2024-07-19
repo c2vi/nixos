@@ -9,7 +9,7 @@
 		../common/nixos-headless.nix
     ../common/nixos.nix
 
-		inputs.home-manager.nixosModules.home-manager
+		inputs.home-manager-old.nixosModules.home-manager
 		../users/me/headless.nix
 		../users/root/default.nix
     ../users/server/headles.nix
