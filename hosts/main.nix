@@ -40,6 +40,7 @@
 
     # see: https://github.com/NixOS/nixpkgs/issues/300081
     #"${inputs.nixpkgs-unstable}/nixos/modules/virtualisation/incus.nix" 
+    ../scripts/yt-block/module.nix
 	];
 
 
@@ -144,61 +145,6 @@
       multi off
       order hosts,nis,bind
     '';
-  };
-  systemd.services.stark = 
-    let 
-    stark = pkgs.writeShellApplication {
-      name = "stark";
-
-      runtimeInputs = with pkgs; [ curl w3m ];
-
-      text = ''
-        if [ -f "/etc/hosts-youtube-block" ];
-        then
-          timeout=$(cat /etc/hosts-youtube-block)
-
-          # check our daily limit
-          if [ -f "/etc/hosts-youtube-daily" ];
-          then
-          echo hi
-          #today=$(cat /etc/hosts-youtube-daily)
-
-          # set timeout to 0 when dayli limit is over 90m
-          # and also write 
-          fi
-
-          echo "read timeout $timeout"
-          if [[ "$timeout" == "1" ]] || [[ "$timeout" == "1\n" ]] || [[ "$timeout" == "-1" ]] || [[ "$timeout" == "0" ]]
-          then
-            rm -rf /etc/hosts-youtube-block
-          else
-            timeout=$((timeout - 1))
-            echo -en $timeout > /etc/hosts-youtube-block
-            echo "new timeout: $timeout"
-          fi
-        else
-          echo "updateing hosts file"
-          rm -rf /etc/hosts
-          cat ${self}/misc/my-hosts > /etc/hosts
-          cat /etc/current_hosts >> /etc/hosts
-          #cat ${self}/misc/my-hosts-"$(cat /etc/current_hosts)" >> /etc/hosts
-        fi
-      '';
-      };
-    in
-  {
-    enable = true;
-    description = "block Youtube";
-    #type = "simple";
-    #unitConfig = {
-      #Type = "simple";
-    #};
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = "60s";
-      ExecStart = "${stark}/bin/stark";
-    };
-    wantedBy = [ "multi-user.target" ];
   };
 
 
