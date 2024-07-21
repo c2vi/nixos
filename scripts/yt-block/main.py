@@ -62,8 +62,8 @@ def cmd_guard():
     if state["yt_time_current"] == 0:
         block_yt()
 
-    # if time_current in state is 0, block yt
-    if state["yt_time_current"] >= 0:
+    # if time_current in state is greater than 0, unblock yt
+    if state["yt_time_current"] > 0:
         unblock_yt()
 
     # decrement time_current
@@ -96,8 +96,6 @@ def cmd_info():
     pwd = get_pwd()
 
     state = read_state(pwd)
-
-    kill_mc()
 
     print("YouTube")
     print("time_left:", state["yt_time_left"])
@@ -157,7 +155,7 @@ def get_hosts():
                 continue
             split = line.split(" ")
             try:
-                hosts.append([split[1].strip(), split[0].strip()])
+                hosts.append([split[0].strip(), split[1].strip()])
             except:
                 print("error with geting hosts from /etc/hosts: ", split)
     return hosts
@@ -168,7 +166,7 @@ def write_hosts(hosts):
     with open("/etc/hosts", "w") as file:
         lines = []
         for entry in hosts:
-            lines.append(entry[1] + " " + entry[0])
+            lines.append(entry[0] + " " + entry[1])
 
         file.write("\n".join(lines) + "\n")
 
@@ -176,29 +174,37 @@ def write_hosts(hosts):
 def block_yt():
     hosts = get_hosts()
     for entry in YT_HOSTS:
-        hosts.append(entry)
+        if entry not in hosts:
+            hosts.append(entry)
 
     write_hosts(hosts)
+    os.system("iptables -I INPUT -s 188.21.9.20 -j REJECT")
 
 def unblock_yt():
     hosts = get_hosts()
     new_hosts = []
     for entry in hosts:
-        if entry[0] == "youtube.com" or entry[0] == "www.youtube.com":
+        if entry[1] == "youtube.com" or entry[1] == "www.youtube.com":
             continue
         else:
             new_hosts.append(entry)
 
     write_hosts(new_hosts)
+    os.system("iptables -D INPUT 1")
 
 def kill_mc():
-    output = subprocess.check_output(['bash', '-c', "ps fax | grep minecraft"])
-    for line in output.decode().split("\n"):
-        if line.find("java") != -1:
-            kill_line(line)
+    try:
+        output = subprocess.check_output(['bash', '-c', "ps fax | grep minecraft"])
+        for line in output.decode().split("\n"):
+            if line.find("java") != -1:
+                kill_line(line)
+    except Exception as e:
+        print("killing failed", e)
 
 def kill_line(line):
-    pid = int(line.split(" ")[1])
+    #print("line:", line)
+    pid = int(line.split(" ")[0])
+    #print("killing pid:", pid)
     os.system(f"kill {pid}")
 
 if __name__ == "__main__":
