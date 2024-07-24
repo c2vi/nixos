@@ -45,7 +45,7 @@ in rec {
     shield = "charybdis_right";
 
     #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
-    zephyrDepsHash = "sha256-ra+uyEuneWoP1qkMUyhlLtq1rdWifsioqHnODqZC36o=";
+    zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
   };
 
   keyboardLeft = inputs.zmk-nix.legacyPackages.${system}.buildKeyboard {
@@ -57,6 +57,20 @@ in rec {
 
     # the charybdis has a left and right, so the default parts works
     shield = "charybdis_left";
+
+    #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
+    zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
+  };
+
+  keyboardBoth = inputs.zmk-nix.legacyPackages.${system}.buildSplitKeyboard {
+    name = "firmware";
+
+    src = ./zmk-config;
+
+    board = "nice_nano_v2";
+
+    # the charybdis has a left and right, so the default parts works
+    shield = "charybdis_%PART%";
 
     #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
     zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
