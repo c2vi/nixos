@@ -45,7 +45,7 @@
     btrfs-progs
 
     # packages that i might not need everywhere??
-		wstunnel
+		#wstunnel
 		rclone
 		playerctl
 		alsa-utils
