@@ -154,7 +154,7 @@ in rec {
     makeWrapper = pkgs.makeWrapper;
   in stdenv.mkDerivation rec {
     pname = "kotlin-native";
-    version = "2.0.10-RC";
+    version = "2.0.0";
 
     src = let
       getArch = {
@@ -167,9 +167,9 @@ in rec {
         "https://github.com/JetBrains/kotlin/releases/download/v${version}/kotlin-native-prebuilt-${arch}-${version}.tar.gz";
 
       getHash = arch: {
-        "macos-aarch64" = "1v1ld4nxa77vjxiz4jw5h29s8i4ghfbmq0d01r15i75pr46md8r7";
-        "macos-x86_64" = "05ywdhagj3qzjaw5sd94sgjk89dysky7d7lfqpwvc8s35v77rv8f";
-        "linux-x86_64" = "1j2lpl1r7r30dgard6ia29n3qrsr98wb3qwpc80z4jh6k42qn6id";
+        "macos-aarch64" = "sha256-PxPQ9tVNyufoqKAR9fcXBtQzn6MkbVI11Sow2O3Tl5A=";
+        "macos-x86_64" = "sha256-I+OQqi/ISomh4GtSnJ4sP37NMu9wayXLfb91uJRvh4Q=";
+        "linux-x86_64" = "sha256-aVEp0NkKsDQlqtqAygKd3EG/B2PLmZTzCrIrCENXoYk=";
       }.${arch};
     in
       fetchurl {
