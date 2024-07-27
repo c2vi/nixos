@@ -16,34 +16,34 @@
         compatible = "zmk,keymap";
 
         Base {
-            label = "Base";
+            label = "base";
             bindings = <
-  &kp TAB  &kp Q  &kp W      &kp E      &kp R  &kp T    &kp Y    &kp U      &kp I    &kp O     &kp P    &kp BSPC
-  &kp ESC  &kp A  &kp S      &kp D      &kp F  &kp G    &kp H    &kp J      &kp K    &kp L  &kp SEMI    &kp APOS
-&kp LSHFT  &kp Z  &kp X      &kp C      &kp V  &kp B    &kp N    &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp RSHIFT
-                         &kp E  &kp D  &kp F    &kp M  &kp O
+  &kp TAB   &kp Q  &kp W      &kp E      &kp R  &kp T    &kp U    &kp Y      &kp I    &kp O     &kp P    &kp BSPC
+  &kp ESC   &kp A  &kp S      &kp D      &kp F  &kp G    &kp J    &kp H      &kp K    &kp L  &to 1    &kp APOS
+&to 0   &kp Z  &kp X      &kp C      &kp V  &kp B    &kp M    &kp N  &kp COMMA  &kp DOT  &kp FSLH  &to 1
+                         &kp LGUI  &kp LALT  &kp ENTER   &kp LSHFT  &kp SPACE
             >;
 
-            trackball-bindings = <&tmv_coarse>;
+            trackball-bindings = <&tmv_coarse> ;
         };
 
         Lower {
-            label = "Lower";
+            label = "numbers";
             bindings = <
-      &trans    &trans    &kp UP     &trans     &trans    &trans       &kp N7   &kp N8  &kp N9   &kp N0  &kp HOME   &kp F1
-      &trans  &kp LEFT  &kp DOWN  &kp RIGHT     &trans    &trans       &kp N4   &kp N5  &kp N6    &none    &trans  &kp F10
-&kp LEFT_ALT    &trans    &trans     &trans  &kp MINUS  &kp PLUS       &kp N1   &kp N2  &kp N3  &kp DOT    &trans  &kp F20
-                                   &kp LGUI  &kp R    &trans    &kp RCTRL  &kp RET
-            >;
+      &trans    &trans    &kp UP     &trans    &kp BSLH    &trans    &kp N7   &trans   &kp N8  &kp N9  &kp HOME   &kp BSPC
+      &bootloader  &kp LEFT  &kp DOWN  &to 2     &to 0    &trans        &kp N4   &trans   &kp N5  &kp N6   &kp N0  &bootloader
+      &to 0    &trans    &trans     &trans  &kp MINUS  &kp PLUS    &kp N1   &trans   &kp N2  &kp N3    &trans  &kp F20
+                                   &kp LGUI  &kp LALT    &kp ENTER    &kp LSHFT &kp SPACE
+            >;   
         };
 
         Raise {
-            label = "Raise";
+            label = "navigation";
             bindings = <
-&trans      &kp EXCL       &kp AT    &kp HASH   &kp DLLR     &kp PRCNT    &kp CARET   &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR    &kp DEL
-&trans    &bt BT_CLR   &bt BT_PRV  &bt BT_NXT     &trans         &to 3    &kp UNDER  &kp EQUAL         &kp LBKT  &kp RBKT  &kp BSLH  &kp GRAVE
-&trans  &out OUT_TOG  &bootloader      &trans     &trans        &trans    &kp MINUS   &kp PLUS         &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE
-                                     &kp LGUI  &kp R  &kp LEFT_ALT       &trans    &bootloader
+  &trans        &kp EXCL      &kp AT      &kp HASH       &kp DLLR      &kp PRCNT    &kp CARET   &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR    &kp BSPC
+  &bootloader    &bt BT_CLR   &bt BT_PRV  &bt BT_NXT     &to 0         &kp DOWN    &kp DOWN   &kp LEFT     &kp UP  &kp RIGHT  &kp BSLH  &bootloader
+  &to 0  &out OUT_TOG  &trans      &trans     &trans        &trans     &kp MINUS   &kp PLUS         &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE
+                                     &kp LGUI  &kp LALT  &kp ENTER       &kp LSHFT    &kp SPACE
             >;
         };
 
