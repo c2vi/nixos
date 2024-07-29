@@ -70,6 +70,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [
 
     -- launch a terminal
+    ((modm , xK_BackSpace), spawn $ XMonad.terminal conf),
+
     ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf),
 
     -- enable keyboard
