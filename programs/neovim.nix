@@ -25,6 +25,10 @@
 		  "rust-analyzer.diagnostics.enable" = true;
 		  "rust-analyzer.checkOnSave.enable" = false;
 		  "languageserver" = {
+        "slint" = {
+          "filetypes" = [ "slint" ];
+          "command" = "slint-lsp";
+        };
 			  "vhdl" = {
 				  "command" = "/home/sebastian/work/config/nvim/language-servers/vhdl/vhdl-tool";
 				  "args" = [ "lsp" ];
@@ -45,6 +49,8 @@
 		};
 
 		extraConfig = ''
+
+      autocmd BufEnter *.slint :setlocal filetype=slint
 
 			syntax enable
 			filetype plugin indent on
