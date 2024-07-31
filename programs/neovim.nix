@@ -28,6 +28,7 @@
         "slint" = {
           "filetypes" = [ "slint" ];
           "command" = "slint-lsp";
+					"rootPatterns" =  [ ".slint" ];
         };
 			  "vhdl" = {
 				  "command" = "/home/sebastian/work/config/nvim/language-servers/vhdl/vhdl-tool";
