@@ -38,7 +38,7 @@
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
   	enable = true;
-    device = "/dev/sda";
+    device = "/dev/disk/by-label/FASU-BOOT";
   	efiSupport = false;
 		extraConfig = ''
 			set timeout=2
