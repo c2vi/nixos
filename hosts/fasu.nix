@@ -18,7 +18,7 @@
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-label/fasu-boot";
+    device = "/dev/disk/by-label/FASU-BOOT";
     fsType = "fat32";
   };
 
