@@ -27,6 +27,13 @@
     }
   ];
 
+  virtualisation.libvirtd = {
+    enable = true;
+    qemuOvmf = true;
+    qemuSwtpm = true;
+    #qemuOvmfPackage = pkgs.OVMFFull;
+  };
+
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
   	enable = true;
@@ -79,6 +86,7 @@
 
   environment.systemPackages = with pkgs; [
     ntfs3g
+    virtiofsd
   ];
 
 	nix.settings = {
@@ -88,22 +96,25 @@
       trusted-users = [ "me" ];
 	};
 
+
+  networking.useDHCP = false;
+  networking.bridges = {
+    "br0" = {
+      interfaces = [ "enp0s25" ];
+    };
+  };
+  networking.interfaces.br0.ipv4.addresses = [ {
+    address = "192.168.1.3";
+    prefixLength = 24;
+  } ];
 	networking = {
 		#usePredictableInterfaceNames = false;
 		defaultGateway = {
 			address = "192.168.1.1";
-			interface = "eth0";
+			interface = "br0";
 		};
 		hostName = "fusu";
 		nameservers = [ "1.1.1.1" "8.8.8.8" ];
-		interfaces = {
-			"enp0s25" = {
-				name = "eth0";
-				ipv4.addresses = [
-					{ address = "192.168.1.3"; prefixLength = 24;}
-				];
-			};
-		};
 	};
 
 }

@@ -45,6 +45,7 @@
 
 
   environment.systemPackages = with pkgs; [
+    slint-lsp
     cifs-utils
     nfs-utils
     ntfs3g
