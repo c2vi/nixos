@@ -327,6 +327,15 @@
       		];
    		};
 
+      # server that hosts stuff
+   		"fasu" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/fasu.nix
+      		];
+   		};
+
       # my server at home
    		"rpi" = inputs.nixpkgs-old.lib.nixosSystem rec {
 			  #inherit specialArgs;
