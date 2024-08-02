@@ -19,7 +19,7 @@
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-label/FASU-BOOT";
-    fsType = "fat32";
+    fsType = "vfat";
   };
 
   # allow acern to ssh into server
