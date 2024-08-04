@@ -38,7 +38,8 @@
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
   	enable = true;
-    device = "/dev/nbd1";
+    #device = "/dev/nbd1";
+    device = "nodev";
   	efiSupport = false;
 		extraConfig = ''
 			set timeout=2
@@ -75,8 +76,15 @@
     8080 # for mitm proxy
 
     25565 # mc server
+    25580 # wmc lobby server
     25566 # mc server
+    3306 # mariadb for wmc
+    6379 # redis for wmc
 	];
+	networking.firewall.allowedUDPPorts = [
+    25572 # wmc voice to velocity proxy
+    25800 # wmc voice lobby
+  ];
 
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
