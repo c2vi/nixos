@@ -47,9 +47,11 @@ def cmd_guard():
 
     # if it's after 22:00 block yt and kill all minecraft processes
     now = datetime.datetime.now()
-    if now.hour >= 22:
+    if now.hour >= 21:
+        print("after 21:00 blocking....")
         block_yt()
         kill_mc()
+        return
 
     # if date is not today, set time_left to YT_TIME_LIMIT
     date_from_state = datetime.datetime.strptime(state["date"], "%Y-%m-%d")
@@ -71,6 +73,9 @@ def cmd_guard():
         state["yt_time_current"] -= 1
 
     write_state(state, pwd)
+
+    # so that i can't just change the time in order to watch after 21:00
+    os.system("systemctl start systemd-timesyncd")
 
 def cmd_request():
     pwd = get_pwd()
@@ -178,7 +183,40 @@ def block_yt():
             hosts.append(entry)
 
     write_hosts(hosts)
-    os.system("iptables -I INPUT -s 188.21.9.20 -j REJECT")
+    yt_ips = [
+        "142.251.208.174",
+        "142.251.208.142",
+        "142.251.208.110",
+        "142.251.39.78",
+        "142.251.39.46",
+        "142.251.39.14",
+        "142.250.201.206",
+        "142.250.180.238",
+        "142.250.180.206",
+        "172.217.20.14",
+        "172.217.19.110",
+
+        "188.21.9.20",
+        "142.251.208.142",
+
+        # "2a00:1450:400d:80d::200e",
+        # "2a00:1450:400d:80c::200e",
+        # "2a00:1450:400d:802::200e",
+        # "2a00:1450:400d:80e::200e",
+    ]
+
+    os.system("iptables -N YTBLOCK")
+    print("running: iptables -N YTBLOCK")
+
+    os.system("iptables -D OUTPUT -j YTBLOCK")
+    os.system("iptables -I OUTPUT -j YTBLOCK")
+    print("running: iptables -I OUTPUT -j YTBLOCK")
+
+    for ip in yt_ips:
+        os.system(f"iptables -D YTBLOCK -d {ip} -j REJECT")
+        os.system(f"iptables -I YTBLOCK -d {ip} -j REJECT")
+        print(f"running: iptables -I YTBLOCK -d {ip} -j REJECT")
+    #os.system("iptables -I OUTPUT -d  -j REJECT")
 
 def unblock_yt():
     hosts = get_hosts()
@@ -190,7 +228,16 @@ def unblock_yt():
             new_hosts.append(entry)
 
     write_hosts(new_hosts)
-    os.system("iptables -D INPUT 1")
+    os.system("iptables -F YTBLOCK")
+    print("running: iptables -F YTBLOCK")
+
+    os.system("iptables -D OUTPUT -j YTBLOCK")
+    os.system("iptables -D OUTPUT -j YTBLOCK")
+    os.system("iptables -D OUTPUT -j YTBLOCK")
+    print("running 3 times: iptables -D OUTPUT -j YTBLOCK")
+
+    os.system("iptables -X YTBLOCK")
+    print("running: iptables -X YTBLOCK")
 
 def kill_mc():
     try:
@@ -202,9 +249,9 @@ def kill_mc():
         print("killing failed", e)
 
 def kill_line(line):
-    #print("line:", line)
+    print("line:", line)
     pid = int(line.split(" ")[0])
-    #print("killing pid:", pid)
+    print("killing pid:", pid)
     os.system(f"kill {pid}")
 
 if __name__ == "__main__":
