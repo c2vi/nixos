@@ -37,7 +37,7 @@
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
   	enable = true;
-    device = "/dev/sda";
+    device = "/dev/disk/by-id/ata-TOSHIBA_MQ04ABF100_11MYT5RBT";
   	efiSupport = false;
 		extraConfig = ''
 			set timeout=2
