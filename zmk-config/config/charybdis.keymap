@@ -18,10 +18,10 @@
         Base {
             label = "base";
             bindings = <
-  &kp TAB   &kp Q  &kp W      &kp E      &kp R  &kp T    &kp U    &kp Y      &kp I    &kp O     &kp P    &kp BSPC
+  &kp TAB   &kp Q  &kp W      &kp E      &kp R  &kp T    &kp U    &kp Z      &kp I    &kp O     &kp P    &kp BSPC
   &kp ESC   &kp A  &kp S      &kp D      &kp F  &kp G    &kp J    &kp H      &kp K    &kp L  &to 1    &kp APOS
-&to 0   &kp Z  &kp X      &kp C      &kp V  &kp B    &kp M    &kp N  &kp COMMA  &kp DOT  &kp FSLH  &to 1
-                         &kp LGUI  &kp LALT  &kp ENTER   &kp LSHFT  &kp SPACE
+&to 0   &kp Y  &kp X      &kp C      &kp V  &kp B    &kp M    &kp N  &kp COMMA  &kp DOT  &kp FSLH  &to 1
+                         &kp LGUI  &kp LCTRL  &kp ENTER   &kp LSHFT  &kp SPACE
             >;
 
             trackball-bindings = <&tmv_coarse> ;
@@ -30,9 +30,9 @@
         Lower {
             label = "numbers";
             bindings = <
-      &trans    &trans    &kp UP     &trans    &kp BSLH    &trans    &kp N7   &trans   &kp N8  &kp N9  &kp HOME   &kp BSPC
-      &bootloader  &kp LEFT  &kp DOWN  &to 2     &to 0    &trans        &kp N4   &trans   &kp N5  &kp N6   &kp N0  &bootloader
-      &to 0    &trans    &trans     &trans  &kp MINUS  &kp PLUS    &kp N1   &trans   &kp N2  &kp N3    &trans  &kp F20
+      &trans  &trans    &kp UP    &kp MINUS   &kp BSLH      &kp EQUAL     &kp N7   &trans   &kp N8  &kp N9  &kp HOME   &kp BSPC
+      &trans  &kp LEFT  &to 3  &to 2     &to 0        &kp SEMI        &kp N4   &trans   &kp N5  &kp N6   &kp N0  &bootloader
+      &to 0    &trans    &trans     &kp LBKT  &kp RBKT    &kp SQT    &kp N1   &trans   &kp N2  &kp N3    &trans  &kp F20
                                    &kp LGUI  &kp LALT    &kp ENTER    &kp LSHFT &kp SPACE
             >;   
         };
@@ -47,33 +47,15 @@
             >;
         };
 
-        Game {
-            label = "Game";
-            bindings = <
-&trans  &trans  &trans  &trans  &trans        &trans      &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans         &sl 4      &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans        &trans      &trans  &trans  &trans  &trans  &trans   &to 0
-                        &trans  &trans  &kp LEFT_ALT    &kp RGUI  &trans
-            >;
-        };
-
-        Game_++ {
-            label = "Game ++";
-            bindings = <
- &kt F5  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp NUMBER_5    &kp LC(RA(Y))  &kp LC(RA(U))  &kp LC(RA(I))  &kp LC(RA(H))  &kp LC(RA(J))  &kp LC(RA(DEL))
-  &to 3         &kp L         &kp O         &kp Y         &kp K         &kp G           &trans         &trans         &trans         &trans         &trans       &kp LA(F4)
-&kp F10         &none         &to 0         &none  &kp NUMBER_6  &kp NUMBER_7           &trans         &trans         &trans         &trans         &trans            &to 0
-                                            &kp J         &kp I         &kp M           &trans         &trans
-            >;
-        };
-
         Mouse {
+            label = "mouse";
             bindings = <
-   &trans  &trans  &trans     &trans  &trans     &trans    &trans  &trans  &trans  &trans  &trans     &trans
-   &trans  &trans  &trans     &trans  &trans     &trans    &trans  &trans  &trans  &trans  &trans     &trans
-&mkp MCLK  &trans  &trans     &trans  &trans     &trans    &trans  &trans  &trans  &trans  &trans  &mkp LCLK
-                           &mkp LCLK  &trans  &mkp RCLK    &trans  &trans
+&trans  &trans  &trans  &trans  &trans        &trans         &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &mkp RCLK  &mkp LCLK  &to 0    &sl 4         &trans  &kp N1  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans        &trans         &trans  &trans  &trans  &trans  &trans   &to 0
+                        &trans  &trans  &kp LEFT_ALT       &kp RGUI  &trans
             >;
         };
+
     };
 };
