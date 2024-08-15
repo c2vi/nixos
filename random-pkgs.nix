@@ -4,9 +4,13 @@
 }: let
   pkgs = import nixpkgs { inherit system; };
 in rec {
+
+
   zephyr = inputs.zephyr-nix.packages.${system};
 
+
   one = inputs.zephyr-nix;
+
 
   two-shell = pkgs.mkShell {
     packages = with pkgs; [
@@ -27,12 +31,17 @@ in rec {
       export ZEPHYR_BASE=${inputs.zephyr-nix.inputs.zephyr};
     '';
   };
+
+
   three = inputs.zmk-nix.legacyPackages.${system}.fetchZephyrDeps {
     name = "testing-deps";
     hash = "";
     src = self;
   };
+
+
   four = inputs.zephyr-nix.packages.${system}.buildZephyrWorkspace;
+
 
   keyboardRight = inputs.zmk-nix.legacyPackages.${system}.buildKeyboard {
     name = "firmware-right";
@@ -48,6 +57,7 @@ in rec {
     zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
   };
 
+
   keyboardLeft = inputs.zmk-nix.legacyPackages.${system}.buildKeyboard {
     name = "firmware-left";
 
@@ -62,6 +72,8 @@ in rec {
     zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
   };
 
+
+
   keyboardBoth = inputs.zmk-nix.legacyPackages.${system}.buildSplitKeyboard {
     name = "firmware";
 
@@ -74,6 +86,12 @@ in rec {
 
     #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
     zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
+  };
+
+
+
+  unkillableKernelModule = mypkgs.callPackage ./mods/unkillable-process-kernel-module.nix {
+    kernel = self.nixosConfigurations.main.config.boot.kernelPackages.kernel;
   };
 
   usbip-kernel = self.nixosConfigurations.main.config.system.build.kernel.overrideAttrs (prev: {
