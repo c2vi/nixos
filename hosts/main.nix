@@ -100,6 +100,7 @@
   */
 
   boot.extraModulePackages = [ self.packages.${system}.random.unkillableKernelModule ];
+  boot.kernelModules = [ "unkillable" ];
 
 
   hardware.bluetooth.settings = {

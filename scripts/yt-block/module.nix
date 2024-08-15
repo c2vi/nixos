@@ -1,7 +1,6 @@
 { pkgs, ... }:
 let 
 	yt_block = pkgs.callPackage ./app.nix {};
-	yt_block_starter = pkgs.callPackage ./app.nix {};
 in {
 	systemd.services.yt-block = {
 		 enable = true;
@@ -9,7 +8,7 @@ in {
 		 serviceConfig = {
 			Restart = "always";
 			#RestartSec = "60s";
-			ExecStart = "${yt_block_starter}/bin/yt_block_starter";
+			ExecStart = "${yt_block}/bin/yt_block starter";
 		 };
 		 wantedBy = [ "multi-user.target" ];
 	};

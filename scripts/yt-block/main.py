@@ -9,7 +9,7 @@ import base64
 import subprocess
 import time
 
-YT_TIME_MAX = 90 # in min
+YT_TIME_MAX = 60 # in min
 STATE_FILE = "/etc/yt_block_state"
 
 DEFAULT_STATE = {
@@ -263,17 +263,21 @@ def cmd_starter():
     # become a unkillable process and start this pyhton file with arg1=guard every minute
 
     # make the /dev/unkillable
+    os.system("rm /dev/unkillable")
     os.system("mknod /dev/unkillable c 117 0")
     os.system("chmod 666 /dev/unkillable")
+    os.system("ls /dev/unkillable")
 
     # get pid
     pid = os.getpid()
 
+    # for some strange reason this does not work
     with open("/dev/unkillable", "r") as file:
         file.read(pid)
 
     while True:
-        os.system(f"python {__file__} guard")
+        print("file:", __file__)
+        os.system(f"$PYTHON {__file__} guard")
         time.sleep(60)
 
 if __name__ == "__main__":

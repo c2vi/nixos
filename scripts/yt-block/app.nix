@@ -7,6 +7,7 @@ in pkgs.writeShellApplication {
   name = "yt_block";
   runtimeInputs = with pkgs; [ iptables bash gnugrep ps util-linux ];
   text = ''
+    export PYTHON=${python}/bin/python
     ${python}/bin/python ${python_script} "$@"
   '';
 }
