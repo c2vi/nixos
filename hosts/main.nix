@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, self, secretsDir, config, inputs, ... }:
+{ pkgs, lib, workDir, self, secretsDir, config, inputs, system, ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -98,6 +98,8 @@
     })
   ];
   */
+
+  boot.extraModulePackages = [ self.packages.${system}.random.unkillableKernelModule ];
 
 
   hardware.bluetooth.settings = {

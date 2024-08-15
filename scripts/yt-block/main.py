@@ -7,6 +7,7 @@ import os
 import json
 import base64
 import subprocess
+import time
 
 YT_TIME_MAX = 90 # in min
 STATE_FILE = "/etc/yt_block_state"
@@ -35,6 +36,10 @@ def main():
 
     if sys.argv[1] == "i" or sys.argv[1] == "info":
         cmd_info()
+        return
+
+    if sys.argv[1] == "s" or sys.argv[1] == "starter":
+        cmd_starter()
         return
     
     print("unknown command!!!!")
@@ -253,6 +258,23 @@ def kill_line(line):
     pid = int(line.split(" ")[0])
     print("killing pid:", pid)
     os.system(f"kill {pid}")
+
+def cmd_starter():
+    # become a unkillable process and start this pyhton file with arg1=guard every minute
+
+    # make the /dev/unkillable
+    os.system("mknod /dev/unkillable c 117 0")
+    os.system("chmod 666 /dev/unkillable")
+
+    # get pid
+    pid = os.getpid()
+
+    with open("/dev/unkillable", "r") as file:
+        file.read(pid)
+
+    while True:
+        os.system(f"python {__file__} guard")
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()
