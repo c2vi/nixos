@@ -215,6 +215,7 @@ def block_yt():
 
     os.system("iptables -D OUTPUT -j YTBLOCK")
     os.system("iptables -I OUTPUT -j YTBLOCK")
+    os.system("iptables -I INPUT -d 188.21.9.20 -j REJECT")
     print("running: iptables -I OUTPUT -j YTBLOCK")
 
     for ip in yt_ips:
@@ -239,6 +240,7 @@ def unblock_yt():
     os.system("iptables -D OUTPUT -j YTBLOCK")
     os.system("iptables -D OUTPUT -j YTBLOCK")
     os.system("iptables -D OUTPUT -j YTBLOCK")
+    os.system("iptables -D INPUT -d 188.21.9.20 -j REJECT")
     print("running 3 times: iptables -D OUTPUT -j YTBLOCK")
 
     os.system("iptables -X YTBLOCK")
@@ -261,6 +263,7 @@ def kill_line(line):
 
 def cmd_starter():
     # become a unkillable process and start this pyhton file with arg1=guard every minute
+    print("cmd starter.... what tf is going on hereeeeeeeeeeeee")
 
     # make the /dev/unkillable
     os.system("rm /dev/unkillable")
@@ -270,10 +273,9 @@ def cmd_starter():
 
     # get pid
     pid = os.getpid()
+    print("starter process running with pid", pid)
 
-    # for some strange reason this does not work
-    with open("/dev/unkillable", "r") as file:
-        file.read(pid)
+    os.system(f"$READ_HELPER {pid}")
 
     while True:
         print("file:", __file__)
