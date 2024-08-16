@@ -8,6 +8,7 @@ import json
 import base64
 import subprocess
 import time
+import psutil
 
 YT_TIME_MAX = 60 # in min
 STATE_FILE = "/etc/yt_block_state"
@@ -247,13 +248,9 @@ def unblock_yt():
     print("running: iptables -X YTBLOCK")
 
 def kill_mc():
-    try:
-        output = subprocess.check_output(['bash', '-c', "ps fax | grep minecraft"])
-        for line in output.decode().split("\n"):
-            if line.find("java") != -1:
-                kill_line(line)
-    except Exception as e:
-        print("killing failed", e)
+    for proc in psutil.process_iter():
+        if "org.prismlauncher.EntryPoint" in proc.cmdline():
+            os.system(f"kill {proc.pid}")
 
 def kill_line(line):
     print("line:", line)

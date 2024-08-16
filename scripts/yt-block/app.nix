@@ -1,7 +1,7 @@
 { pkgs
 , ...
 }: let
-  python = pkgs.python3.withPackages (ps: with ps; [pkgs.python311Packages.cryptography]);
+  python = pkgs.python3.withPackages (ps: with ps; [ pkgs.python311Packages.cryptography pkgs.python311Packages.psutil ]);
 	python_script = pkgs.writeText "main-py" (builtins.readFile ./main.py);
   read-helper = pkgs.callPackage ./read-helper.nix {};
 in pkgs.writeShellApplication {

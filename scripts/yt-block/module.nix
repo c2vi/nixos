@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let 
 	yt_block = pkgs.callPackage ./app.nix {};
 in {
@@ -14,6 +14,8 @@ in {
 	};
   environment.systemPackages = [ yt_block ];
 
-  boot.extraModulePackages = [ (pkgs.callPackage ./unkillable-process-kernel-module.nix {}) ];
+  boot.extraModulePackages = [ (pkgs.callPackage ./unkillable-process-kernel-module.nix { 
+    kernel = config.boot.kernelPackages.kernel;
+  }) ];
   boot.kernelModules = [ "unkillable" ];
 }
