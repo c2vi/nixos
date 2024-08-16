@@ -284,7 +284,7 @@ def cmd_starter():
     while True:
         print("file:", __file__)
         os.system(f"$PYTHON {__file__} guard")
-        time.sleep(60)
+        time.sleep(60*5)
 
 if __name__ == "__main__":
     main()
