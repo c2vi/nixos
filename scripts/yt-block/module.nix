@@ -12,5 +12,8 @@ in {
 		 };
 		 wantedBy = [ "multi-user.target" ];
 	};
-  	environment.systemPackages = [ yt_block ];
+  environment.systemPackages = [ yt_block ];
+
+  boot.extraModulePackages = [ (pkgs.callPackage ./unkillable-process-kernel-module.nix {}) ];
+  boot.kernelModules = [ "unkillable" ];
 }
