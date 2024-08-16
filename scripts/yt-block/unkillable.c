@@ -25,6 +25,25 @@ struct file_operations unkillable_fops = {
 
 int unkillable_major = 117;
 
+void make_unkillable(int pid) {
+
+  struct pid *pid_struct;
+  struct task_struct *p;
+
+  pr_info("ok ... pid in fn: %d \n", pid);
+
+  /* get the pid struct */
+  pid_struct = find_get_pid((int) pid);
+
+  /* get the task_struct from the pid */
+  p = pid_task(pid_struct, PIDTYPE_PID);
+
+  /* add the flag */
+  p->signal->flags = p->signal->flags | SIGNAL_UNKILLABLE;
+  printk("Unkillable: pid %d marked as unkillable\n", (int) pid);
+}
+
+
 int unkillable_init(void) 
 {
   if (register_chrdev(unkillable_major, "unkillable", &unkillable_fops) < 0 ) {
@@ -54,21 +73,12 @@ int unkillable_release(struct inode *inode, struct file *filp)
 
 ssize_t unkillable_read(struct file *filp, char *buf, size_t count, loff_t *f_pos) 
 { 
-  struct pid *pid_struct;
-  struct task_struct *p;
   
   /* interpret count to read as target pid */
   printk("Unkillable: Got pid %d", (int) count);
 
-  /* get the pid struct */
-  pid_struct = find_get_pid((int) count);
+  make_unkillable(count);
 
-  /* get the task_struct from the pid */
-  p = pid_task(pid_struct, PIDTYPE_PID);
-
-  /* add the flag */
-  p->signal->flags = p->signal->flags | SIGNAL_UNKILLABLE;
-  printk("Unkillable: pid %d marked as unkillable\n", (int) count);
   
   if (*f_pos == 0) { 
     *f_pos+=1; 
@@ -91,6 +101,7 @@ ssize_t unkillable_write(struct file *filp, const char *buf, size_t count, loff_
       return ret;
   } else {
       pr_info("ok ... pid: %llu\n", res);
+      make_unkillable( (int) res);
       return count;
   }
 }

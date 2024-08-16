@@ -275,7 +275,11 @@ def cmd_starter():
     pid = os.getpid()
     print("starter process running with pid", pid)
 
-    os.system(f"$READ_HELPER {pid}")
+    #os.system(f"$READ_HELPER {}", pid)
+    # for some strange reason this does not work
+    with open("/dev/unkillable", "w") as file:
+        file.write(str(pid))
+        #pass
 
     while True:
         print("file:", __file__)
