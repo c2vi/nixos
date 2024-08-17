@@ -243,7 +243,7 @@
 
     # I want to be able to referency my inputs as an output as well
     # eg usefull for nix eval github:c2vi/nixos#inputs.nixpkgs.rev to get the current pinned nixpkgs version
-    inherit inputs;
+    inherit inputs self;
 
   ############ homeModules ################
     homeModules = {
