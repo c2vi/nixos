@@ -84,6 +84,8 @@
 	networking.firewall.allowedUDPPorts = [
     25572 # wmc voice to velocity proxy
     25800 # wmc voice lobby
+
+    19132 # mc bedrock port
   ];
 
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
