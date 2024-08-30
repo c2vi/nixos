@@ -43,7 +43,7 @@ in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkg
       '';
       homepage = "https://github.com/mridah/csv2vcf";
       license = licenses.mit;
-      maintainers = with lib.maintainers; [ ];
+      maintainers = with lib.maintainers; [ c2vi ];
       platforms = platforms.all;
     };
   };
