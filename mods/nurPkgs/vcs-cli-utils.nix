@@ -24,5 +24,6 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://github.com/henkelmax/svc-cli-utils";
     #maintainers = [ ];
     platforms = platforms.all;
+    mainProgram = "svc";
   };
 }
