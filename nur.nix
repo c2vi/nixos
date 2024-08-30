@@ -4,6 +4,7 @@
 { pkgs ? import <nixpkgs> { } }:
 
 let
+  lib = pkgs.lib;
   files = builtins.readDir ./mods/nurPkgs;
   names = pkgs.lib.attrsets.mapAttrsToList (name: value: pkgs.lib.strings.removeSuffix ".nix" name) files;
   pwd = builtins.toString ./.;
@@ -11,6 +12,9 @@ in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkg
 //
 {
 
+  imap-backup = pkgs.callPackage ./mods/imap-backup/package.nix {};
+
+  /* fails for nur evaluations
   iio-hyprland = let
     repo = pkgs.fetchFromGitHub {
       owner = "yassineibr";
@@ -18,6 +22,7 @@ in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkg
       rev = "nix-support";
       hash = "sha256-xFc8J8tlw6i+FbTC05nrlvQIXRmguFzDqh+SQOR54TE=";
     }; in pkgs.callPackage "${repo}/default.nix" {};
+    */
 
   csv2vcf = let 
     src = pkgs.fetchFromGitHub {
@@ -38,7 +43,7 @@ in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkg
       '';
       homepage = "https://github.com/mridah/csv2vcf";
       license = licenses.mit;
-      maintainers = with lib.maintainers; [ c2vi ];
+      maintainers = with lib.maintainers; [ ];
       platforms = platforms.all;
     };
   };
