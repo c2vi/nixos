@@ -72,6 +72,7 @@
 		8888 # for general usage
 		9999 # for general usage
     8080 # for mitm proxy
+    5901 # vnc
 
     25565 # mc server
     25566 # mc server
