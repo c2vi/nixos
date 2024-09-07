@@ -21,6 +21,7 @@
 
 
   programs.nix-ld.enable = true;
+  programs.steam.enable = true;
 
   # disable touch clicks because i always tap while typing
   #services.xserver.libinput.touchpad.tappingButtonMap = null;
@@ -40,7 +41,7 @@
 
     # see: https://github.com/NixOS/nixpkgs/issues/300081
     #"${inputs.nixpkgs-unstable}/nixos/modules/virtualisation/incus.nix" 
-    ../scripts/yt-block/module.nix
+    #../scripts/yt-block/module.nix
 	];
 
 
