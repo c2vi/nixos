@@ -75,9 +75,9 @@
 		9999 # for general usage
     8080 # for mitm proxy
 
-    25565 # mc server
+    25565 # mc proxy
     25580 # wmc lobby server
-    25566 # mc server
+    25566 # mc proxy cracked
     3306 # mariadb for wmc
     6379 # redis for wmc
 	];

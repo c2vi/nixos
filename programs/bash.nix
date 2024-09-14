@@ -5,7 +5,7 @@
 		enable = true;
 		enableCompletion = true;
 
-		historyFile = "${persistentDir}/${hostname}/bash-history";
+		historyFile = "/home/$USER/work/app-data/${hostname}/bash-history";
 		historyFileSize = 100000;
 		historyControl = [ "ignoredups" ];
 		historyIgnore = [
@@ -259,9 +259,23 @@
 			python3 -c "print($@)"
 			}
 
+      # cam
+      function cam(){
+        xset r rate 130 85
+        xinput set-prop "ZMK Project Charybdis Mouse" 304 60
+        xinput set-prop "Charybdis Mouse" 304 60
+        id=$(xinput | grep Charybdis | tail -n 1 | awk '{print $4}' | cut -c4- )
+        echo id: $id
+        setxkbmap -device $id -layout us
+
+        id=$(xinput | grep Charybdis | tail -n 1 | awk '{print $6}' | cut -c4- )
+        echo id: $id
+        setxkbmap -device $id -layout us
+      }
 
 			# map
 			function map(){
+       source $
 			if [ "$1" == "" ]
 			then
 			bash ~/work/virtchord/reset
