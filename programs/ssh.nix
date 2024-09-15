@@ -50,6 +50,14 @@
 				hostname = "fusu";
 				user = "server";
 			};
+			fasu = {
+				hostname = "fasu";
+				user = "me";
+			};
+			fasus = {
+				hostname = "fasu";
+				user = "server";
+			};
 
 		  fusu = {
 				hostname = "fusu";
