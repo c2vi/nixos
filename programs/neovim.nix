@@ -45,6 +45,10 @@
 					"filetypes" = [ "nix" ];
 					"rootPatterns" =  [ "flake.nix" ];
 				};
+				"typst" = {
+					"command" = "${pkgs.typst-lsp}/bin/typst-lsp";
+					"filetypes" = [ "typ" "typst" ];
+				};
 		  };
 		  "svelte.enable-ts-plugin" = true;
 		};
