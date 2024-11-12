@@ -7,10 +7,10 @@
 		plugins = with pkgs.vimPlugins; [
 			haskell-vim
 			plenary-nvim
-			# typst ... TODO
 			rust-vim
 			dracula-vim
       lf-vim
+      typst-vim
 		];
 
 		coc.enable = true;
