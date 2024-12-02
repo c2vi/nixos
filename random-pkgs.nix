@@ -3,7 +3,42 @@
   ... 
 }: let
   pkgs = import nixpkgs { inherit system; };
+  lib = pkgs.lib;
 in rec {
+
+  qtrs = pkgs.stdenv.mkDerivation {
+    name = "qt rust bindings";
+
+    nativeBuildInputs = with pkgs; [
+      openssl
+      pkg-config
+      sqlite
+      
+      #clang
+      #libclang.dev
+      #libclang
+      #libclang.lib
+      cargo
+      libsForQt5.qt5.full
+    ];
+
+    LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
+    RITUAL_STD_HEADERS = "${pkgs.libcxx.dev}/include/c++/v1";
+
+    buildInputs = with pkgs; [
+      libclang.dev
+      libclang.lib
+      sqlite
+      libsForQt5.qt5.full
+    ];
+
+    dontUnpack = true;
+    dontPatch = true;
+    buildPhase = ''
+      cargo test
+    '';
+
+  };
 
 
   zephyr = inputs.zephyr-nix.packages.${system};
@@ -88,9 +123,11 @@ in rec {
     zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
   };
 
+  
+  yt-block = pkgs.callPackage ./scripts/yt-block/app.nix {};
 
 
-  unkillableKernelModule = mypkgs.callPackage ./mods/unkillable-process-kernel-module.nix {
+  unkillableKernelModule = mypkgs.callPackage ./scripts/yt-block/unkillable-process-kernel-module.nix {
     kernel = self.nixosConfigurations.main.config.boot.kernelPackages.kernel;
   };
 

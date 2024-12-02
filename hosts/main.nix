@@ -11,6 +11,8 @@
   # fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
 
   services.nscd.enable = lib.mkForce false;
+  virtualisation.docker.enable = true;
+
   system.nssModules = lib.mkForce [];
 
   services.xserver.enableTCP = true;

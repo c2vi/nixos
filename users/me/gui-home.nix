@@ -79,6 +79,8 @@
 		xclip
 		stalonetray
 		killall
+    vlc
+    chromium
 
     # use signal from unstable, because the app itself says it would to update to be usable
 		self.inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.signal-desktop

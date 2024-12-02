@@ -25,7 +25,7 @@
   '';
 
   nix.settings = {
-    experimental-features = lib.mkDefault "nix-command flakes";
+    experimental-features = lib.mkDefault "nix-command flakes repl-flake";
     trusted-users = [ "root" "@wheel" ];
   };
   nixpkgs.config.allowUnfree = true;

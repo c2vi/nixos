@@ -138,6 +138,9 @@
 
 			#################### functions ####################
 
+      nrel(){
+        nix repl --expr "rec { nixpkgs = builtins.getFlake \"nixpkgs\"; pkgs = import nixpkgs {}; flake = builtins.getFlake \"git+file://$(pwd)\"; out = flake.packages.x86_64-linux;} $@"
+      }
 
       # shortcut for copying over to tab
       tta(){

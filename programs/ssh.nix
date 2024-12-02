@@ -6,6 +6,20 @@
       "*" = {
 				identityFile = "${secretsDir}/private-key";
       };
+      pcmc = {
+        hostname = "195.201.148.94";
+        user = "root";
+      };
+      ligai = {
+        hostname = "ssh.lightning.ai";
+        identityFile = "~/work/here/secrets/lightning-ai-key";
+        #IdentitiesOnly = "yes";
+        #ServerAliveInterval = 15;
+        #ServerAliveCountMax = 4;
+	      #StrictHostKeyChecking = "no";
+	      #UserKnownHostsFile = "/dev/null";
+        user = "s_01j7xkk335kbnr7r19zhssxn29";
+      };
 			"github.com" = {
 				hostname = "github.com";
 			};

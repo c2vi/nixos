@@ -81,10 +81,6 @@
       url = "github:lilyinstarlight/zmk-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    keyboard-config = {
-      url = "github:eigatech/zmk-config/charybdis-3.5";
-      flake = false;
-    };
 	};
 
 	outputs = { self, nixpkgs, nixpkgs-unstable, nixos-generators, flake-utils, systems, ... }@inputs: 

@@ -50,8 +50,8 @@
         Mouse {
             label = "mouse";
             bindings = <
-&trans  &trans  &trans  &trans  &trans        &trans         &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &mkp RCLK  &mkp LCLK  &to 0    &sl 4         &trans  &kp N1  &trans  &trans  &trans  &trans
+&trans  &trans  &trans     &trans     &kp PG_UP  &trans         &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &mkp RCLK  &mkp LCLK  &to 0      &sl 4         &trans  &kp N1  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans        &trans         &trans  &trans  &trans  &trans  &trans   &to 0
                         &trans  &trans  &kp LEFT_ALT       &kp RGUI  &trans
             >;
