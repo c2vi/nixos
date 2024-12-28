@@ -19,6 +19,8 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHTV1VoNAjMha5IP+qb8XABDo02pW3iN0yPBIbSqZA27 me@acern"
   ];
 
+  
+
   # allow server user to shutdown fusu
   security.sudo.extraRules = [
     {
@@ -105,7 +107,7 @@
     };
   };
   networking.interfaces.br0.ipv4.addresses = [ {
-    address = "192.168.1.3";
+    address = "192.168.1.2";
     prefixLength = 24;
   } ];
 	networking = {
