@@ -9,25 +9,36 @@
 		inputs.home-manager.nixosModules.home-manager
     ../users/me/headless.nix
     ../users/root/default.nix
-    ../users/server/headles.nix
+    ../users/files/headless.nix
 	];
 
   # mac address for wakeonlan: 00:19:99:fd:28:23
 
   # allow acern to ssh into server
-  users.users.server.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHTV1VoNAjMha5IP+qb8XABDo02pW3iN0yPBIbSqZA27 me@acern"
-  ];
+  #users.users.server.openssh.authorizedKeys.keys = [
+    #"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHTV1VoNAjMha5IP+qb8XABDo02pW3iN0yPBIbSqZA27 me@acern"
+  #];
 
   
 
   # allow server user to shutdown fusu
-  security.sudo.extraRules = [
-    {
-      users = [ "server" ];
-      commands = [ { command = "/run/current-system/sw/bin/shutdown"; options = [ "SETENV" "NOPASSWD" ]; } ];
-    }
-  ];
+  #security.sudo.extraRules = [
+    #{
+      #users = [ "server" ];
+      #commands = [ { command = "/run/current-system/sw/bin/shutdown"; options = [ "SETENV" "NOPASSWD" ]; } ];
+    #}
+  #];
+
+
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.zfs.package = pkgs.zfs_unstable;
+  boot.zfs.forceImportRoot = false;
+  networking.hostId = "7552c83e";
+
+  fileSystems."/home/files/storage" = {
+    device = "storage";
+    fsType = "zfs";
+  };
 
   virtualisation.libvirtd = {
     enable = true;
@@ -39,7 +50,8 @@
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
   	enable = true;
-    device = "/dev/disk/by-id/ata-TOSHIBA_MQ04ABF100_11MYT5RBT";
+    #device = "/dev/disk/by-id/ata-TOSHIBA_MQ04ABF100_11MYT5RBT";
+    device = "nodev"; # don't install, when i do nixre -h fusu ... but when installing onto the two discs (sata hdd and nvme ssd) change to the device like above
   	efiSupport = false;
 		extraConfig = ''
 			set timeout=2
@@ -57,6 +69,7 @@
   		settings.PasswordAuthentication = false;
   		settings.KbdInteractiveAuthentication = false;
   		settings.PermitRootLogin = "yes";
+      ports = [ 49388 ];
 
       settings.X11Forwarding = true;
 
@@ -76,11 +89,9 @@
     8080 # for mitm proxy
     5901 # vnc
 
-    25565 # mc server
-    25566 # mc server
 	];
 
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.networkmanager.enable = false;  # Easiest to use and most distros use this by default.
 
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 
@@ -111,7 +122,7 @@
     prefixLength = 24;
   } ];
 	networking = {
-		#usePredictableInterfaceNames = false;
+		usePredictableInterfaceNames = true;
 		defaultGateway = {
 			address = "192.168.1.1";
 			interface = "br0";

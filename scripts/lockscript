@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+path="/home/mia/Pictures/Screenshots/screen.png"
+grim "$path" &&
+corrupter -add 0 -bheight 20 -stdabber 10 -boffset 50 "$path" "$path" &&
+
+swaylock -c /home/mia/.config/swaylock/config &&
+swaymsg "output * dpms on"

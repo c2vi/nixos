@@ -3,7 +3,8 @@
 
   ################################### INPUTS #########################################
 	inputs = {
-		nixpkgs.url = "github:NixOS/nixpkgs/release-24.05";
+		#nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
+		nixpkgs.url = "github:NixOS/nixpkgs/b9562c824b11473587286eb499680129c2d0d4f1";
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
 		nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -83,13 +84,13 @@
     };
 	};
 
-	outputs = { self, nixpkgs, nixpkgs-unstable, nixos-generators, flake-utils, systems, ... }@inputs: 
+	outputs = { self, nixpkgs, nixpkgs-unstable, nixos-generators, flake-utils, systems, ... }@inputs:
 
   ################################### LET FOR OUPUTS #########################################
 		let 
 			confDir = "/home/me/work/config";
 			workDir = "/home/me/work";
-			secretsDir = "/home/me/work/here/secrets";
+			secretsDir = "/home/me/secrets";
 			persistentDir = "/home/me/work/app-data";
 
       tunepkgs = import nixpkgs {
@@ -116,19 +117,26 @@
             "electron-25.9.0"
             ];
         }; 
-        overlays = [ 
+        overlays = [
           #( import ./mods/my-nixpkgs-overlay.nix { inherit nixpkgs; } )
           #( import ./mods/second-overlay.nix { inherit nixpkgs; } )
         ];
       };
 
       specialArgs = {
-				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs;
+				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs unstable nur;
         system = "x86_64-linux";
         pkgs = mypkgs;
 			};
-    eachSystem = inputs.flake-utils.outputs.lib.eachSystem;
-    allSystems = inputs.flake-utils.outputs.lib.allSystems;
+      eachSystem = inputs.flake-utils.outputs.lib.eachSystem;
+      allSystems = inputs.flake-utils.outputs.lib.allSystems;
+
+      unstable = import nixpkgs-unstable {
+        system = "x86_64-linux";
+        config.allowUnfree = true;
+      };
+
+      nur = import inputs.nur { pkgs = mypkgs; };
 		in
 
   ################################### EACH SYSTEM OUPUTS #########################################
@@ -283,6 +291,14 @@
          		./hosts/hpm.nix
 					  ./hardware/hpm-laptop.nix
             #./mods/hec-server.nix
+      		];
+   		};
+
+   		"mac" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/mac.nix
       		];
    		};
 
@@ -544,3 +560,4 @@
     };
 	};
 }
+

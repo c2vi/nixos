@@ -31,10 +31,6 @@
         hostname = "127.0.0.1";
         user = "me";
       };
-      rpi = {
-        port = 49388;
-        user = "me";
-      };
       files = {
         port = 49388;
         user = "files";
@@ -59,11 +55,6 @@
 			hpm = {
 				user = "me";
 			};
-
-			fusus = {
-				hostname = "fusu";
-				user = "server";
-			};
 			fasu = {
 				hostname = "fasu";
 				user = "me";
@@ -74,6 +65,7 @@
 			};
 
 		  fusu = {
+        port = 49388;
 				hostname = "fusu";
 				user = "me";
 			};

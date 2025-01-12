@@ -40,6 +40,58 @@ in rec {
 
   };
 
+  #######################################################################
+  # make an iso
+  #to build:  nix build .#random.iso.config.system.build.isoImage
+
+  # an old old nixpkgs: https://github.com/NixOS/nixpkgs/tree/release-15.09
+  iso = let
+    oldNixpkgsSrc = pkgs.fetchFromGitHub {
+      owner = "NixOS";
+      repo = "nixpkgs";
+      rev = "cc7c26173149348ba43f0799fac3f3823a2d21fc"; # 15.09
+      #rev = "3ba3d8d8cbec36605095d3a30ff6b82902af289c";
+      #rev = "71db8c7a02f3be7cb49b495786050ce1913246d3";
+      hash = "sha256-Bu0ECsynGNuj4lYK/QcvuKqKCKd6b1j8jlE7fLjE+t0=";
+    };
+    oldPkgs = import oldNixpkgsSrc { system = "x86_64-linux"; };
+
+    # ${nixpkgs-repo}/nixos/default.nix holds a function, that takes a system and a configuration and outputs just what nixpkgs.lib.nixosSystem outputs
+    # so we can make our own nixosSystem func
+    oldNixosSystem = { system, modules, ... }: import (oldNixpkgsSrc + "/nixos") {
+      inherit system;
+      configuration = { imports = modules; };
+    };
+
+
+
+    system = oldNixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        (oldNixpkgsSrc + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix")
+        ({ pkgs, ...}: {
+          boot.initrd.kernelModules = [ "fbcon" ];
+          services.openssh.enable = true;
+          users.users.root.password = "changeme";
+
+          services.xserver.enable = false;
+          #services.displayManager.enable = false;
+        })
+      ];
+    };
+  in system.config.system.build.isoImage;
+
+
+
+  obs = let
+    pkgs = import inputs.nixpkgs-unstable { inherit system; };
+  in pkgs.wrapOBS {
+    plugins = with pkgs.obs-studio-plugins; [
+      obs-ndi
+    ];
+  };
+
+
 
   zephyr = inputs.zephyr-nix.packages.${system};
 
@@ -178,7 +230,7 @@ in rec {
   });
 
   run-vm = specialArgs.pkgs.writeScriptBin "run-vm" ''
-    ${self.nixosConfigurations.hpm.config.system.build.vm}/bin/run-hpm-vm -m 4G -cpu host -smp 4
+    ${self.nixosConfigurations.main.config.system.build.vm}/bin/run-main-vm -m 4G -cpu host -smp 4
   '';
 
   hec-img = nixos-generators.nixosGenerate {

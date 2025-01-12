@@ -10,6 +10,34 @@
   # ??????????? TODO
   # fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
 
+
+/*
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.wayland = false;
+  services.xserver.desktopManager.plasma5.enable = true;
+
+
+	modules.battery_monitor.enable = true;
+  services.blueman.enable = true;
+	hardware.bluetooth.enable = true;
+
+
+  # Enable the gnome-keyring secrets vault. 
+  # Will be exposed through DBus to programs willing to store secrets.
+  services.gnome.gnome-keyring.enable = true;
+
+  # enable Sway window manager
+  programs.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true;
+  };
+  */
+
+  #services.openssh.enable = true;
+
+  virtualisation.vmVariant.services.timesyncd.enable = lib.mkForce false;
+
+
   services.nscd.enable = lib.mkForce false;
   virtualisation.docker.enable = true;
 
@@ -20,6 +48,8 @@
     xserver-allow-tcp=true
   '';
   services.xserver.displayManager.xserverArgs = [ "-listen tcp" ];
+
+  nixpkgs.config.allowUnfree = lib.mkForce true;
 
 
   programs.nix-ld.enable = true;
@@ -33,8 +63,10 @@
 	imports = [
 		../common/all.nix
 		../common/nixos-headless.nix
-		../common/nixos-graphical.nix
+		#../common/nixos-graphical.nix
+    ../common/nixos-wayland.nix
     ../common/building.nix
+		../mods/battery_monitor.nix
 
     inputs.networkmanager.nixosModules.networkmanager
 		inputs.home-manager.nixosModules.home-manager
@@ -48,6 +80,17 @@
 
 
   environment.systemPackages = with pkgs; [
+    grim # screenshot functionality
+    slurp # screenshot functionality
+    wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
+    mako # notification system developed by swaywm maintainer
+    (pkgs.wrapOBS {
+      plugins = with obs-studio-plugins; [
+        obs-ndi
+        obs-teleport
+      ];
+    })
+
     slint-lsp
     cifs-utils
     nfs-utils
@@ -159,8 +202,19 @@
 	security.polkit.enable = true;
   services.rpcbind.enable = true;
 
-  services.avahi.enable = true;
-  services.avahi.hostName = "c2vi";
+  #services.avahi.hostName = "c2vi";
+  services.avahi = {
+      enable = true;
+      nssmdns = true;
+      publish = {
+        enable = true;
+        addresses = true;
+        domain = true;
+        hinfo = true;
+        userServices = true;
+        workstation = true;
+      };
+  };
 
   networking.networkmanager.enable = true;
   #networking.networkmanager.extraConfig = ''
@@ -170,7 +224,7 @@
   #networking.useDHCP = lib.mkForce true;
 
 	networking.firewall.allowPing = true;
-	networking.firewall.enable = true;
+	networking.firewall.enable = false;
 
 	services.samba.openFirewall = true;
 
@@ -190,7 +244,7 @@
       53 # allow dns
 	];
 
-  networking.search = [ "c2vi.local" ];
+  #networking.search = [ "c2vi.local" ];
   #networking.hosts = {
     #"10.1.1.3" = [ "phone" ];
   #};
@@ -489,8 +543,8 @@
 
 
 	############################## swap and hibernate ###################################
-	swapDevices = [ { device = "/dev/lvm0/swap"; } ];
-	boot.resumeDevice = "/dev/lvm0/swap";
+	swapDevices = [ { device = "/swapfile"; } ];
+	boot.resumeDevice = "/swapfile";
 	services.logind = {
 		extraConfig = ''
 			HandlePowerKey=suspend-then-hibernate
@@ -500,7 +554,7 @@
 		lidSwitchDocked = "ignore";
 	};
 	systemd.sleep.extraConfig = ''
-		HibernateDelaySec=2h
+		HibernateDelaySec=27h
 		HibernateMode=shutdown
 	'';
 }

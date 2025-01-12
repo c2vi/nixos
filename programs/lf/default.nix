@@ -164,7 +164,7 @@
       set shellopts "-eu"
       set ifs "\n"
       set shell "bash"
-      set ruler "df:acc:progress:selection:filter:ind"
+      #set ruler "df:acc:progress:selection:filter:ind"
     '';
 	};
 }

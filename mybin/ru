@@ -17,6 +17,11 @@ then
 ssh tab "rm /sdcard/note/CUR/*"
 
 
+elif [ "$1" == "du" ]
+then
+du -d 1 -h $2 | sort -h -r
+
+
 elif [ "$1" == "mnt-wechner" ]
 then
 rclone mount --vfs-cache-mode full -vvvv onedrive-school:projekt-autobatterie ~/work/htl/projekt/wechner/mnt
@@ -104,7 +109,7 @@ sudo systemctl hibernate
 
 elif [ "$1" == "suspend" ]
 then
-sudo systemctl suspend
+sudo systemctl suspend-then-hibernate
 
 
 fi
