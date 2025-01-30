@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+CONFIG_REPO_LOCATION=~/work/config
+CHARYBDIS_DISK_LOCATION=/dev/disk/by-uuid/0042-0042
+
+
+# use the fusefatfs packaged in my nurPkgs
+alias fusefatfs="$(nix build ${CONFIG_REPO_LOCATION}#mynurPkgs.fusefatfs --no-keep-outputs --print-out-paths)/bin/fusefatfs"
+
+
+# if we have a keyboard config like thing in the clipboard.... use that
+if [[ "$(wl-paste | head -n 4)" == '#include <dt-bindings/zmk/mouse.h>
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/keys.h>' ]]
+then
+  echo pasting keyboard config from clipboard
+  wl-paste > $CONFIG_REPO_LOCATION/zmk-config/config/charybdis.keymap
+fi
+
+mkdir -p $TMP/keyboard-flash-mnt
+exit
+
+sudo fusefatfs $CHARYBDIS_DISK_LOCATION $TMP/keyboard-flash-mnt
+
+
+firmware_out_path=$(nix build .#random.keyboardRight -L --no-keep-outputs --print-out-paths)
+echo firmware at: $firmware_out_path
+
+sudo cp $firmware_out_path #NEXT: what to copy where
+
+sudo umount $TMP/keyboard-flash-mnt
