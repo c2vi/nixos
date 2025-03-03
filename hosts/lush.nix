@@ -145,6 +145,7 @@
         uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
         type = "wifi";
         interface-name = "wlan0";
+        autoconnect = true;
       };
 
       wifi = {
@@ -160,6 +161,31 @@
 
       ipv4 = {
         address1 = "192.168.20.21/24";
+        method = "auto";
+      };
+    };
+
+    hh40 = {
+      connection = {
+        id = "hh40";
+        uuid = "73a61cef-8f7b-4f42-ab3f-0066e0295bbc";
+        type = "wifi";
+        interface-name = "wlan0";
+        autoconnect = true;
+      };
+
+      wifi = {
+        hidden = "false";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/home-wifi-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/home-wifi-password";
+      };
+
+      ipv4 = {
         method = "auto";
       };
     };

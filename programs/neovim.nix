@@ -395,6 +395,20 @@
 
 			" ###### rust ###### "
 
+      " specially for mize...
+			cnoreabbrev md call Set_Mize_RunBuild()
+
+      function! Set_Mize_RunBuild()
+			  cnoreabbrev c call Mize_RunBuild()
+      endfunction
+
+      function! Mize_RunBuild()
+				:w
+        silent ! echo Run > ~/.mize/mize_dev_module/pipe
+      endfunction
+
+
+
 			function! Setup_rust()
 
 				vnoremap s :call Rust_toggle_comment()<Enter>

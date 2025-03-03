@@ -71,7 +71,6 @@
 		blueman
 		pavucontrol
 		spotify
-		flameshot
 		networkmanagerapplet
 		haskellPackages.xmobar
 		dolphin

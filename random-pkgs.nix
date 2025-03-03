@@ -140,8 +140,12 @@ in rec {
     # the charybdis has a left and right, so the default parts works
     shield = "charybdis_right";
 
-    #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
-    zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
+    postPatch = ''
+      mkdir -p ./zmk/app/boards/
+      cp -r ./boards/* ./zmk/app/boards/
+    '';
+
+    zephyrDepsHash = "sha256-4enAzZRvlV0ni1+rv7PUsRI6Rhb+zweuFBLeb/sflBc=";
   };
 
 
@@ -155,8 +159,13 @@ in rec {
     # the charybdis has a left and right, so the default parts works
     shield = "charybdis_left";
 
+    postPatch = ''
+      mkdir -p ./zmk/app/boards/
+      cp -r ./boards/* ./zmk/app/boards/
+    '';
+
     #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
-    zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
+    zephyrDepsHash = "sha256-4enAzZRvlV0ni1+rv7PUsRI6Rhb+zweuFBLeb/sflBc=";
   };
 
 
@@ -172,7 +181,7 @@ in rec {
     shield = "charybdis_%PART%";
 
     #zephyrDepsHash = "sha256-n7xX/d8RLqDyPOX4AEo5hl/3tQtY6mZ6s8emYYtOYOg=";
-    zephyrDepsHash = "sha256-/ECQR3x0hzVGB7icGuWeyyNC9HuWmCgS5xA8r30gCAw=";
+    zephyrDepsHash = "sha256-r4SIPCLqBT/y2bblHUUZtNRwrhXFWY8wWtkplbG3coo=";
   };
 
   

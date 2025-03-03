@@ -2,14 +2,14 @@
 
 # Settings
 battery_percent_MODULUS=5 # How many percent difference are required for another update
-INTERVAL=5 # The interval at which to check the battery percentage
+INTERVAL=20 # The interval at which to check the battery percentage
 ALERT_SCRIPT="sudo /home/mia/Scripts/keyboard_alert.sh"
 
 # Battery Levels
 BAT_RECOMMENDED_UPPER_LIMIT=80
-BAT_RECOMMENDED_LOWER_LIMIT=40
-BAT_SLIGHTLY_LOW=30
-BAT_LOW=20
+BAT_RECOMMENDED_LOWER_LIMIT=30
+BAT_SLIGHTLY_LOW=25
+BAT_LOW=17
 BAT_VERY_LOW=10
 BAT_HIB=5
 
@@ -23,13 +23,13 @@ get_percentage()
 
 countdown()
 {
-    for i in $(seq 1 10);
+    for i in $(seq 1 15);
     do
         if [[ $(cat /sys/bus/acpi/drivers/battery/*/power_supply/BAT?/status) = "Charging" ]]; then
             return
         fi
 
-        sleep 1
+        sleep 4
         notify-send $((10-$i)) -u critical
     done
     systemctl hibernate

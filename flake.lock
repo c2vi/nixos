@@ -3667,6 +3667,7 @@
         "robotnix": "robotnix",
         "systems": "systems_5",
         "victorinix": "victorinix",
+        "waveforms": "waveforms",
         "zephyr-nix": "zephyr-nix",
         "zmk-nix": "zmk-nix"
       }
@@ -4154,6 +4155,26 @@
       "original": {
         "owner": "c2vi",
         "repo": "victorinix",
+        "type": "github"
+      }
+    },
+    "waveforms": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1740296893,
+        "narHash": "sha256-8FQRWdQXqRI7EfDjx9EkQMpnEEQXmK/m/PSRWcRIagc=",
+        "owner": "liff",
+        "repo": "waveforms-flake",
+        "rev": "d210e3a743349a659a1cfdc202cba32bae6f2dbc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "liff",
+        "repo": "waveforms-flake",
         "type": "github"
       }
     },

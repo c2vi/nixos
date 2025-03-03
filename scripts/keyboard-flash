@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+set -e
+
 CONFIG_REPO_LOCATION=~/work/config
 CHARYBDIS_DISK_LOCATION=/dev/disk/by-uuid/0042-0042
 
 
 # use the fusefatfs packaged in my nurPkgs
-alias fusefatfs="$(nix build ${CONFIG_REPO_LOCATION}#mynurPkgs.fusefatfs --no-keep-outputs --print-out-paths)/bin/fusefatfs"
+export fusefatfs="$(nix build ${CONFIG_REPO_LOCATION}#mynurPkgs.fusefatfs --no-keep-outputs --print-out-paths)/bin/fusefatfs"
 
 
 # if we have a keyboard config like thing in the clipboard.... use that
@@ -15,18 +17,34 @@ if [[ "$(wl-paste | head -n 4)" == '#include <dt-bindings/zmk/mouse.h>
 #include <dt-bindings/zmk/keys.h>' ]]
 then
   echo pasting keyboard config from clipboard
-  wl-paste > $CONFIG_REPO_LOCATION/zmk-config/config/charybdis.keymap
+  wl-paste | grep -v "bindings/zmk/pointing" > $CONFIG_REPO_LOCATION/zmk-config/config/charybdis.keymap
 fi
 
-mkdir -p $TMP/keyboard-flash-mnt
-exit
+sudo mkdir -p /tmp/keyboard-flash-mnt
 
-sudo fusefatfs $CHARYBDIS_DISK_LOCATION $TMP/keyboard-flash-mnt
+# error checking if device exists
+if [[ ! -L $CHARYBDIS_DISK_LOCATION ]]
+then
+  echo err: keyboard not in bootloader mode
+  exit 1
+fi
 
+echo before build
 
-firmware_out_path=$(nix build .#random.keyboardRight -L --no-keep-outputs --print-out-paths)
+if [[ $1 == "left" ]]
+then 
+  firmware_out_path=$(nix build ${CONFIG_REPO_LOCATION}#random.keyboardLeft -L --no-keep-outputs --print-out-paths)
+else
+  firmware_out_path=$(nix build ${CONFIG_REPO_LOCATION}#random.keyboardRight -L --no-keep-outputs --print-out-paths)
+fi
 echo firmware at: $firmware_out_path
 
-sudo cp $firmware_out_path #NEXT: what to copy where
+# flashing by writing to device directly
+#sudo dd if=$firmware_out_path/zmk.uf2 of=$CHARYBDIS_DISK_LOCATION
 
-sudo umount $TMP/keyboard-flash-mnt
+# flashing by mounting
+sudo $fusefatfs -o rw+ $CHARYBDIS_DISK_LOCATION /tmp/keyboard-flash-mnt
+
+sudo cp $firmware_out_path/zmk.uf2 /tmp/keyboard-flash-mnt/CURRENT.UF2 || true
+
+sudo umount /tmp/keyboard-flash-mnt

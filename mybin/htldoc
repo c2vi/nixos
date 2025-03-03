@@ -1,7 +1,8 @@
 #!/bin/sh
 
 if [ -f "htldoc.nix" ]; then
-	htldocUrl=$(nix eval --expr 'let config = (import ./htldoc.nix {}); in if builtins.hasAttr "htldocVersion" config then config.htldocVersion else "github:c2vi/htldoc/master"' --impure)
+	htldocUrl=$(nix eval --expr 'let config = (import ./htldoc.nix {}); in if builtins.hasAttr "htldocVersion" config then config.htldocVersion else "github:c2vi/htldoc/master"' --impure --raw)
+	echo htldocUrl: $htldocUrl
 	nix run $htldocUrl -- $@
 else 
 	nix run github:c2vi/htldoc/master -- $@

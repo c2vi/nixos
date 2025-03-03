@@ -38,6 +38,9 @@
   virtualisation.vmVariant.services.timesyncd.enable = lib.mkForce false;
 
 
+  virtualisation.waydroid.enable = true;
+
+
   services.nscd.enable = lib.mkForce false;
   virtualisation.docker.enable = true;
 
@@ -54,6 +57,10 @@
 
   programs.nix-ld.enable = true;
   programs.steam.enable = true;
+
+
+
+
 
   # disable touch clicks because i always tap while typing
   #services.xserver.libinput.touchpad.tappingButtonMap = null;
@@ -76,10 +83,20 @@
     # see: https://github.com/NixOS/nixpkgs/issues/300081
     #"${inputs.nixpkgs-unstable}/nixos/modules/virtualisation/incus.nix" 
     #../scripts/yt-block/module.nix
+
+    # add waveforms flake module
+    #inputs.waveforms.nixosModule
 	];
+
+  services.udev.packages = [ inputs.waveforms.packages.${system}.adept2-runtime ];
 
 
   environment.systemPackages = with pkgs; [
+    inputs.waveforms.packages.${system}.waveforms
+
+    # add pyclip for waydroid
+    python310Packages.pyclip
+
     grim # screenshot functionality
     slurp # screenshot functionality
     wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
@@ -90,6 +107,14 @@
         obs-teleport
       ];
     })
+
+    # waveforms
+
+    # my keyboar flash script, that opens as an alacritty window
+    (pkgs.writeShellScriptBin "keyboard-flash" "alacritty --command ${pkgs.writeShellScriptBin "keyboard-flash-internal" "${./..}/scripts/keyboard-flash; bash"}/bin/keyboard-flash-internal")
+
+    # my keyboar flash script, that opens as an alacritty window
+    (pkgs.writeShellScriptBin "keyboard-flash-left" "alacritty --command ${pkgs.writeShellScriptBin "keyboard-flash-internal" "${./..}/scripts/keyboard-flash left; bash"}/bin/keyboard-flash-internal")
 
     slint-lsp
     cifs-utils
@@ -104,7 +129,9 @@
   # shedule nix builds with low priority, so the laptop is still usable while building something
   nix.daemonCPUSchedPolicy = "idle";
   nix.daemonIONiceLevel = 7;
-  systemd.services.nix-daemon.serviceConfig.Nice = 9;
+  
+ 
+ systemd.services.nix-daemon.serviceConfig.Nice = 9;
 
   # enable ntp
   #services.ntp.enable = true;
@@ -513,14 +540,22 @@
     virtualisation.incus.enable = true;
     systemd.services.incus.path = [ pkgs.swtpm ];
     #virtualisation.incus.package = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.incus;
-    users.users.me.extraGroups = [ "incus-admin" ];
+
+    # add myself to plugdev group for waveforms
+    # and incus-admin to use incus without sudo
+    users.users.me.extraGroups = [ "incus-admin" "plugdev" ];
 
 
     virtualisation.podman.enable = true;
 
     virtualisation.kvmgt.enable = true;
     boot.extraModprobeConfig = "options i915 enable_guc=2";
-    boot.kernelParams = [ "intel_iommu=on" "pcie_aspm=force" ];
+    boot.resumeDevice = "/dev/disk/by-uuid/20002ed7-1431-4992-90f6-730bdc6eef2c";
+    boot.kernelParams = [
+      "resume_offset=45743809"
+      "intel_iommu=on"
+      "pcie_aspm=force"
+    ];
 
     virtualisation.kvmgt.vgpus = {
       "i915-GVTg_V5_8" = {
@@ -544,17 +579,18 @@
 
 	############################## swap and hibernate ###################################
 	swapDevices = [ { device = "/swapfile"; } ];
-	boot.resumeDevice = "/swapfile";
+
+	# boot.resumeDevice = "/swapfile";
 	services.logind = {
 		extraConfig = ''
 			HandlePowerKey=suspend-then-hibernate
 		'';
-		lidSwitch = "suspend-then-hibernate";
-		lidSwitchExternalPower = "suspend-then-hibernate";
+		lidSwitch = "lock";
+		lidSwitchExternalPower = "lock";
 		lidSwitchDocked = "ignore";
 	};
 	systemd.sleep.extraConfig = ''
-		HibernateDelaySec=27h
+		HibernateDelaySec=4h
 		HibernateMode=shutdown
 	'';
 }

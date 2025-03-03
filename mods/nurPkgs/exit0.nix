@@ -1,20 +1,23 @@
 { stdenv
 , fetchFromGitHub
 , meson
+, lib
+, ninja
 }:
 
 stdenv.mkDerivation rec {
-	name = "exitß";
+	name = "exit0";
 
 	src = fetchFromGitHub {
 		owner = "richardweinberger";
 		repo = "exit0";
     rev = "f6cdeeb858ad9717b698a21e6fec3bb94b2aa2dd";
-    sha256 = "";
+    sha256 = "sha256-NCNPO4XCdCwPLSQuW4AT6vskqvu1ks/yHGUzzI+l3hE=";
 	};
 
   nativeBuildInputs = [
     meson
+    ninja
   ];
   
   buildInputs = [

@@ -2,14 +2,9 @@
 # special thanks to: https://github.com/lostMia/nixos-config
 # TODOs
 # - monitor scaling
-# - fix copying
 # - flameshot
-# - rofi config
-# - rofi show ssh as well
-# - fix audio next,prev
-# - backgroudn and transperency
+# - background and transperency
 # - hibernation
-# - swapfile not found in stage1
 # - win + D command
 # - kernel output for luks pwd on all displays
 
@@ -66,6 +61,7 @@
   ];
 
 	sound.enable = true;
+  home-manager.users.me.services.swayosd.enable = true;
   services.blueman.enable = true;
 	hardware.bluetooth.enable = true;
 
@@ -80,6 +76,32 @@
   };
 
   environment.systemPackages = with pkgs; [
+    # flameshot where clipboard works with wayland
+    (flameshot.overrideAttrs (prev: {
+      nativeBuildInputs = prev.nativeBuildInputs or [] ++ [ libsForQt5.kguiaddons ];
+      cmakeFlags = prev.nativeBuildInputs or [] ++ [ "-DUSE_WAYLAND_CLIPBOARD=true" "-DUSE_WAYLAND_GRIM=ON" ];
+      patches = prev.patches or [] ++ [ ../overlays/patches/flameshot-wayland.patch ];
+    }))
+
+    waybar
+    /*
+    (waybar.overrideAttrs (prev: {
+      //patches = prev.patches or [] ++ [
+        //(pkgs.fetchpatch {
+          //url = "https://github.com/alebastr/Waybar/commit/reload-signal-fix.patch";
+          //hash = "sha256-c4+A7biF1FOLemjcr+TobWMLUnha8zbHIkLaW24iUcQ=";
+        //})
+      //];
+      patches = [];
+      src = pkgs.fetchFromGitHub {
+        owner = "alebastr";
+        repo = "Waybar";
+        rev = "d8a7f429e756f4dc378ed1cb9824d47ea46edab5";
+        hash = "sha256-EB7tA2mHv67Hq1yMMDJ7YuQdAinrcpI0GkLxsTguWac=";
+      };
+    }))
+    */
+
     xdg-desktop-portal
     wlr-randr
     rofi-wayland
@@ -87,7 +109,7 @@
     swayfx
     wl-clipboard
     zoxide
-    waybar
+
     power-profiles-daemon
     brightnessctl
     autotiling
@@ -103,7 +125,6 @@
     sway-audio-idle-inhibit
     dunst
     libnotify
-    nur.repos.kira-bruneau.swaylock-fprintd
     swayidle
     corrupter
     swayosd
@@ -157,7 +178,7 @@
               dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
 
       ### Variables
-          set $mod Mod1
+          set $mod Mod4
           set $left h
           set $down j
           set $up k
@@ -174,9 +195,9 @@
       ### Input configuration
           input type:keyboard {
               xkb_layout de,de
-              repeat_delay 160,160
-              repeat_rate 80,80
-              xkb_options altwin:swap_lalt_lwin
+              repeat_delay 130,130
+              repeat_rate 90,90
+              # xkb_options altwin:swap_lalt_lwin
           }
 
           # altwin:swap_lalt_lwin swaps the left alt and windows keys, so the win key is on the right and the alt is on the left.
@@ -206,35 +227,51 @@
 
       ## Autostart
           exec autotiling                                                           # Automatically tiles in whatever direction is the longest
-          exec "/usr/bin/env bash ${./..}/scripts/idlescript"               # Manages suspending and locking
-          exec "/usr/bin/env bash ${./..}/scripts/batteryscript.sh"         # Sends battery notifications when necessary
+
+          #exec "/usr/bin/env bash ${./..}/scripts/idlescript"               # Manages suspending and locking
+          exec ${pkgs.bash}/bin/bash ${./..}/scripts/batteryscript.sh         # Sends battery notifications when necessary
           exec nm-applet                                                            # Networkmanager applet
           exec blueman-applet                                                       # Bluetoothmanager applet
           exec blueman-tray                                                         # Bluetoothmanager tray icon
           exec shikane                                                              # Manages displays and known display setups
           exec sway-audio-idle-inhibit                                              # Prevents sleep when audio is playing
-          exec swayosd-server                                                       # OSD server for audio and screen brightness popups
           exec waybar                                                               # Status bar for sway
+          exec swayosd-server
 
-          assign [class="vesktop"] workspace 1
-          assign [class="Signal"] workspace 1
-          assign [app_id="firefox"] workspace 2
-          assign [app_id="thunderbird"] workspace 10
+          exec swayidle lock ${pkgs.writeScriptBin "my-lock" ''
+            swaylock
+            systemctl suspend-then-hibernate
+          ''}/bin/my-lock
+
+          #assign [class="vesktop"] workspace 1
+          #assign [class="Signal"] workspace 1
+          #assign [app_id="firefox"] workspace 2
+          #assign [app_id="thunderbird"] workspace 10
 
 
       ### Key bindings
-          bindsym Mod4+Shift+Return exec $term
+          #bindsym Mod4+Shift+Return exec $term
+
+          bindsym --locked $mod+d exec wlr-randr --output eDP-1 --on
+          bindsym --locked $mod+Shift+d exec wlr-randr --output eDP-1 --off
 
           bindsym $mod+Shift+Return exec $term
           bindsym $mod+delete exec $term
           bindsym $mod+Shift+c kill
           bindsym $mod+q reload
-          bindsym $mod+x exec ${./..}/scripts/lockscript
+          bindsym $mod+x exec swaylock
+          bindsym $mod+Shift+x exec bash -c "swaylock; systemctl suspend-then-hibernate"
+
+
+          #exec swayidle -w \
+            #timeout 300 'swaylock -f -c 000000 -i $lock_bg' \
+            #timeout 600 'swaymsg "output * dpms off"' \
+              #resume 'swaymsg "output * dpms on"' \
+            #before-sleep 'swaylock -f -c 000000 -i $lock_bg'
+
           bindsym $mod+Shift+s exec "${./..}/scripts/screenshot.sh"
 
-          #bindsym $mod+p exec $menu -show combi -combi-modes "run" -modi combi -monitor "eDP-1" # rofi
-          bindsym $mod+p exec $menu -show combi -combi-modes "run" -modi combi
-          bindsym $mod+Shift+p exec $menu -show ssh -monitor "eDP-1"
+          bindsym $mod+p exec $menu -show combi -combi-modes "ssh,run"
 
           bindsym $mod+Shift+q exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
@@ -243,17 +280,21 @@
           #bindsym $mod+Escape exec 'swaymsg input type:keyboard xkb_switch_layout next'
 
           # bindsym $mod+odiaeresis exec woomer
-          
+
           #bindsym $mod+a exec woomer
           #bindsym $mod+p exec ${./..}/scripts/toggle_freeze_process.sh
 
       # Function Keys
-          bindsym $mod+Shift+m exec sleep 0.1 && swaymsg output eDP-1 dpms toggle
+          #bindsym $mod+Shift+m exec sleep 0.1 && swaymsg output eDP-1 dpms toggle
 
-          bindsym $mod+Shift+y exec swayosd-client --brightness -2
-          bindsym $mod+y exec swayosd-client --brightness +2
+          bindsym $mod+Shift+y exec swayosd-client --brightness -8
+          bindsym $mod+y exec swayosd-client --brightness +8
 
           #bindsym $mod+m exec swayosd-client --output-volume mute-toggle --max-volume 200
+
+          bindsym $mod+n exec playerctl next
+          bindsym $mod+Shift+n exec playerctl previous
+          bindsym $mod+c exec playerctl play-pause
 
           bindsym $mod+Shift+v exec swayosd-client --output-volume -2 --max-volume 200
           bindsym $mod+v exec swayosd-client --output-volume +2 --max-volume 200
@@ -335,9 +376,9 @@
 
       # Layout stuff:
           gaps inner 2
-          gaps outer 2
+          gaps outer 0
 
-          gaps top 5
+          gaps top 0
           #smart_borders on
           #smart_gaps on
 
@@ -353,9 +394,10 @@
           bindsym $mod+Comma layout tabbed
           bindsym $mod+Period layout toggle split
 
-          bindsym $mod+Return fullscreen
+          bindsym $mod+space fullscreen
           bindsym $mod+Shift+space floating toggle
-          bindsym $mod+space focus mode_toggle
+          #bindsym $mod+r focus mode_toggle
+          bindsym $mod+r exec sh -c "echo Run > ~/.mize/mize_dev_module/pipe"
 
       # Scratchpad:
           # Sway has a "scratchpad", which is a bag of holding for windows.
@@ -376,15 +418,15 @@
           # down will grow the containers height
           set $move_amount 175px
 
-          bindsym $mod+Mod4+$right resize grow width $move_amount
-          bindsym $mod+Mod4+$up resize shrink height $move_amount
-          bindsym $mod+Mod4+$down resize grow height $move_amount
-          bindsym $mod+Mod4+$left resize shrink width $move_amount
+          bindsym $mod+Mod1+$right resize grow width $move_amount
+          bindsym $mod+Mod1+$up resize shrink height $move_amount
+          bindsym $mod+Mod1+$down resize grow height $move_amount
+          bindsym $mod+Mod1+$left resize shrink width $move_amount
 
-          bindsym $mod+Mod4+Left resize grow width $move_amount
-          bindsym $mod+Mod4+Down resize shrink height $move_amount
-          bindsym $mod+Mod4+Up resize grow height $move_amount
-          bindsym $mod+Mod4+Right resize shrink width $move_amount
+          bindsym $mod+Mod1+Left resize grow width $move_amount
+          bindsym $mod+Mod1+Down resize shrink height $move_amount
+          bindsym $mod+Mod1+Up resize grow height $move_amount
+          bindsym $mod+Mod1+Right resize shrink width $move_amount
 
       # Return to default mode
           # bindsym Return mode "default"
@@ -1044,42 +1086,58 @@
     '';
   };
 
-  home-manager.users.me.home.file.".config/swaylock/config".text = ''
-    daemonize
-    show-failed-attempts
-    show-keyboard-layout
-    ignore-empty-password
-    fingerprint
-    image=$HOME/Pictures/Screenshots/screen.png
-    indicator-radius=200
-    indicator-thickness=10
-    inside-color=#00000000
-    line-color=#00000000
-    ring-color=#00000000
-    text-color=#00000000
 
-    layout-bg-color=#00000000
-    layout-text-color=#00000000
+  security.pam.services.swaylock = {
+    text = ''
+      auth include login
+    '';
+  };
+  home-manager.users.me.programs.swaylock = {
+    package = pkgs.writeScriptBin "swaylock" ''
+      path=/tmp/lock_screen_picture.png
+      grim "$path" &&
+      corrupter -add 0 -bheight 20 -stdabber 10 -boffset 50 "$path" "$path" &&
 
-    inside-clear-color=#00000000
-    line-clear-color=#00000000
-    ring-clear-color=#ffff99
-    text-clear-color=#00000000
-
-    inside-ver-color=#00000000
-    line-ver-color=#00000000
-    ring-ver-color=#70ffff
-    text-ver-color=#00000000
-
-    inside-wrong-color=#00000000
-    line-wrong-color=#00000000
-    ring-wrong-color=#ff5555
-    text-wrong-color=#00000000
-
-    bs-hl-color=#ff5555
-    key-hl-color=#99ff99
-
-    text-caps-lock-color=#ffffff
-  '';
-
+      #swaymsg "output * dpms on"
+      ${nur.repos.kira-bruneau.swaylock-fprintd}/bin/swaylock
+    '';
+    enable = true;
+    settings = {
+      daemonize = true;
+      show-failed-attempts = true;
+      show-keyboard-layout = true;
+      ignore-empty-password = true;
+      fingerprint = true;
+      image = "/tmp/lock_screen_picture.png";
+      indicator-radius = 200;
+      indicator-thickness = 10;
+      inside-color = "#00000000";
+      line-color = "#00000000";
+      ring-color = "#00000000";
+      text-color = "#00000000";
+  
+      layout-bg-color = "#00000000";
+      layout-text-color = "#00000000";
+  
+      inside-clear-color = "#555755";
+      line-clear-color = "#00000000";
+      ring-clear-color = "#ffff99";
+      text-clear-color = "#00000000";
+  
+      inside-ver-color = "#00000000";
+      line-ver-color = "#00000000";
+      ring-ver-color = "#70ffff";
+      text-ver-color = "#00000000";
+  
+      inside-wrong-color = "#00000000";
+      line-wrong-color = "#00000000";
+      ring-wrong-color = "#ff5555";
+      text-wrong-color = "#00000000";
+  
+      bs-hl-color = "#ff5555";
+      key-hl-color = "#99ff99";
+  
+      text-caps-lock-color = "#ffffff";
+    };
+  };
 }
