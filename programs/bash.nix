@@ -113,9 +113,9 @@
 			fi
 
 
-      # source lfcd
-      source ${pkgs.lf.src}/etc/lfcd.sh
-      alias lf="lfcd"
+      function lf () {
+        ${config.programs.lf.package}/bin/lf -last-dir-path /tmp/lf-last-path && cd $(cat /tmp/lf-last-path)
+      }
 
 
 			# so that programms i spawn from my shell don't have so high cpu priority
