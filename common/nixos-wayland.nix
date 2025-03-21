@@ -190,7 +190,7 @@
           font HackNerdFont-Regular 16
 
       ### Output configuration
-          #output * scale 1 bg ${./..}/resources/nix.png fill
+          output * scale 1 bg #121212 solid_color
 
       ### Input configuration
           input type:keyboard {
