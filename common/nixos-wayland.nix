@@ -1086,6 +1086,8 @@
     '';
   };
 
+  # Don't forget to actually enable the damn thing...
+  services.power-profiles-daemon.enable = true;
 
   security.pam.services.swaylock = {
     text = ''
