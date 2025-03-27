@@ -35,7 +35,43 @@
 
   #services.openssh.enable = true;
 
+
+
+  services.sunshine = {
+    package = pkgs.sunshine.overrideAttrs {
+      src = pkgs.fetchFromGitHub {
+        owner = "garnacho";
+        repo = "Sunshine";
+        rev = "xdg-portal";
+        hash = "sha256-To1vhNQxjIa5Hc+z2xo+ODSQyIH6cnI3A7Ofc7MDL60=";
+      };
+    };
+    enable = true;
+    autoStart = true;
+    capSysAdmin = true;
+    openFirewall = true;
+    
+  };
+
+
+
+
+
+
+
+
+
+
   virtualisation.vmVariant.services.timesyncd.enable = lib.mkForce false;
+
+  services.tailscale.enable = true;
+
+  services.resilio = {
+    enable = true;
+    enableWebUI = true;
+  };
+  users.users.me.homeMode = "770"; # important for resilio
+
 
 
   virtualisation.waydroid.enable = true;
@@ -58,6 +94,16 @@
   programs.nix-ld.enable = true;
   programs.steam.enable = true;
 
+
+
+  ################# make firefox default browser
+  xdg.mime.defaultApplications = {
+    "text/html" = "firefox.desktop";
+    "x-scheme-handler/http" = "firefox.desktop";
+    "x-scheme-handler/https" = "firefox.desktop";
+    "x-scheme-handler/about" = "firefox.desktop";
+    "x-scheme-handler/unknown" = "firefox.desktop";
+  };
 
 
 
@@ -89,6 +135,16 @@
 	];
 
   services.udev.packages = [ inputs.waveforms.packages.${system}.adept2-runtime ];
+  users.users.rslsync.extraGroups = ["users"];
+
+  # add myself to plugdev group for waveforms
+  # and incus-admin to use incus without sudo
+  users.users.me.extraGroups = [ "incus-admin" "plugdev" "rslsync" ];
+
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "python-2.7.18.8"
+  ];
 
 
   environment.systemPackages = with pkgs; [
@@ -251,9 +307,13 @@
   #networking.useDHCP = lib.mkForce true;
 
 	networking.firewall.allowPing = true;
-	networking.firewall.enable = false;
+	networking.firewall.enable = true;
 
 	services.samba.openFirewall = true;
+
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 
+    44444 # resilio sync
+  ];
 
 	networking.firewall.allowedTCPPorts = [
   	5357 # wsdd
@@ -485,42 +545,49 @@
   # */
 
 
+  systemd.services.waydroid = {
+    enable = false;
+    description = "run waydroid session in background";
+    unitConfig = {
+      Type = "simple";
+    };
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = "500s";
+      ExecStart = "${pkgs.waydroid}/bin/waydroid session start";
+      User = "me";
+      Group = "users";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
 
 	#################################### samba ######################################
+  /*
 	services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 
 	services.samba = {
   		enable = true;
   		securityType = "user";
-  		extraConfig = ''
-			security = user
-			map to guest = bad user
-			guest account = me
-
-			server role = standalone server
-			workgroup = WORKGROUP
-  		'';
-  		shares = {
-    		rpi_schule = {
-    			path = "${workDir}/rpi-schule/";
-	 			"guest ok" = "yes";
-    			"read only" = "no";
-    			public = "yes";
-    			writable = "yes";
-    			printable = "no";
-    			comment = "share for rpi in school wlan";
-    		};
-
+  		settings = {
+        global = {
+			    "security" = "user";
+			    "map to guest" = "bad user";
+			    "guest account" = "me";
+			    "server role" = "standalone server";
+			    "workgroup" = "WORKGROUP";
+        };
     		share = {
     			comment = "share for sharing stuff";
     			path = "${workDir}/share";
     			public = "yes";
-	 			"guest ok" = "yes";
+	 			  "guest ok" = "yes";
     			"read only" = "no";
     			writable = "yes";
     		};
   		};
 	};
+  */
 
 
   ######################################### virtualisation ###############################
@@ -540,10 +607,6 @@
     virtualisation.incus.enable = true;
     systemd.services.incus.path = [ pkgs.swtpm ];
     #virtualisation.incus.package = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.incus;
-
-    # add myself to plugdev group for waveforms
-    # and incus-admin to use incus without sudo
-    users.users.me.extraGroups = [ "incus-admin" "plugdev" ];
 
 
     virtualisation.podman.enable = true;

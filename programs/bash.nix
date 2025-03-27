@@ -1,19 +1,17 @@
-{ persistentDir, confDir, hostname, self, pkgs, config, system, inputs, workDir, ... }:
+{ secretsDir, confDir, hostname, self, pkgs, config, system, inputs, workDir, ... }:
 {
 	programs.bash = {
 
 		enable = true;
 		enableCompletion = true;
 
-		historyFile = "/home/$USER/work/app-data/${hostname}/bash-history";
+		historyFile = if hostname == "main" then "/home/$USER/work/app-data/${hostname}/bash-history" else "/home/$USER/here/bash-history";
 		historyFileSize = 100000;
 		historyControl = [ "ignoredups" ];
 		historyIgnore = [
 			"ls"
 			"cd"
 			"exit"
-      "sd vim /etc/hosts"
-      "sd vim /etc/host-youtube-block"
 		];
 
 		shellOptions = [
@@ -46,6 +44,7 @@
 		shellAliases = {
       ports = "${pkgs.lsof}/bin/lsof -i -P -n";
       losetup = "${pkgs.util-linux}/bin/losetup";
+      u = "sudo umount ~/mnt";
       #log = let
         #log = pkgs.writeShellApplication {
           #name = "log";
@@ -89,7 +88,7 @@
       export PATH=${self}/mybin:$PATH
 			export TERM="xterm-color"
       export system=${system}
-      export NIX_PATH=$NIX_PATH:nixpkgs=${self}
+      export NIX_PATH=nixpkgs=${self.inputs.nixpkgs.outPath}
       export NIXPKGS_ALLOW_UNFREE=1
 
       # the commit hash of nixpkgs 23.11
@@ -113,9 +112,31 @@
 			fi
 
 
+
+
       function lf () {
         ${config.programs.lf.package}/bin/lf -last-dir-path /tmp/lf-last-path && cd $(cat /tmp/lf-last-path)
       }
+
+
+
+
+
+      function rp () {
+        host=$1
+
+        if [[ "$host" == "mosatop" ]]
+        then
+          xfreerdp /u:"c2vi" /v:mosatop /p:$(cat ${secretsDir}/mosatop-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
+
+        elif [[ "$host" == "acern" ]]
+        then
+          xfreerdp /u:"seb" /v:acern /p:$(cat ${secretsDir}/acern-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
+
+        fi
+      }
+			complete -W "mosatop acern" rp
+
 
 
 			# so that programms i spawn from my shell don't have so high cpu priority
@@ -178,11 +199,9 @@
 			# ------------------------------------------------
 			cb() {
 			  local _scs_col="\e[0;32m"; local _wrn_col='\e[1;31m'; local _trn_col='\e[0;33m'
-			  # Check that xclip is installed.
-			  if ! type xclip > /dev/null 2>&1; then
-				 echo -e "$_wrn_col""You must have the 'xclip' program installed.\e[0m"
+
 			  # Check user is not root (root doesn't have access to user xorg server)
-			  elif [[ "$USER" == "root" ]]; then
+			  if [[ "$USER" == "root" ]]; then
 				 echo -e "$_wrn_col""Must be regular user (not root) to copy a file to the clipboard.\e[0m"
 			  else
 				 # If no tty, data should be available on stdin
@@ -198,7 +217,7 @@
 					echo "       echo <string> | cb"
 				 else
 					# Copy input to clipboard
-					echo -n "$input" | xclip -selection c
+					echo -n "$input" | wl-copy
 					# Truncate text for status
 					if [ ''${#input} -gt 80 ]; then input="$(echo $input | cut -c1-80)$_trn_col...\e[0m"; fi
 					# Print status.
@@ -326,7 +345,7 @@
 			complete -W "start stop restart status daemon-reload" stl
 
 			# run 
-			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso speed-test-upload speed-test-download bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char mnt-school" ru
+			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso speed-test-upload speed-test-download bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char mnt-school mnt-host" ru
 
 
 		'';

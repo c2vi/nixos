@@ -60,7 +60,6 @@
     (nerdfonts.override {fonts = ["Hack"];})
   ];
 
-	sound.enable = true;
   home-manager.users.me.services.swayosd.enable = true;
   services.blueman.enable = true;
 	hardware.bluetooth.enable = true;

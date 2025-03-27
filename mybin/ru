@@ -27,6 +27,18 @@ then
 rclone mount --vfs-cache-mode full -vvvv onedrive-school:projekt-autobatterie ~/work/htl/projekt/wechner/mnt
 
 
+elif [ "$1" == "mnt-host" ]
+then
+if [[ "$1" == "-r" ]]
+then
+  host=$3
+  sshfs $host:/ ~/mnt
+else
+  host=$2
+  sshfs $host: ~/mnt
+fi
+
+
 elif [ "$1" == "mnt-school" ]
 then
 rclone mount --vfs-cache-mode full -vvvv onedrive-school: ~/mnt
@@ -41,7 +53,7 @@ wstunnel -L 55555:127.0.0.1:49388 ws://sebastian.dns.army:49389
 
 elif [ "$1" == "speed-test-nixos-iso" ]
 then
-wget -O /tmp/speed-test.iso "https://dl.t2sde.org/binary/2022/t2-22.6-x86-64-minimal-desktop-gcc-glibc.iso"
+wget -O /tmp/speed-test.iso "https://channels.nixos.org/nixos-24.11/latest-nixos-gnome-x86_64-linux.iso"
 rm /tmp/speed-test.iso
 
 

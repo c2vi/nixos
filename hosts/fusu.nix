@@ -1,7 +1,10 @@
 
 { inputs, pkgs, secretsDir, ... }:
 {
+
+  #disabledModules = [ "services/databases/couchdb.nix" ];
 	imports = [
+    #"${inputs.nixpkgs-unstable}/nixos/modules/services/databases/couchdb.nix"
 		../common/all.nix
 		../common/nixos.nix
     ../common/building.nix
@@ -10,6 +13,7 @@
     ../users/me/headless.nix
     ../users/root/default.nix
     ../users/files/headless.nix
+    ../users/server/headless.nix
 	];
 
   # mac address for wakeonlan: 00:19:99:fd:28:23
@@ -29,7 +33,16 @@
     #}
   #];
 
+  
 
+
+  services.tailscale.enable = true;
+  services.resilio = {
+    # TODO: add the config for the share to here
+    enable = true;
+    enableWebUI = true;
+    httpListenAddr = "100.70.54.18";
+  };
 
 
   boot.supportedFilesystems = [ "zfs" ];
@@ -82,6 +95,12 @@
 
 	networking.firewall.allowPing = true;
 	networking.firewall.enable = true;
+
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 
+    443 # couchdb for obsidian live sync https
+    44444 # resilio sync
+    9000 # resilio webui
+  ];
 
 	services.samba.openFirewall = true;
 
@@ -152,6 +171,14 @@
 		hostName = "fusu";
 		nameservers = [ "1.1.1.1" "8.8.8.8" ];
 	};
+
+
+
+  ############################ couchdb for Obsidian Live sync
+  #services.couchdb.enable = true;
+  #services.couchdb.extraConfigFiles = [ "/home/files/storage/files/stuff/obsidian-live-sync/local.ini" ];
+  #services.couchdb.databaseDir = "/home/files/storage/files/stuff/obsidian-live-sync/data";
+
 
 
   ############################ update ip service
@@ -240,16 +267,16 @@
 	services.samba = {
     enable = true;
     securityType = "user";
-    extraConfig = ''
-      server role = standalone server
-      map to guest = bad user
-      usershare allow guests = yes
-      hosts allow = 192.168.0.0/16
-      hosts deny = 0.0.0.0
-      workgroup = WORKGROUP
-      security = user
-    '';
-    shares = {
+    settings = {
+      global = {
+        "server role" = "standalone server";
+        "map to guest" = "bad user";
+        "usershare allow guests" = "yes";
+        # "hosts allow" = "192.168.1 127.0.0.1 localhost";
+        # "hosts deny" = "0.0.0.0/0";
+        "workgroup" = "WORKGROUP";
+        "security" = "user";
+      };
       files = {
         "valid users" = "files";
         "comment" = "all my files";

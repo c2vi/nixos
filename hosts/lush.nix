@@ -146,6 +146,7 @@
         type = "wifi";
         interface-name = "wlan0";
         autoconnect = true;
+        autoconnect-priority = "-200";
       };
 
       wifi = {
@@ -172,6 +173,7 @@
         type = "wifi";
         interface-name = "wlan0";
         autoconnect = true;
+        autoconnect-priority = "-999";
       };
 
       wifi = {
@@ -187,6 +189,25 @@
 
       ipv4 = {
         method = "auto";
+        address1 = "192.168.1.37/24";
+      };
+    };
+
+    dhcp = {
+      connection = {
+        id = "dhcp";
+        uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
+        type = "ethernet";
+        autoconnect = "false";
+        interface-name = "end0";
+      };
+
+      ethernet = {
+        mac-address = "DC:A6:32:CB:4D:5E";
+      };
+
+      ipv4 = {
+        method = "auto";
       };
     };
 
@@ -196,11 +217,11 @@
         uuid = "f55f34e3-4595-4642-b1f6-df3185bc0a04";
         type = "ethernet";
         autoconnect = false;
-        interface-name = "eth0";
+        interface-name = "end0";
       };
 
       ethernet = {
-        mac-address = "F4:39:09:4A:DF:0E";
+        mac-address = "DC:A6:32:CB:4D:5E";
       };
 
       ipv4 = {

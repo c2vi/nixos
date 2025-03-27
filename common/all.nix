@@ -36,6 +36,8 @@
 
 	users.mutableUsers = true;
 
+  nix.channel.enable = false;
+
 
 
 	# This value determines the NixOS release from which the default

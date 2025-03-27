@@ -3,8 +3,8 @@
 
   ################################### INPUTS #########################################
 	inputs = {
-		#nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
-		nixpkgs.url = "github:NixOS/nixpkgs/b9562c824b11473587286eb499680129c2d0d4f1";
+		nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
+		#nixpkgs.url = "github:NixOS/nixpkgs/b9562c824b11473587286eb499680129c2d0d4f1";
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
 		nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -20,7 +20,8 @@
     };
 
 		home-manager = {
-			url = "github:nix-community/home-manager/release-24.05";
+			url = "github:nix-community/home-manager/release-24.11";
+			#url = "github:nix-community/home-manager/release-24.05";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
 
@@ -240,6 +241,11 @@
 	{
     top = builtins.mapAttrs (name: value: value.config.system.build.toplevel) (self.nixOnDroidConfigurations // self.nixosConfigurations);
 
+    img = builtins.mapAttrs (name: value: 
+      # build tarball for wsl systems and sdImage for others.....
+      if value.config.wsl.enable then value.config.system.build.tarballBuilder else value.config.system.build.sdImage
+    ) (self.nixOnDroidConfigurations // self.nixosConfigurations);
+
     # this is my nur repo, that you can import and call with pkgs
     nur = import ./nur.nix;
 
@@ -405,6 +411,14 @@
       	system = "x86_64-linux";
         modules = [
           ./hosts/acern.nix
+        ];
+      };
+
+   		"mosatop" = nixpkgs.lib.nixosSystem {
+			  inherit specialArgs;
+      	system = "x86_64-linux";
+        modules = [
+          ./hosts/mosatop.nix
         ];
       };
 

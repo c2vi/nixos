@@ -33,11 +33,10 @@
 
 
   home.file = {
-    ".mysecrets/root-pwd".text = "changemehiiii";
-    ".mysecrets/me-pwd".text = "changeme";
-
     #".mozilla/firefox".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/firefox";
     ".cache/rofi-3.runcache".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/rofi-run-cache";
+
+    ".local/share/PrismLauncher/".source = config.lib.file.mkOutOfStoreSymlink "${workDir}/app-data/prism-launcher";
   };
 
 
@@ -126,7 +125,7 @@
     (pkgs.writeShellApplication {
       name = "rpi";
       text = let 
-        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" { libraries = [pkgs.python311Packages.dnspython]; } ''
+        myPythonRpi = pkgs.writers.writePython3Bin "myPythonRpi" { libraries = [pkgs.python3Packages.dnspython]; } ''
           # flake8: noqa
           import os
           import re

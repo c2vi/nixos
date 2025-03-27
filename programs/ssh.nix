@@ -6,7 +6,7 @@
       "*" = {
 				identityFile = "${secretsDir}/private-key";
       };
-      pcmc = {
+      ouranos = {
         hostname = "195.201.148.94";
         user = "root";
       };
@@ -49,6 +49,10 @@
         port = 8022;
       };
       acern = {
+        user = "me";
+        port = 2222;
+      };
+      mosatop = {
         user = "me";
         port = 2222;
       };

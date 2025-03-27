@@ -119,7 +119,7 @@ in {
 
     restartIfChanged = false;
     serviceConfig = {
-      ExecStart = "${pkgs.cage}/bin/cage -d -- ${myobs}/bin/obs";
+      ExecStart = "${pkgs.cage}/bin/cage -d -- ${pkgs.moonlight-qt}/bin/moonlight";
       User = "root";
 
       # ConditionPathExists = "/dev/tty0";

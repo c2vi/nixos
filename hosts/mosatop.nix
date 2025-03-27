@@ -11,8 +11,6 @@
   ];
 
 
-  programs.bash.loginShellInit = "";
-
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 
     "aarch64-linux"
@@ -22,15 +20,19 @@
 
   ######################### networking #####################################
 
-  networking.hostName = "acern";
+  networking.hostName = "mosatop";
 	networking.firewall.allowPing = true;
 	networking.firewall.enable = true;
 	networking.firewall.allowedUDPPorts = [
   	3702 # wsdd
     51820  # wireguard
+    24454 # minecraft voice chat
 	];
 	networking.firewall.allowedTCPPorts = [
     2222 # sshd
+    8888 # general use
+    9999 # general use
+    25565 # minecraft
   ];
 
 
