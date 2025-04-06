@@ -5,7 +5,7 @@
 		enable = true;
 		enableCompletion = true;
 
-		historyFile = if hostname == "main" then "/home/$USER/work/app-data/${hostname}/bash-history" else "/home/$USER/here/bash-history";
+		historyFile = if hostname == "main" then "/home/$USER/work/app-data/${hostname}/bash-history" else "/home/$USER/host/bash-history";
 		historyFileSize = 100000;
 		historyControl = [ "ignoredups" ];
 		historyIgnore = [
@@ -92,8 +92,8 @@
       export NIXPKGS_ALLOW_UNFREE=1
 
       # the commit hash of nixpkgs 23.11
-      export nip="nixpkgs/71db8c7a02f3be7cb49b495786050ce1913246d3"
-      export nup="nixpkgs/2a34566b67bef34c551f204063faeecc444ae9da"
+      export nip="nixpkgs/${self.inputs.nixpkgs.rev}"
+      export nup="nixpkgs/${self.inputs.nixpkgs-unstable.rev}"
 
       # needed to make ssh -X work
       # see: https://unix.stackexchange.com/questions/412065/ssh-connection-x11-connection-rejected-because-of-wrong-authentication
@@ -136,6 +136,17 @@
         fi
       }
 			complete -W "mosatop acern" rp
+
+
+      # function to create a tmpdir, to use for some temporary work....
+      # made this, to not just keep cluttering my $HOME... with all kinds of projects
+      function mt () {
+        export TOPDIR=$HOME/tmp
+        mkdir -p $TOPDIR
+        cd $(${pkgs.python3}/bin/python ${self}/scripts/quick-tmp-dir.py "$@")
+      }
+
+
 
 
 
