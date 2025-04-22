@@ -5,8 +5,8 @@
 
 let
   lib = pkgs.lib;
-  files = builtins.readDir ./mods/nurPkgs;
-  names = pkgs.lib.attrsets.mapAttrsToList (name: value: pkgs.lib.strings.removeSuffix ".nix" name) files;
+  files = builtins.filter (el: lib.strings.hasSuffix ".nix" el) (lib.attrsets.mapAttrsToList (name: value: name) (builtins.readDir ./mods/nurPkgs));
+  names = map (value: lib.strings.removeSuffix ".nix" value) files;
   pwd = builtins.toString ./.;
 in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkgs/${name}.nix" {}))
 //

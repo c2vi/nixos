@@ -1,17 +1,25 @@
 { lib
 , python3Packages
+, python3
+, stdenv
 }:
 
-python3Packages.buildPythonApplication {
+stdenv.mkDerivation {
   pname = "minecraft-server-whitelist-all-players";
   version = "1.0";
   pyproject = false;
 
-  propagatedBuildInputs = with python3Packages; [ requests ];
+  propagatedBuildInputs = [
+    (python3.withPackages (pythonPackages: with pythonPackages; [
+      requests
+    ]))
+  ];
 
 
   dontUnpack = true;
   src = ./.;
+
+  installPhase = "install -Dm755 ${./minecraft-server-whitelist-all-players.py} $out/bin/minecraft-server-whitelist-all-players";
 
   meta = with lib; {
     description = "A small python script to generate a whitelist.json from all players that ever joined the server.";
