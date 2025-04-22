@@ -33,6 +33,10 @@
     8888 # general use
     9999 # general use
     25565 # minecraft
+    29901
+    29902
+    29903
+    29904
   ];
 
 

@@ -88,6 +88,11 @@
       url = "github:liff/waveforms-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    vscode-server = {
+      url = "github:nix-community/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 	};
 
 	outputs = { self, nixpkgs, nixpkgs-unstable, nixos-generators, flake-utils, systems, ... }@inputs:
@@ -114,6 +119,7 @@
           #})
         #];
       };
+
       mypkgs = import nixpkgs { 
         system = "x86_64-linux"; 
         config = {
@@ -129,8 +135,15 @@
         ];
       };
 
+      pkgsUnstable = import nixpkgs-unstable {
+        system = "x86_64-linux"; 
+        config = {
+          allowUnfree = true;
+        };
+      };
+
       specialArgs = {
-				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs unstable nur;
+				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs unstable nur pkgsUnstable;
         system = "x86_64-linux";
         pkgs = mypkgs;
 			};
@@ -243,7 +256,7 @@
 
     img = builtins.mapAttrs (name: value: 
       # build tarball for wsl systems and sdImage for others.....
-      if value.config.wsl.enable then value.config.system.build.tarballBuilder else value.config.system.build.sdImage
+      if builtins.hasAttr "wsl" value.config && value.config.wsl.enable then value.config.system.build.tarballBuilder else value.config.system.build.sdImage
     ) (self.nixOnDroidConfigurations // self.nixosConfigurations);
 
     # this is my nur repo, that you can import and call with pkgs
@@ -375,7 +388,6 @@
         specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
         modules = [
           ./hosts/lush.nix
-
         ];
       };
 

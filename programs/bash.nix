@@ -6,7 +6,7 @@
 		enableCompletion = true;
 
 		historyFile = if hostname == "main" then "/home/$USER/work/app-data/${hostname}/bash-history" else "/home/$USER/host/bash-history";
-		historyFileSize = 100000;
+		historyFileSize = 10000000;
 		historyControl = [ "ignoredups" ];
 		historyIgnore = [
 			"ls"
@@ -101,6 +101,8 @@
 
       export nl="--log-format bar-with-logs"
       export acern="ssh://acern x86_64-linux,aarch64-linux - 20 10 big-parallel - -"
+      export mac="ssh://mac x86_64-linux,aarch64-linux - 8 5 big-parallel - -"
+      export mosatop="ssh://mosatop x86_64-linux,aarch64-linux - 8 5 big-parallel - -"
       export hpm="ssh://hpm x86_64-linux,aarch64-linux - 8 5 big-parallel - -"
 
 			# my prompt
@@ -132,6 +134,14 @@
         elif [[ "$host" == "acern" ]]
         then
           xfreerdp /u:"seb" /v:acern /p:$(cat ${secretsDir}/acern-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
+
+        elif [[ "$host" == "mwin" ]]
+        then
+          xfreerdp /u:"me" /v:mac:4400 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
+
+        elif [[ "$host" == "win" ]]
+        then
+          xfreerdp /u:"me" /v:192.168.122.141 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
 
         fi
       }
@@ -280,9 +290,9 @@
 			sd() {
 				if [ "$1" == "" ]
 				then
-					sudo $(history | tail -n 2 | head -n 1 | awk '{$1=""; print $0}')
+					sudo -E $(history | tail -n 2 | head -n 1 | awk '{$1=""; print $0}')
 				else
-					sudo $@
+					sudo -E $@
 				fi
 			}
 
@@ -356,7 +366,7 @@
 			complete -W "start stop restart status daemon-reload" stl
 
 			# run 
-			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso speed-test-upload speed-test-download bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char mnt-school mnt-host" ru
+			complete -W "mnt-wechner sync-school wstunnel hibernate p speed-test-nixos-iso speed-test-upload speed-test-download bat bstat mnt-files-local mnt-lan-local mnt-files-remote mnt-lan-remote suspend rm-tab-cur rm-last-char mnt-school mnt-host davinci-resolve-convert-videos" ru
 
 
 		'';

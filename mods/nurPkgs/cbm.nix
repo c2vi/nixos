@@ -12,8 +12,8 @@ stdenv.mkDerivation rec {
 	src = fetchFromGitHub {
 		owner = "resurrecting-open-source-projects";
 		repo = "cbm";
-    rev = "master";
-    sha256 = "sha256-Ubm8jky8nbJZWVSlqipg22ZjlnsgdVmoQWxYi9cyags=";
+    rev = "b6bc84bd9702d711466348a7af5c25d4c4f0bbf5";
+    sha256 = "sha256-rL9ttGK4CIPFHXmNBgVq1QzLkMDGtgF+1eoCH1bwvG0=";
 	};
 
   nativeBuildInputs = [

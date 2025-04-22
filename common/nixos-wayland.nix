@@ -82,6 +82,9 @@
       patches = prev.patches or [] ++ [ ../overlays/patches/flameshot-wayland.patch ];
     }))
 
+    hyprpicker
+    satty
+    nwg-displays
     waybar
     /*
     (waybar.overrideAttrs (prev: {
@@ -190,6 +193,37 @@
 
       ### Output configuration
           output * scale 1 bg #121212 solid_color
+
+          output "HEADLESS-1" {
+              mode  1920x1080@1.0Hz
+              pos 5760 532
+              transform normal
+              scale 1.0
+              scale_filter nearest
+              adaptive_sync off
+              dpms on
+          }
+
+          output "eDP-1" {
+              mode  1920x1080@60.001Hz
+              pos 0 884
+              transform normal
+              scale 1.0
+              scale_filter nearest
+              adaptive_sync off
+              dpms on
+          }
+          output "DP-1" {
+              mode  3840x2160@59.997Hz
+              pos 1920 0
+              transform normal
+              scale 1.0
+              scale_filter nearest
+              adaptive_sync off
+              dpms on
+          }
+          workspace 5 output eDP-1
+          workspace 0 output HEADLESS-1
 
       ### Input configuration
           input type:keyboard {
@@ -319,8 +353,8 @@
           bindsym $mod+Shift+Up move up
           bindsym $mod+Shift+Right move right
 
-          bindsym $mod+u workspace prev
-          bindsym $mod+i workspace next
+          #bindsym $mod+u workspace prev
+          #bindsym $mod+i workspace next
 
       # Workspaces:
           bindsym $mod+1 workspace number 1
@@ -459,8 +493,6 @@
           "cpu"
           "temperature"
           "battery"
-          "power-profiles-daemon"
-          "custom/power-usage"
           "disk"
         ];
 

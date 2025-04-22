@@ -1,4 +1,4 @@
-{ lib, pkgs, inputs, secretsDir, workDir, ... }:
+{ lib, pkgs, inputs, secretsDir, config, ... }:
 {
   
   #system.stateVersion = "23.05"; # Did you read the comment?
@@ -32,7 +32,13 @@
     };
   };
   
-  boot.kernelParams = lib.mkForce ["console=ttyS0,115200n8" "console=tty0" "nohibernate" "loglevel=7" ];
+  # get usbip working
+  boot.extraModulePackages = [
+    config.boot.kernelPackages.usbip
+  ];
+
+
+  boot.kernelParams = lib.mkForce ["console=ttyS0,115200n8" "console=ttyAMA0,115200n8" "console=tty0" "nohibernate" "loglevel=7" ];
 	# hardware.bluetooth.enable = true;
 
 
@@ -62,9 +68,6 @@
   services.blueman.enable = true;
   hardware.enableRedistributableFirmware = true;
 
-  # This causes an overlay which causes a lot of rebuilding
-  environment.noXlibs = lib.mkForce false;
-
 
   environment.systemPackages = with pkgs; [
     vim
@@ -75,10 +78,11 @@
   # "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix" creates a
   # disk with this label on first boot. Therefore, we need to keep it. It is the
   # only information from the installer image that we need to keep persistent
-  fileSystems."/" =
-    { device = "/dev/disk/by-label/NIXOS_SD";
-      fsType = "ext4";
-    };
+  fileSystems."/" = { 
+    device = "/dev/disk/by-label/NIXOS_SD";
+    noCheck = true;
+    fsType = "ext4";
+  };
 
   boot = {
     #kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
@@ -115,6 +119,7 @@
   networking.firewall.allowedTCPPorts = [
       8888 # general use
       9999 # general use
+      3240 # usbip
   ];
 
   networking.hostName = "lush";
@@ -122,23 +127,6 @@
   networking.networkmanager.enable = true;
 
   networking.networkmanager.profiles = {
-    home = {
-      connection = {
-        id = "main";
-        uuid = "a02273d9-ad12-395e-8372-f61129635b6f";
-        type = "ethernet";
-        autoconnect-priority = "-999";
-        interface-name = "eth0";
-        autoconnect = true;
-      };
-
-      ipv4 = {
-        address1 = "192.168.1.44/24,192.168.1.1";
-        dns = "1.1.1.1;";
-        method = "manual";
-      };
-    };
-
     pw = {
       connection = {
         id = "pw";
@@ -198,7 +186,7 @@
         id = "dhcp";
         uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
         type = "ethernet";
-        autoconnect = "false";
+        autoconnect = "true";
         interface-name = "end0";
       };
 
@@ -207,6 +195,7 @@
       };
 
       ipv4 = {
+        address1 = "192.168.1.44/24,192.168.1.1";
         method = "auto";
       };
     };

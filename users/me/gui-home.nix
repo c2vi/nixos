@@ -18,10 +18,23 @@
 		name = "Yaru";
 	 };
 
+  gtk = {
+    enable = true;
+
+    gtk3.extraConfig = {
+      # needed for Prusa Slicer for example
+      "gtk-application-prefer-dark-theme" = 1;
+    };
+
+    gtk4.extraConfig = {
+      "gtk-application-prefer-dark-theme" = 1;
+    };
+  };
+
 	dconf.settings = {
 	  "org/virt-manager/virt-manager/connections" = {
-		 autoconnect = ["qemu:///system"];
-		 uris = ["qemu:///system"];
+		 autoconnect = [ "qemu:///system" "qemu+ssh://me@mac/system" ];
+		 uris = [ "qemu:///system" "qemu+ssh://me@mac/system" ];
 	  };
 	};
 
@@ -37,6 +50,7 @@
     ".cache/rofi-3.runcache".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/rofi-run-cache";
 
     ".local/share/PrismLauncher/".source = config.lib.file.mkOutOfStoreSymlink "${workDir}/app-data/prism-launcher";
+    ".local/share/DaVinciResolve/".source = config.lib.file.mkOutOfStoreSymlink "${workDir}/app-data/DaVinciResolve";
   };
 
 
@@ -161,6 +175,10 @@
             with open("/etc/hosts", "r") as file:
               for line in file.readlines():
                 print(line, end="")
+            exit()
+
+          if sys.argv[1] == "v":
+            os.system("sudo vim /etc/hosts")
             exit()
 
           net = sys.argv[1]

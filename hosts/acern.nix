@@ -12,6 +12,8 @@
 
 
   programs.bash.loginShellInit = "";
+  virtualisation.docker.enable = true;
+  users.users.me.extraGroups = [ "docker" ];
 
   # to build rpi images
   boot.binfmt.emulatedSystems = [ 

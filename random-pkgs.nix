@@ -1,8 +1,9 @@
 { mypkgs, specialArgs, nixos-generators,
-  system, inputs, nixpkgs, self,
+  system, inputs, nixpkgs, self, nixpkgs-unstable,
   ... 
 }: let
   pkgs = import nixpkgs { inherit system; };
+  pkgsUnstable = import nixpkgs-unstable { inherit system; };
   lib = pkgs.lib;
 in rec {
 
@@ -39,6 +40,44 @@ in rec {
     '';
 
   };
+
+  resolve = pkgs.davinci-resolve.overrideAttrs (prev: {
+    extraBwrapArgs = prev.extraBwrapArgs or [] ++ [
+      "--bind /etc/OpenCL /etc/OpenCL"
+    ];
+  });
+
+  tmp-resolve = pkgs.stdenv.mkDerivation {
+    name = "my-test-env";
+    nativeBuildInputs = with pkgs; [ intel-compute-runtime-legacy1 pkg-config ];
+    buildInputs = with pkgs; [ intel-compute-runtime-legacy1 ];
+  };
+
+  sunshine = pkgsUnstable.sunshine.overrideAttrs (prev: {
+    patches = prev.patches or [] ++ [
+      #(pkgs.fetchpatch {
+        #url = "https://github.com/LizardByte/Sunshine/pull/2507.patch";
+        #hash = "sha256-DdyiR7djH4GF1bcQP/a20BYpTBvrAzd0UxJ0o0nC4rU=";
+      #})
+    ];
+
+    buildInputs = prev.buildInputs or [] ++ [
+      pkgsUnstable.pipewire
+      pkgsUnstable.xdg-desktop-portal
+    ];
+    cmakeFlage = prev.cmakeFlags or [] ++ [
+      (lib.cmakeBool "SUNSHINE_ENABLE_PORTAL" true)
+    ];
+
+    src = pkgs.fetchFromGitHub {
+      #owner = "LizardByte";
+      owner = "c2vi";
+      repo = "Sunshine";
+      rev = "2671cd374dc5d12d402de572d170c9dfee8c5d7b";
+      hash = "sha256-7IOMXmvl7/WYF6ktSUrLZjq+Lnq9YpSqUsj0FVtG8tI=";
+      fetchSubmodules = true;
+    };
+  });
 
   #######################################################################
   # make an iso

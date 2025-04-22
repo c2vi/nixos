@@ -52,6 +52,10 @@
         user = "me";
         port = 2222;
       };
+      mac = {
+        user = "me";
+        port = 22;
+      };
       mosatop = {
         user = "me";
         port = 2222;
@@ -72,6 +76,12 @@
         port = 49388;
 				hostname = "fusu";
 				user = "me";
+			};
+
+		  fusus = {
+        port = 49388;
+				hostname = "fusu";
+				user = "server";
 			};
 
 			ocih = {

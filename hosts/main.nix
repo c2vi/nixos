@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, self, secretsDir, config, inputs, system, ... }:
+{ pkgs, lib, workDir, self, secretsDir, config, inputs, system, pkgsUnstable, ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -38,6 +38,7 @@
 
 
   services.sunshine = {
+    /*
     package = pkgs.sunshine.overrideAttrs {
       src = pkgs.fetchFromGitHub {
         owner = "garnacho";
@@ -46,6 +47,32 @@
         hash = "sha256-To1vhNQxjIa5Hc+z2xo+ODSQyIH6cnI3A7Ofc7MDL60=";
       };
     };
+    */
+
+    package = pkgsUnstable.sunshine.overrideAttrs (prev: {
+      patches = prev.patches or [] ++ [
+        #(pkgs.fetchpatch {
+          #url = "https://github.com/LizardByte/Sunshine/pull/2507.patch";
+          #hash = "sha256-DdyiR7djH4GF1bcQP/a20BYpTBvrAzd0UxJ0o0nC4rU=";
+        #})
+      ];
+
+      buildInputs = prev.buildInputs or [] ++ [
+        pkgsUnstable.pipewire
+        pkgsUnstable.xdg-desktop-portal
+      ];
+      cmakeFlage = prev.cmakeFlags or [] ++ [
+        (lib.cmakeBool "SUNSHINE_ENABLE_PORTAL" true)
+      ];
+
+      src = pkgs.fetchFromGitHub {
+        owner = "c2vi";
+        repo = "Sunshine";
+        rev = "2671cd374dc5d12d402de572d170c9dfee8c5d7b";
+        hash = "sha256-7IOMXmvl7/WYF6ktSUrLZjq+Lnq9YpSqUsj0FVtG8tI=";
+        fetchSubmodules = true;
+      };
+    });
     enable = true;
     autoStart = true;
     capSysAdmin = true;
@@ -55,6 +82,9 @@
 
 
 
+  hardware.graphics.extraPackages = with pkgs; [
+    intel-media-driver intel-ocl intel-vaapi-driver intel-compute-runtime-legacy1
+  ];
 
 
 
@@ -78,7 +108,6 @@
 
 
   services.nscd.enable = lib.mkForce false;
-  virtualisation.docker.enable = true;
 
   system.nssModules = lib.mkForce [];
 
@@ -149,6 +178,11 @@
 
   environment.systemPackages = with pkgs; [
     inputs.waveforms.packages.${system}.waveforms
+    intel-compute-runtime-legacy1
+    ffmpeg-full
+    remmina
+    vesktop
+    prismlauncher
 
     # add pyclip for waydroid
     python310Packages.pyclip
@@ -163,6 +197,11 @@
         obs-teleport
       ];
     })
+
+    (writeShellScriptBin "davinci" ''
+      NIXPKGS_ALLOW_UNFREE=1 OCL_ICD_ENABLE_TRACE=True QT_QPA_PLATFORM=xcb nix run nixpkgs#davinci-resolve --impure -L
+    '')
+
 
     # waveforms
 
@@ -185,9 +224,7 @@
   # shedule nix builds with low priority, so the laptop is still usable while building something
   nix.daemonCPUSchedPolicy = "idle";
   nix.daemonIONiceLevel = 7;
-  
- 
- systemd.services.nix-daemon.serviceConfig.Nice = 9;
+  systemd.services.nix-daemon.serviceConfig.Nice = 9;
 
   # enable ntp
   #services.ntp.enable = true;
@@ -322,6 +359,7 @@
     8080 # for mitm proxy
     51820  # wireguard
     6000 # Xserver
+    10000 # tailscale tcp funnel
 	];
 
 	networking.firewall.allowedUDPPorts = [

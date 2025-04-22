@@ -61,6 +61,8 @@
     qemuSwtpm = true;
     #qemuOvmfPackage = pkgs.OVMFFull;
   };
+  virtualisation.docker.enable = true;
+  users.users.server.extraGroups = [ "docker" ];
 
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
@@ -119,7 +121,16 @@
     49391
     49392
     49393
+
 	];
+
+
+  networking.firewall.allowedTCPPortRanges = [
+    { from = 25500; to = 27777;} # minecraft
+  ];
+  networking.firewall.allowedUDPPortRanges = [
+    { from = 27700; to = 28800;} # minecraft
+  ];
 
 	networking.firewall.allowedUDPPorts = [
   		3702 # wsdd
@@ -313,6 +324,7 @@
         "recycle:touch_mtime" = "Yes";
         "recycle:maxsize" = "8000";
       };
+
       mama = {
         "comment" = "Meine Dateien auf Mamas Laptop";
         "path" = "/home/files/storage/files/stuff/Mamas-Laptop";

@@ -22,6 +22,46 @@ then
 du -d 1 -h $2 | sort -h -r
 
 
+
+
+elif [ "$1" == "davinci-resolve-convert-videos" ]
+then
+FFMPEG_ACCEL_ARGS="-hwaccel vaapi -hwaccel_device /dev/dri/renderD128"
+KEEP=true
+PRORES=$2
+if [[ "$1" == "d" ]]
+then
+  KEEP=false
+fi
+
+if [ -d "$PWD/vid" ];
+then
+  cd vid
+  mkdir -p "$PWD/for-davinci"
+
+  files=()
+  for x in *.mp4; do
+    files+=("${x%%/*}")
+  done
+
+  for file in "${files[@]}"
+  do
+    echo "handling file: $file"
+    if [ -f "$PWD/for-davinci/${file%.*}$PRORES.mov" ]
+    then
+      rm "$PWD/for-davinci/${file%.*}$PRORES.mov"
+    fi
+    echo "PRORES: $PRORES"
+    [[ "$PRORES" != "-prores" ]] && ffmpeg $FFMPEG_ACCEL_ARGS -i "$PWD/$file" -c:v mpeg4 -c:a mp3 "${PWD}/for-davinci/${file%.*}.mov"
+    [[ "$PRORES" == "-prores" ]] && ffmpeg $FFMPEG_ACCEL_ARGS -i "$PWD/$file" -c:v prores_ks -c:a pcm_s16le "${PWD}/for-davinci/${file%.*}-prores.mov"
+    [[ "$KEEP" == "false" ]] && rm "$file"
+  done
+fi
+
+
+
+
+
 elif [ "$1" == "mnt-wechner" ]
 then
 rclone mount --vfs-cache-mode full -vvvv onedrive-school:projekt-autobatterie ~/work/htl/projekt/wechner/mnt

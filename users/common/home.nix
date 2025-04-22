@@ -52,7 +52,7 @@
 		zip
 		unzip
 		arp-scan
-		lolcat
+		#lolcat
 		comma
 		delta
     jq
