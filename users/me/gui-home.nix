@@ -4,6 +4,7 @@
 {
 	imports = [
     ../common/home.nix
+    ../../programs/ssh.nix
 
     # my gui programs
 		../../programs/alacritty.nix
@@ -12,7 +13,10 @@
 		../../programs/rofi/default.nix
 		../../programs/zathura.nix
     ../../programs/firefox/default.nix
+    inputs.lan-mouse.homeManagerModules.default
 	];
+
+  programs.lan-mouse.systemd = true;
 
 	gtk.cursorTheme = {
 		name = "Yaru";
@@ -40,6 +44,7 @@
 
   home.sessionVariables = {
     inherit system;
+    VIC_BINARY = "/home/me/work/victorinix/vic";
   };
 
 	services.dunst.enable = true;
@@ -51,6 +56,7 @@
 
     ".local/share/PrismLauncher/".source = config.lib.file.mkOutOfStoreSymlink "${workDir}/app-data/prism-launcher";
     ".local/share/DaVinciResolve/".source = config.lib.file.mkOutOfStoreSymlink "${workDir}/app-data/DaVinciResolve";
+    ".local/share/JetBrains/IdeaIC2024.3".source = config.lib.file.mkOutOfStoreSymlink "${workDir}/app-data/IdeaIC2024.3";
   };
 
 

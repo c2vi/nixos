@@ -11,7 +11,6 @@
 		../../programs/git.nix
     ../../programs/lf/default.nix
 		../../programs/bash.nix
-		../../programs/ssh.nix
 		../../programs/neovim.nix
   ];
 
