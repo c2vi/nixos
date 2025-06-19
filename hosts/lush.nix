@@ -70,6 +70,7 @@
 
 
   environment.systemPackages = with pkgs; [
+    linuxPackages.usbip
     vim
     bluez
     git

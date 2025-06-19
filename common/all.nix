@@ -38,6 +38,8 @@
 
   nix.channel.enable = false;
 
+  services.openssh.settings.GatewayPorts = "clientspecified";
+
 
 
 	# This value determines the NixOS release from which the default

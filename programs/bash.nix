@@ -42,6 +42,10 @@
 		};
 
 		shellAliases = {
+      md="~/work/modules/modules/dev/run";
+      mize="~/work/mize/mize";
+      m="~/work/mize/mize";
+
       ports = "${pkgs.lsof}/bin/lsof -i -P -n";
       losetup = "${pkgs.util-linux}/bin/losetup";
       u = "sudo umount ~/mnt";
@@ -84,6 +88,9 @@
 			'';
 		};
 
+    profileExtra = ''
+    '';
+
 		bashrcExtra = ''
       export PATH=${self}/mybin:$PATH
 			export TERM="xterm-color"
@@ -91,7 +98,7 @@
       export NIX_PATH=nixpkgs=${self.inputs.nixpkgs.outPath}
       export NIXPKGS_ALLOW_UNFREE=1
 
-      # the commit hash of nixpkgs 23.11
+      # the commit hash of the nixpkgs revs i use
       export nip="nixpkgs/${self.inputs.nixpkgs.rev}"
       export nup="nixpkgs/${self.inputs.nixpkgs-unstable.rev}"
 
@@ -121,6 +128,10 @@
       }
 
 
+      function vic() {
+        source ~/work/victorinix/vic
+      }
+
 
 
 
@@ -148,6 +159,7 @@
 			complete -W "mosatop acern" rp
 
 
+
       # function to create a tmpdir, to use for some temporary work....
       # made this, to not just keep cluttering my $HOME... with all kinds of projects
       function mt () {
@@ -155,7 +167,6 @@
         mkdir -p $TOPDIR
         cd $(${pkgs.python3}/bin/python ${self}/scripts/quick-tmp-dir.py "$@")
       }
-
 
 
 

@@ -44,6 +44,8 @@
 
     networkmanager.url = "github:c2vi/nixos-networkmanager-profiles";
 
+    lan-mouse.url = "github:feschber/lan-mouse";
+
     robotnix = {
       #url = "github:nix-community/robotnix";
       url = "github:c2vi/robotnix";

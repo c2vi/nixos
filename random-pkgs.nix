@@ -7,6 +7,10 @@
   lib = pkgs.lib;
 in rec {
 
+  runc = pkgs.runc.overrideAttrs ({
+    src = /home/me/work/config/gitignore/runc;
+  });
+
   qtrs = pkgs.stdenv.mkDerivation {
     name = "qt rust bindings";
 

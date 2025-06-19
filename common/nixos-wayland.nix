@@ -8,12 +8,12 @@
 # - win + D command
 # - kernel output for luks pwd on all displays
 
-{ pkgs, nur, unstable, ... }: {
+{ lib, pkgs, nur, unstable, ... }: {
 
   services.greetd = {
     enable = true;
-    settings = {
-      default_session = {
+    settings = rec {
+      initial_session = {
         #command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time -d --env WLR_RENDERER_ALLOW_SOFTWARE=1 --cmd sway";
         command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.writeScriptBin "run-sway" ''
           export WLR_RENDERER_ALLOW_SOFTWARE=1
@@ -26,6 +26,7 @@
         ''}/bin/run-sway";
         user = "me";
       };
+      default_session = initial_session;
     };
   };
 
@@ -194,35 +195,40 @@
       ### Output configuration
           output * scale 1 bg #121212 solid_color
 
-          output "HEADLESS-1" {
-              mode  1920x1080@1.0Hz
-              pos 5760 532
-              transform normal
-              scale 1.0
-              scale_filter nearest
-              adaptive_sync off
-              dpms on
-          }
+      #################### from nwg-display
+        output "eDP-1" {
+            mode  1920x1080@60.001Hz
+            pos 0 1181
+            transform normal
+            scale 1.0
+            scale_filter nearest
+            adaptive_sync off
+            dpms on
+        }
+        output "HEADLESS-1" {
+            mode  1920x1080@1.0Hz
+            pos 5760 532
+            transform normal
+            scale 1.0
+            scale_filter nearest
+            adaptive_sync off
+            dpms on
+        }
+        output "DP-1" {
+            mode  3840x2160@59.997Hz
+            pos 1920 0
+            transform normal
+            scale 1.0
+            scale_filter nearest
+            adaptive_sync off
+            dpms on
+        }
+      #################### end from nwg-display
 
-          output "eDP-1" {
-              mode  1920x1080@60.001Hz
-              pos 0 884
-              transform normal
-              scale 1.0
-              scale_filter nearest
-              adaptive_sync off
-              dpms on
-          }
-          output "DP-1" {
-              mode  3840x2160@59.997Hz
-              pos 1920 0
-              transform normal
-              scale 1.0
-              scale_filter nearest
-              adaptive_sync off
-              dpms on
-          }
-          workspace 5 output eDP-1
+          set $disp2 "DP-1"
+          set $disp1 "eDP-1"
+
+          workspace 7 output eDP-1
           workspace 0 output HEADLESS-1
 
       ### Input configuration
@@ -276,6 +282,8 @@
             systemctl suspend-then-hibernate
           ''}/bin/my-lock
 
+          exec '/usr/bin/env bash -c "sleep 10; systemctl --user start lan-mouse"'
+
           #assign [class="vesktop"] workspace 1
           #assign [class="Signal"] workspace 1
           #assign [app_id="firefox"] workspace 2
@@ -284,6 +292,7 @@
 
       ### Key bindings
           #bindsym Mod4+Shift+Return exec $term
+          bindsym $mod exec alacritty
 
           bindsym --locked $mod+d exec wlr-randr --output eDP-1 --on
           bindsym --locked $mod+Shift+d exec wlr-randr --output eDP-1 --off
@@ -343,61 +352,86 @@
           bindsym $mod+Up focus up
           bindsym $mod+Right focus right
 
-          bindsym $mod+Shift+$left move left
-          bindsym $mod+Shift+$down move down
-          bindsym $mod+Shift+$up move up
-          bindsym $mod+Shift+$right move right
-
+          bindsym $mod+Shift+$left mark swap, focus left, swap container with mark swap, focus left, unmark swap
+          bindsym $mod+Shift+$right mark swap, focus right, swap container with mark swap, focus right, unmark swap
+          bindsym $mod+Shift+$up mark swap, focus up, swap container with mark swap, focus up, unmark swap
+          bindsym $mod+Shift+$down mark swap, focus down, swap container with mark swap, focus down, unmark swap
+            
+          # the old way of moving around
           bindsym $mod+Shift+Left move left
           bindsym $mod+Shift+Down move down
           bindsym $mod+Shift+Up move up
           bindsym $mod+Shift+Right move right
 
-          #bindsym $mod+u workspace prev
-          #bindsym $mod+i workspace next
 
-      # Workspaces:
+
+      ############################ Workspaces:
+
+        # the sticky workspaces, that are the same in all workrooms
+
           bindsym $mod+1 workspace number 1
-          bindsym $mod+2 workspace number 2
-          bindsym $mod+3 workspace number 3
-          bindsym $mod+4 workspace number 4
-          bindsym $mod+5 workspace number 5
-          bindsym $mod+6 workspace number 6
           bindsym $mod+7 workspace number 7
           bindsym $mod+8 workspace number 8
           bindsym $mod+9 workspace number 9
           bindsym $mod+0 workspace number 10
 
+
           bindsym $mod+Shift+1 move container to workspace number 1
-          bindsym $mod+Shift+2 move container to workspace number 2
-          bindsym $mod+Shift+3 move container to workspace number 3
-          bindsym $mod+Shift+4 move container to workspace number 4
-          bindsym $mod+Shift+5 move container to workspace number 5
-          bindsym $mod+Shift+6 move container to workspace number 6
           bindsym $mod+Shift+7 move container to workspace number 7
           bindsym $mod+Shift+8 move container to workspace number 8
           bindsym $mod+Shift+9 move container to workspace number 9
           bindsym $mod+Shift+0 move container to workspace number 10
 
-          # define display output names
-          set $disp1 "eDP-1"
-          set $disp2 "DP-1"
-          
           # default display outputs for workspaces with fallback to disp1
           workspace 1 output $disp2 $disp1
-          workspace 2 output $disp2 $disp1
-          workspace 3 output $disp2 $disp1
-          workspace 4 output $disp2 $disp1
-          workspace 5 output $disp2 $disp1
           workspace 6 output $disp2 $disp1
-          workspace 7 output $disp2 $disp1
           workspace 8 output $disp2 $disp1
           workspace 9 output $disp2 $disp1
-          workspace 10 output $disp2 $disp1
+          workspace 7 output eDP-1
+          workspace 0 output HEADLESS-1
 
           workspace_auto_back_and_forth false
+          focus_wrapping workspace
 
-      # Fx stuff:
+        # Workrooms:
+          set $workroom d
+          set $workspace 0
+
+        # nav to workspaces in workrooms
+          bindsym $mod+2 set $$workspace 2; workspace $$workroom$$workspace
+          bindsym $mod+3 set $$workspace 3; workspace $$workroom$$workspace
+          bindsym $mod+4 set $$workspace 4; workspace $$workroom$$workspace
+          bindsym $mod+5 set $$workspace 5; workspace $$workroom$$workspace
+          bindsym $mod+6 set $$workspace 6; workspace $$workroom$$workspace
+
+        # move windows to workspaces in workrooms
+          bindsym $mod+Shift+2 set $$tmp-workspace 2; move container to workspace $$workroom$$tmp-workspace
+          bindsym $mod+Shift+3 set $$tmp-workspace 3; move container to workspace $$workroom$$tmp-workspace
+          bindsym $mod+Shift+4 set $$tmp-workspace 4; move container to workspace $$workroom$$tmp-workspace
+          bindsym $mod+Shift+5 set $$tmp-workspace 5; move container to workspace $$workroom$$tmp-workspace
+          bindsym $mod+Shift+6 set $$tmp-workspace 6; move container to workspace $$workroom$$tmp-workspace
+
+        # set outputs for workspaces in workrooms
+        ${
+          let
+            mkLine = workroom: workspace: "workspace ${workroom}${workspace} output $disp2 $disp1\n";
+          in
+          lib.strings.concatStringsSep "\n" (builtins.map (workroom: lib.strings.concatStringsSep "\n" (builtins.map (workspace: mkLine workroom workspace) [ "2" "3" "4" "5" "6" ])) [ "d" "m" "a" "b" "c" ])
+        }
+
+        # change workrooms
+          mode ChangeWorkroom {
+            bindsym Escape mode "default"
+            bindsym $mod+d set $$workroom d; workspace $$workroom$$workspace; mode "default"
+            bindsym $mod+m set $$workroom m; workspace $$workroom$$workspace; mode "default"
+            bindsym $mod+a set $$workroom a; workspace $$workroom$$workspace; mode "default"
+            bindsym $mod+b set $$workroom b; workspace $$workroom$$workspace; mode "default"
+            bindsym $mod+c set $$workroom c; workspace $$workroom$$workspace; mode "default"
+          }
+
+          bindsym $mod+m mode ChangeWorkroom
+
+      ############################# Fx stuff:
           blur disable
           blur_passes 0
           blur_radius 1
@@ -428,9 +462,10 @@
           bindsym $mod+Period layout toggle split
 
           bindsym $mod+space fullscreen
-          bindsym $mod+Shift+space floating toggle
+          bindsym $mod+Shift+m floating toggle
+
           #bindsym $mod+r focus mode_toggle
-          bindsym $mod+r exec sh -c "echo Run > ~/.mize/mize_dev_module/pipe"
+          #bindsym $mod+r exec sh -c "echo Run > ~/.mize/mize_dev_module/pipe"
 
       # Scratchpad:
           # Sway has a "scratchpad", which is a bag of holding for windows.
@@ -444,27 +479,30 @@
           bindsym $mod+Tab scratchpad show
 
       # Resizing containers:
-          #mode "resize" {
-          # left will shrink the containers width
-          # right will grow the containers width
-          # up will shrink the containers height
-          # down will grow the containers height
-          set $move_amount 175px
+        #mode "resize" {
+        # left will shrink the containers width
+        # right will grow the containers width
+        # up will shrink the containers height
+        # down will grow the containers height
+        set $move_amount 175px
 
-          bindsym $mod+Mod1+$right resize grow width $move_amount
-          bindsym $mod+Mod1+$up resize shrink height $move_amount
-          bindsym $mod+Mod1+$down resize grow height $move_amount
-          bindsym $mod+Mod1+$left resize shrink width $move_amount
+        bindsym $mod+Mod1+$right resize grow width $move_amount
+        bindsym $mod+Mod1+$up resize shrink height $move_amount
+        bindsym $mod+Mod1+$down resize grow height $move_amount
+        bindsym $mod+Mod1+$left resize shrink width $move_amount
 
-          bindsym $mod+Mod1+Left resize grow width $move_amount
-          bindsym $mod+Mod1+Down resize shrink height $move_amount
-          bindsym $mod+Mod1+Up resize grow height $move_amount
-          bindsym $mod+Mod1+Right resize shrink width $move_amount
+        bindsym $mod+Mod1+Right resize grow width $move_amount
+        bindsym $mod+Mod1+Up resize shrink height $move_amount
+        bindsym $mod+Mod1+Down resize grow height $move_amount
+        bindsym $mod+Mod1+Left resize shrink width $move_amount
 
       # Return to default mode
-          # bindsym Return mode "default"
-          # bindsym Escape mode "default"
-          # bindsym $mod+r mode "resize"
+        # bindsym Return mode "default"
+        # bindsym Escape mode "default"
+        # bindsym $mod+r mode "resize"
+
+      # window rules
+        for_window [app_id="satty"] floating enable
     '';
   };
 

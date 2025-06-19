@@ -146,6 +146,7 @@
   ];
 
   environment.systemPackages = with pkgs; [
+    sshfs
     ntfs3g
     virtiofsd
     bcache-tools
@@ -388,6 +389,109 @@
       monthly = -1;  # Keep at least one archive for each month
     };
 
+  };
+
+  ############################## backups to fusu ##################################
+
+  users.users.borgs = {
+    uid = 2000;
+    isNormalUser = true;
+    group = "borgs";
+  };
+  users.groups.borgs = {
+    gid = 2000;
+  };
+  home-manager.users.borgs =  { secretsDir, ... }: {
+
+    imports = [
+      ../users/common/home.nix
+    ];
+
+    home.file.".ssh/known_hosts".text = ''
+      195.201.148.94 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBuxoYAjNYi3q2SFlzoVQTePcsnmT+qFHuaiiclC+S5I
+      195.201.148.94 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtDgdBTd8apRMBTweK9ZMRTdFqkU1mbKQDmyXSXbhSQAYwlgkmh1ee4TBE4nt/2b28QT5AqWOazVraqlAoSp+n7GwdsPH26lhbuF+ZVHq05X3RuJLmbhOsa6QlPzjSHiyj+Onkmj9DyXwKhhMErGcT1n2nhC4Oi007qsqcYQIB/YJ7hmMDABMzm9Bwd5Rk6xsDfz+9umvSMpwtfctpKixoVq90Fe3X6wloo5sgXpqfdP1IDFxfiaDp6nOQuOhvcA1Z67oGpW3T8CbZ5aDqA8e1vtpkl7oT3YolR+5153B/e0zOSAk8AabfkLdvrReECg2AHloH7hf9TOBVH0RVZluK+GRVJoaO2b3EspwIlThdQthiZH5/6vwDLsY6zNw6bUlKNntcNbJ5ZHc7zVv03Zlbpp6aWye0O3HR1PkaOo7pragEX9VAGj8Af2fNinSZVtd30gZlRFhLXQRAad+gC9R/5Q9X7V9BZBbWZ3J9DCP5zFoM9Y2R2YySjHX8Dmy7Jps=
+      195.201.148.94 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAFh44c1Efqv/g8lvjDSY6uBYevByf1fg4BhLVcfYudqrSSSwbeaPrv6B+M5psrHo6/zthciDzp4oYUG8ANVRWs=
+      [localhost]:49388 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFr1jHueUdsh4Bc9meR1Var4hbZKLCnZGfCSpsP0oOeS
+      [localhost]:49388 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHr9ZzEzC+2s1YNfPsFqDMbZv+o4XG2tEWlAF3DzzgdDawwxSj963qR46OqefPO+yiPBR/x3tFjXtSQ96qDcum9fzuiSzB+z5+/Zhs7VWEPi9ugGTDLFpX823EQrgcVKFE4jWnGsx6Ek8C9YojKgKf5afHG+ww2jNhTPHgVTrQkqo0JzUEnfjhJ/1/WluzpiGHfIy9re5MU10f2z9Vja7M0oDZ/Je+zavA4tlQpZ3URQnCEKC2vf7DhtwYBAOuyXKMdUSaTNdeTytmDjxdhJ38q8bwTHtfLUBzyYjW012Q5d1+/g1dqInu99uN/+UjTJc/GFiqLCE0tmco1GafptnKHJLgDC93vE832G5qvxhykfUAJdNW58kbWugeQm6Rb0i1UL5ckVHurMZT9BL6E9LKV0SewozyBtnA21RKu1vsheN86N0uBLwn3v1r0H3xPL4+S1WbmpXpIoCAoyTLc2janw2Gt22W1p08tv+a+lntFVqBn5ZSpcaUxQ6wRQQAfokqDh5YUzb+Tu9Fxi483qb6bd18io3kMLDre3G4xXqlvAB386Uj8iAYivmZIPBEFDCWBVki9LzWPfQGumgYN0CqSM6Gpqk0RnyU1CNPACEGaRpE1ph4Dgl9NQzRCiw/fEUiMZy1CTkly1YCiqSpp2iMmsJw+QJjfAbehEP+Tl8NIQ==
+    '';
+
+    programs.ssh = {
+      enable = true;
+      matchBlocks = {
+        "*" = {
+          identityFile = "/home/borgs/backups/borgs-private";
+        };
+        ouranos = {
+          hostname = "195.201.148.94";
+          user = "root";
+        };
+        fusus = {
+          hostname = "localhost";
+          user = "server";
+          port = 49388;
+        };
+      };
+    };
+  };
+
+  # automatically creates the mountpoint as well!!
+  fileSystems."/home/borgs/backups" = {
+    device = "/home/files/storage/backups/servers";
+    options = [ "bind" ];
+  };
+
+  # ouranus
+  systemd.services.backup-ouranos-minecraft = {
+    enable = true;
+    description = "backup the /var/minecraft folder on ouranus to fusu";
+    unitConfig = {
+      Type = "simple";
+    };
+    path = with pkgs; [ socat borgbackup openssh ];
+    serviceConfig = {
+      ExecStart = "/home/borgs/backups/ouranos-minecraft.sh";
+      User = "borgs";
+      Group = "borgs";
+      WorkingDirectory = "/home/borgs/backups";
+    };
+    wants = [ "home-files-storage.mount" ];
+  };
+  systemd.timers.backup-ouranos-minecraft = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      #OnBootSec = "5m";
+      #nUnitActiveSec = "1d";
+      OnCalendar = "*-*-* 04:00:00";
+      Persistent = "True";
+      Unit = "backup-ouranos-minecraft.service";
+    };
+  };
+
+  # ouranus
+  systemd.services.backup-fusu-server = {
+    enable = true;
+    description = "backup the ~/server folder on fusus";
+    unitConfig = {
+      Type = "simple";
+    };
+    path = with pkgs; [ socat borgbackup openssh ];
+    serviceConfig = {
+      ExecStart = "/home/borgs/backups/fusu-server.sh";
+      User = "borgs";
+      Group = "borgs";
+      WorkingDirectory = "/home/borgs/backups";
+    };
+    wants = [ "home-files-storage.mount" ];
+  };
+  systemd.timers.backup-fusu-server = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      #OnBootSec = "5m";
+      #OnUnitActiveSec = "1d";
+      OnCalendar = "*-*-* 04:00:00";
+      Persistent = "True";
+      Unit = "backup-fusu-server.service";
+    };
   };
 
 

@@ -36,8 +36,14 @@
   #services.openssh.enable = true;
 
 
+  programs.fuse.userAllowOther = true;
 
   services.sunshine = {
+    enable = false;
+    autoStart = true;
+    capSysAdmin = true;
+    openFirewall = true;
+    
     /*
     package = pkgs.sunshine.overrideAttrs {
       src = pkgs.fetchFromGitHub {
@@ -73,11 +79,6 @@
         fetchSubmodules = true;
       };
     });
-    enable = true;
-    autoStart = true;
-    capSysAdmin = true;
-    openFirewall = true;
-    
   };
 
 
@@ -88,6 +89,26 @@
 
 
 
+  home-manager.users.me.programs.lan-mouse = {
+    enable = true;
+    settings = {
+      authorized_fingerprints."0d:4f:2c:8a:46:d5:6a:e2:22:c9:02:89:39:da:75:69:2d:e9:32:39:d7:dc:e6:e2:50:d6:20:22:a5:26:d4:44" = "mac";
+      port = 4410;
+      clients = [
+        {
+          position = "right";
+          hostname = "mac";
+          activate_on_startup = true;
+          ips = [ "192.168.1.33" ];
+          port = 4410;
+          #enter_hook = "${pkgs.wl-clipboard}/bin/wl-paste | ${pkgs.openssh}/bin/ssh mac 'cat > ~/clipboard'";
+          #enter_hook = "/run/current-system/sw/bin/echo hooooooooooo > /home/me/p1";
+          enter_hook = "/run/current-system/sw/bin/cat /home/me/.cache/clipboard | /run/current-system/sw/bin/ssh mac 'cat >~/clipboard'";
+        }
+      ];
+    };
+  };
+  home-manager.users.me.systemd.user.services.lan-mouse.Service.Environment = "PATH=/bin";
 
 
 
@@ -123,9 +144,17 @@
   programs.nix-ld.enable = true;
   programs.steam.enable = true;
 
+  home-manager.users.me.home.file.".config/sway/config".text = ''
+    exec ${pkgs.wayvnc}/bin/wayvnc 0.0.0.0 6666
+    #exec wl-paste -w ${pkgs.netcat-openbsd}/bin/nc 192.168.1.33 4405
+    #exec 'wl-paste -w ssh mac "cat > ~/clipboard"'
+    #exec 'sh -c "while true; do ${pkgs.netcat-openbsd}/bin/nc -l 4405 | wl-copy; done"'
+  '';
+
 
 
   ################# make firefox default browser
+  environment.sessionVariables.DEFAULT_BROWSER = "firefox"; # for electron apps
   xdg.mime.defaultApplications = {
     "text/html" = "firefox.desktop";
     "x-scheme-handler/http" = "firefox.desktop";
@@ -223,8 +252,27 @@
 
   # shedule nix builds with low priority, so the laptop is still usable while building something
   nix.daemonCPUSchedPolicy = "idle";
-  nix.daemonIONiceLevel = 7;
-  systemd.services.nix-daemon.serviceConfig.Nice = 9;
+  nix.daemonIOSchedClass = "idle";
+  systemd.services.nix-daemon.serviceConfig.CPUSchedulingPolicy = lib.mkForce "idle";
+  systemd.services.nix-daemon.serviceConfig.IOSchedulingPriority = lib.mkForce "idle";
+  systemd.services.nix-daemon.serviceConfig.CPUWeight= lib.mkForce "idle";
+  /*
+  systemd.services.nix-daemon.serviceConfig.CPUQuota = lib.mkForce "100%";
+  systemd.services.nix-daemon.environment = {
+    LD_PRELOAD = "${pkgs.trickle}/lib/trickle/trickle-overload.so";
+    TRICKLE_WINDOW_SIZE = "200";
+    TRICKLE_UPLOAD_LIMIT = "10";
+    TRICKLE_LSMOOTH = "20";
+    TRICKLE_VERBOSE = "0";
+    TRICKLE_SOCKNAME = "";
+    TRICKLE_ARGV = "alacritty";
+    TRICKLE_TSMOOTH = "3.0";
+    TRICKLE_DOWNLOAD_LIMIT = "30";
+  };
+  nix.extraOptions = ''
+    download-speed = 30
+  '';
+  */
 
   # enable ntp
   #services.ntp.enable = true;
@@ -360,6 +408,7 @@
     51820  # wireguard
     6000 # Xserver
     10000 # tailscale tcp funnel
+    4405 # clipboard sync with imac
 	];
 
 	networking.firewall.allowedUDPPorts = [
@@ -367,6 +416,8 @@
       51820  # wireguard
       67 # allow DHCP traffic
       53 # allow dns
+      48899 # GoodWe inverter discovery
+      4410 # lan-mouse
 	];
 
   #networking.search = [ "c2vi.local" ];
@@ -544,6 +595,7 @@
       };
 
       ipv4 = {
+        address1 = "192.168.1.11/24,192.168.1.1";
         method = "auto";
       };
     };
