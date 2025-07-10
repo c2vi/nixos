@@ -35,6 +35,43 @@
 
   #services.openssh.enable = true;
 
+  # virtual display
+  hardware.display = {
+
+    edid.packages = [
+      (pkgs.runCommand "edid-custom" {} ''
+        mkdir -p "$out/lib/firmware/edid"
+        base64 -d > "$out/lib/firmware/edid/virtual.bin" <<'EOF'
+        AP///////wAEctsABAdgIAYWAQOAPCJ4CGCFplZKnCUSUFQAAAABAQEBAQHRwAEBAQEBAQEBAjqA
+        GHE4LUBYLEUAQEQhAAAGAAAA/ABTMjczSEwKICAgICAgAAAA/QA3Sx5QEgAKICAgICAgAAAA/wBM
+        UUEwQzAxNzgwMDEKAEA=
+        EOF
+      '')
+    /*
+      (pkgs.runCommand "edid-custom" {} ''
+        mkdir -p "$out/lib/firmware/edid"
+        base64 -d > "$out/lib/firmware/edid/virtual.bin" <<'EOF'
+        AP///////wAEctsABAdgIAYWAQOAPCJ46mCFplZKnCUSUFQAAAABAQEBAQHRwAEBAQEBAQEBAjqA
+        GHE4LUBYLEUAVVAhAAAeAAAA/ABTMjczSEwKICAgICAgAAAA/QA3Sx5QEgAKICAgICAgAAAA/wBM
+        UUEwQzAxNzgwMDEKACU=
+        EOF
+      '')
+      */
+    ];
+
+
+    # find a free GPU output using this command:
+    # for p in /sys/class/drm/*/status; do con=${p%/status}; echo -n "${con#*/card?-}: "; cat $p; done
+    outputs."DP-2" = {
+      edid = "virtual.bin";
+
+      # forces this output on even though the display is not physically connected
+      # https://wiki.archlinux.org/title/Kernel_mode_setting#Forcing_modes
+      #mode = "e";
+      mode = "1920x1080e";
+    };
+  };
+
 
   programs.fuse.userAllowOther = true;
 
@@ -708,6 +745,7 @@
       "resume_offset=45743809"
       "intel_iommu=on"
       "pcie_aspm=force"
+      #"drm.debug=0xff"
     ];
 
     virtualisation.kvmgt.vgpus = {

@@ -68,6 +68,7 @@
   services.blueman.enable = true;
   hardware.enableRedistributableFirmware = true;
 
+  services.tailscale.enable = true;
 
   environment.systemPackages = with pkgs; [
     linuxPackages.usbip

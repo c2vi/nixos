@@ -203,7 +203,7 @@
       runtimeInputs = with pkgs; [ curl w3m ];
 
       text = ''
-        ip=$(curl my.ip.fi)
+        ip=$(curl -4 my.ip.fi)
         curl "http://dynv6.com/api/update?hostname=${builtins.readFile "${secretsDir}/dns-name-two"}&ipv4=$ip&token=${builtins.readFile "${secretsDir}/dns-name-two-token"}"
         curl "https://dynamicdns.park-your-domain.com/update?host=home&domain=${builtins.readFile "${secretsDir}/dns-name"}&password=${builtins.readFile "${secretsDir}/dns-name-token"}&ip=$ip"
 
@@ -447,12 +447,13 @@
     unitConfig = {
       Type = "simple";
     };
-    path = with pkgs; [ socat borgbackup openssh ];
+    path = with pkgs; [ curl bash socat borgbackup openssh ];
     serviceConfig = {
       ExecStart = "/home/borgs/backups/ouranos-minecraft.sh";
       User = "borgs";
       Group = "borgs";
       WorkingDirectory = "/home/borgs/backups";
+      ExecStopPost = "/home/borgs/backups/exit-ouranos-minecraft.sh";
     };
     wants = [ "home-files-storage.mount" ];
   };
@@ -474,12 +475,13 @@
     unitConfig = {
       Type = "simple";
     };
-    path = with pkgs; [ socat borgbackup openssh ];
+    path = with pkgs; [ curl bash socat borgbackup openssh ];
     serviceConfig = {
       ExecStart = "/home/borgs/backups/fusu-server.sh";
       User = "borgs";
       Group = "borgs";
       WorkingDirectory = "/home/borgs/backups";
+      ExecStopPost = "/home/borgs/backups/exit-fusu-server.sh";
     };
     wants = [ "home-files-storage.mount" ];
   };
@@ -488,9 +490,37 @@
     timerConfig = {
       #OnBootSec = "5m";
       #OnUnitActiveSec = "1d";
-      OnCalendar = "*-*-* 04:00:00";
+      OnCalendar = "*-*-* 03:00:00";
       Persistent = "True";
       Unit = "backup-fusu-server.service";
+    };
+  };
+
+  # ocih
+  systemd.services.backup-ocih = {
+    enable = true;
+    description = "backup the ~/host folder on ocih";
+    unitConfig = {
+      Type = "simple";
+    };
+    path = with pkgs; [ curl bash socat borgbackup openssh ];
+    serviceConfig = {
+      ExecStart = "/home/borgs/backups/fusu-ocih.sh";
+      User = "borgs";
+      Group = "borgs";
+      WorkingDirectory = "/home/borgs/backups";
+      ExecStopPost = "/home/borgs/backups/exit-ocih.sh";
+    };
+    wants = [ "home-files-storage.mount" ];
+  };
+  systemd.timers.backup-ocih = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      #OnBootSec = "5m";
+      #OnUnitActiveSec = "1d";
+      OnCalendar = "*-*-* 02:00:00";
+      Persistent = "True";
+      Unit = "backup-ocih.service";
     };
   };
 

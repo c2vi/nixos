@@ -19,6 +19,10 @@
         user = "server";
         port = 49388;
       };
+			ocih = {
+				hostname = "152.67.70.13";
+				user = "ubuntu";
+			};
     };
   };
 
