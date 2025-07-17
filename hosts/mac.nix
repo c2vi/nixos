@@ -21,6 +21,7 @@ in {
     ../users/root/default.nix
     ../common/nixos-wayland.nix
   ];
+  services.tailscale.enable = true;
 
 	networking.hostName = "mac";
   networking.firewall.enable = false;
