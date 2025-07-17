@@ -45,10 +45,11 @@
 					"filetypes" = [ "nix" ];
 					"rootPatterns" =  [ "flake.nix" ];
 				};
-				"typst" = {
-					"command" = "${pkgs.typst-lsp}/bin/typst-lsp";
-					"filetypes" = [ "typ" "typst" ];
-				};
+				#"typst" = {
+          # error: 'typst-lsp' has been removed due to lack of upstream maintenance, consider using 'tinymist' instead
+					#"command" = "${pkgs.typst-lsp}/bin/typst-lsp"; 
+					#"filetypes" = [ "typ" "typst" ];
+				#};
 		  };
 		  "svelte.enable-ts-plugin" = true;
 		};

@@ -82,7 +82,7 @@
 
     # gui packages
 		obsidian
-    gnome.eog
+    eog
 		xorg.xkbcomp
 		haskellPackages.xmonad-extras
 		haskellPackages.xmonad-contrib
@@ -92,7 +92,7 @@
 		spotify
 		networkmanagerapplet
 		haskellPackages.xmobar
-		dolphin
+		kdePackages.dolphin
 		mupdf
 		xclip
 		stalonetray

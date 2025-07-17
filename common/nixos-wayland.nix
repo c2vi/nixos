@@ -58,7 +58,7 @@
   };
 
   fonts.packages = with pkgs; [
-    (nerdfonts.override {fonts = ["Hack"];})
+    nerd-fonts.hack
   ];
 
   home-manager.users.me.services.swayosd.enable = true;
@@ -305,7 +305,23 @@
               #resume 'swaymsg "output * dpms on"' \
             #before-sleep 'swaylock -f -c 000000 -i $lock_bg'
 
-          bindsym $mod+Shift+s exec "${./..}/scripts/screenshot.sh"
+          bindsym $mod+Shift+s exec "${
+            let
+              innerScript = pkgs.writeScript "screenshot-inner" ''
+                geometry=$(slurp -c "#ff0000ff")
+
+                if [[ "$?" != "0" ]]
+                then
+                  pkill wayfreeze || true
+                  exit
+                fi
+
+                grim -g "$geometry" -t ppm - | satty --filename - --copy-command=wl-copy --early-exit &
+
+                pkill wayfreeze || true
+              '';
+            in "${pkgs.wayfreeze}/bin/wayfreeze --after-freeze-cmd ${innerScript}"
+          }"
 
           bindsym $mod+p exec $menu -show combi -combi-modes "ssh,run"
 
