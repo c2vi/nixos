@@ -35,6 +35,16 @@
 
   #services.openssh.enable = true;
 
+  programs.obs-studio = {
+    enable = true;
+    enableVirtualCamera = true;
+    plugins = with pkgs.obs-studio-plugins; [
+      droidcam-obs
+      obs-ndi
+      obs-teleport
+    ];
+  };
+
   # virtual display
   hardware.display = {
 
@@ -257,13 +267,6 @@
     slurp # screenshot functionality
     wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
     mako # notification system developed by swaywm maintainer
-    (pkgs.wrapOBS {
-      plugins = with obs-studio-plugins; [
-        obs-ndi
-        obs-teleport
-      ];
-    })
-
     (writeShellScriptBin "davinci" ''
       NIXPKGS_ALLOW_UNFREE=1 OCL_ICD_ENABLE_TRACE=True QT_QPA_PLATFORM=xcb nix run nixpkgs#davinci-resolve --impure -L
     '')

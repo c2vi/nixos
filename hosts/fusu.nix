@@ -430,6 +430,10 @@
           user = "server";
           port = 49388;
         };
+        ocih = {
+          hostname = "152.67.70.13";
+          user = "ubuntu";
+        };
       };
     };
   };
@@ -505,7 +509,7 @@
     };
     path = with pkgs; [ curl bash socat borgbackup openssh ];
     serviceConfig = {
-      ExecStart = "/home/borgs/backups/fusu-ocih.sh";
+      ExecStart = "/home/borgs/backups/ocih.sh";
       User = "borgs";
       Group = "borgs";
       WorkingDirectory = "/home/borgs/backups";

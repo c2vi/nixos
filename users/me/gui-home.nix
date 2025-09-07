@@ -14,7 +14,16 @@
 		../../programs/zathura.nix
     ../../programs/firefox/default.nix
     inputs.lan-mouse.homeManagerModules.default
+
+    "${inputs.vscode-server}/modules/vscode-server/home.nix"
 	];
+  services.vscode-server.enable = true;
+
+  programs.vscode.enable = true;
+  programs.vscode.extensions = with pkgs.vscode-extensions; [
+    ms-vscode-remote.remote-ssh
+    ms-vscode-remote.remote-ssh-edit
+  ];
 
   programs.lan-mouse.systemd = true;
 
@@ -81,6 +90,7 @@
 
 
     # gui packages
+    songrec
 		obsidian
     eog
 		xorg.xkbcomp

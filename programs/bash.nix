@@ -46,6 +46,8 @@
       mize="~/work/mize/mize";
       m="~/work/mize/mize";
 
+      c2="~/work/c2-system/target/debug/system-c2-cli";
+
       ports = "${pkgs.lsof}/bin/lsof -i -P -n";
       losetup = "${pkgs.util-linux}/bin/losetup";
       u = "sudo umount ~/mnt";
@@ -153,6 +155,11 @@
         elif [[ "$host" == "win" ]]
         then
           xfreerdp /u:"me" /v:192.168.122.141 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
+
+        elif [[ "$host" == "phone" ]]
+        then
+          ssh phone "source ~/.bashrc && on"
+          ${pkgs.rustdesk}/bin/rustdesk --connect 100.77.80.77
 
         fi
       }

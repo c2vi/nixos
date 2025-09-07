@@ -1,4 +1,4 @@
-{ lib, secretsDir, pkgs, inputs, ... }: let
+{ lib, secretsDir, pkgs, inputs, unstable, ... }: let
 
 myobs = pkgs.wrapOBS {
   plugins = with pkgs.obs-studio-plugins; [
@@ -22,6 +22,7 @@ in {
     ../common/nixos-wayland.nix
   ];
   services.tailscale.enable = true;
+  programs.nix-ld.enable = true;
 
 	networking.hostName = "mac";
   networking.firewall.enable = false;
@@ -172,20 +173,56 @@ in {
   ];
 
 
-  #services.greetd.enable = lib.mkForce false;
   services.greetd = lib.mkForce {
     enable = true;
     settings = rec {
-      terminal.vt = 2;
-      initial_session = {
-        command = "${pkgs.writeScriptBin "run-sway" ''
+      terminal.vt = 1;
+      initial_session = let
+
+        newerUnstableSrc = builtins.getFlake "nixpkgs/d0fc30899600b9b3466ddb260fd83deb486c32f1";
+        newerUnstable = import newerUnstableSrc.outPath {};
+
+        mySway = newerUnstable.sway.override {
+          sway-unwrapped = (newerUnstable.sway-unwrapped.overrideAttrs (prev: {
+            /*
+            src = pkgs.fetchFromGitHub {
+              owner = "WillPower3309";
+              repo = "swayfx";
+              rev = "";
+              hash = "";
+            };
+            */
+            src = pkgs.fetchFromGitHub {
+              owner = "swaywm";
+              repo = "sway";
+              rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
+              hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
+            };
+          })).override {
+            wlroots = newerUnstable.wlroots.overrideAttrs (prev: {
+              version = "master";
+              src = pkgs.fetchFromGitLab {
+                domain = "gitlab.freedesktop.org";
+                owner = "wlroots";
+                repo = "wlroots";
+                rev = "master";
+                sha256 = "sha256-2FK6FGRpgf/YYqwJST0LVA/pnNRSUDrfrrp6mSwA0Fk=";
+              };
+
+            });
+          };
+        };
+
+      in {
+        #command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time -d --env WLR_RENDERER_ALLOW_SOFTWARE=1 --cmd sway";
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.writeScriptBin "run-sway" ''
           export WLR_RENDERER_ALLOW_SOFTWARE=1
           export SDL_VIDEODRIVER=wayland
           export _JAVA_AWT_WM_NONREPARENTING=1
           export QT_QPA_PLATFORM=wayland
           export XDG_CURRENT_DESKTOP=sway
           export XDG_SESSION_DESKTOP=sway
-          exec sway > /tmp/sway-log 2>&1
+          exec ${pkgs.lib.getExe mySway}
         ''}/bin/run-sway";
         user = "me";
       };
@@ -193,6 +230,56 @@ in {
     };
   };
 
+  systemd.services."sway@" = let
+        mySway = unstable.sway.overrideAttrs (prev: {
+            /*
+            src = pkgs.fetchFromGitHub {
+              owner = "WillPower3309";
+              repo = "swayfx";
+              rev = "";
+              hash = "";
+            };
+            */
+            src = pkgs.fetchFromGitHub {
+              owner = "swaywm";
+              repo = "sway";
+              rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
+              hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
+            };
+          });
+  in {
+    enable = false;
+    after = [ "systemd-user-sessions.service" "dbus.socket" "systemd-logind.service" "getty@%i.service" "plymouth-deactivate.service" "plymouth-quit.service" ];
+    before = [ "graphical.target" ];
+    wants = [ "dbus.socket" "systemd-logind.service" "plymouth-deactivate.service" ];
+    wantedBy = [ "graphical.target" ];
+    conflicts = [ "getty@%i.service" ]; # "plymouth-quit.service" "plymouth-quit-wait.service"
+
+    restartIfChanged = false;
+    serviceConfig = {
+      ExecStart = "${lib.getExe mySway}";
+      User = "me";
+
+      # ConditionPathExists = "/dev/tty0";
+      IgnoreSIGPIPE = "no";
+
+      # Log this user with utmp, letting it show up with commands 'w' and
+      # 'who'. This is needed since we replace (a)getty.
+      UtmpIdentifier = "%I";
+      UtmpMode = "user";
+      # A virtual terminal is needed.
+      TTYPath = "/dev/%I";
+      TTYReset = "yes";
+      TTYVHangup = "yes";
+      TTYVTDisallocate = "yes";
+      # Fail to start if not controlling the virtual terminal.
+      #StandardInput = "tty-fail";
+      #StandardOutput = "syslog";
+      #StandardError = "syslog";
+      # Set up a full (custom) user session for the user, required by Cage.
+      PAMName = "cage";
+    };
+  };
 
   systemd.extraConfig = "DefaultLimitNOFILE=2048";
 
@@ -210,7 +297,7 @@ in {
   hardware.enableRedistributableFirmware = true;
 
   systemd.services."cage@" = {
-    enable = true;
+    enable = false;
     after = [ "systemd-user-sessions.service" "dbus.socket" "systemd-logind.service" "getty@%i.service" "plymouth-deactivate.service" "plymouth-quit.service" ];
     before = [ "graphical.target" ];
     wants = [ "dbus.socket" "systemd-logind.service" "plymouth-deactivate.service" ];

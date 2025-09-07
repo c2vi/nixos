@@ -14,6 +14,8 @@ in pkgs.lib.attrsets.genAttrs names (name: (pkgs.callPackage "${pwd}/mods/nurPkg
 
   imap-backup = pkgs.callPackage ./mods/imap-backup/package.nix {};
 
+  eGTouch = pkgs.callPackage ./mods/eGTouch-driver/pkg.nix {};
+
   /* fails for nur evaluations
   iio-hyprland = let
     repo = pkgs.fetchFromGitHub {

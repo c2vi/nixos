@@ -8,7 +8,27 @@
 # - win + D command
 # - kernel output for luks pwd on all displays
 
-{ lib, pkgs, nur, unstable, ... }: {
+{ lib, pkgs, nur, unstable, ... }: let
+
+  # use sway from unstable, to have swayfx 0.5.3 to have sway 1.11 to have wlroots 0.19.0 to have ability to share individual windows
+mySway = unstable.sway.overrideAttrs (prev: {
+    /*
+    src = pkgs.fetchFromGitHub {
+      owner = "WillPower3309";
+      repo = "swayfx";
+      rev = "";
+      hash = "";
+    };
+    */
+    src = pkgs.fetchFromGitHub {
+      owner = "swaywm";
+      repo = "sway";
+      rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
+      hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
+    };
+  });
+
+in {
 
   services.greetd = {
     enable = true;
@@ -22,13 +42,39 @@
           export QT_QPA_PLATFORM=wayland
           export XDG_CURRENT_DESKTOP=sway
           export XDG_SESSION_DESKTOP=sway
-          exec sway
+          exec ${pkgs.lib.getExe mySway}
         ''}/bin/run-sway";
         user = "me";
       };
       default_session = initial_session;
     };
   };
+
+  systemd.user.services.xdg-desktop-portal-wlr.serviceConfig.ExecStart = let
+    settingsFormat = pkgs.formats.ini { };
+    configFile = settingsFormat.generate "xdg-desktop-portal-wlr.ini" {
+      screencast = {
+        output_name = "eDP-1";
+
+        # to make streaming of individual windows work
+        chooser_type = "dmenu";
+        chooser_cmd = "${lib.getExe pkgs.bemenu}";
+      };
+    };
+    package = pkgs.xdg-desktop-portal-wlr.overrideAttrs (prev: {
+      src = pkgs.fetchFromGitHub {
+        owner = "emersion";
+        repo = "xdg-desktop-portal-wlr";
+        rev = "b3703cceea485972b139c22342bdc2ed7b80c1c2";
+        sha256 = "sha256-nFAp/9ofRH4kIFgg2SjzZNXYu8r0BBjO5VPFc3jKeas=";
+      };
+    });
+  in [
+    # Empty ExecStart value to override the field
+    ""
+    "${package}/libexec/xdg-desktop-portal-wlr --config=${configFile}"
+  ];
+
 
   security.rtkit.enable = true;
   services.pipewire = {
@@ -48,13 +94,10 @@
         default = "wlr";
       };
     };
-    wlr.enable = true;
-    wlr.settings.screencast = {
-      output_name = "eDP-1";
-      chooser_type = "simple";
-      chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-    };
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [ 
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-wlr
+    ];
   };
 
   fonts.packages = with pkgs; [
@@ -105,11 +148,12 @@
     }))
     */
 
+    bemenu
+
     xdg-desktop-portal
     wlr-randr
     rofi-wayland
     wev
-    swayfx
     wl-clipboard
     zoxide
 
@@ -285,8 +329,12 @@
 
 
       ### Key bindings
-          #bindsym Mod4+Shift+Return exec $term
-          bindsym $mod exec alacritty
+          # QuickLaunch
+          bindsym $mod+i mode "QuickLaunch"
+	        mode QuickLaunch {
+            bindsym $mod+f exec alacritty; mode "default"
+            bindsym Escape mode "default"
+          }
 
           bindsym --locked $mod+d exec wlr-randr --output eDP-1 --on
           bindsym --locked $mod+Shift+d exec wlr-randr --output eDP-1 --off
