@@ -44,7 +44,7 @@
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-label/fes-boot";
+    device = "/dev/disk/by-label/FES-BOOT";
     fsType = "fat32";
   };
 
