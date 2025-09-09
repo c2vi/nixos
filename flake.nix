@@ -365,6 +365,14 @@
       		];
    		};
 
+   		"fes" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/fes.nix
+      		];
+   		};
+
       # server that hosts stuff
    		"fasu" = nixpkgs.lib.nixosSystem {
 				inherit specialArgs;

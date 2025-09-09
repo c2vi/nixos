@@ -8,26 +8,41 @@
 # - win + D command
 # - kernel output for luks pwd on all displays
 
-{ lib, pkgs, nur, unstable, ... }: let
+{ lib, pkgs, nur, unstable, ... }:
+let
+        newerUnstableSrc = builtins.getFlake "nixpkgs/d0fc30899600b9b3466ddb260fd83deb486c32f1";
+        newerUnstable = import newerUnstableSrc.outPath {};
 
-  # use sway from unstable, to have swayfx 0.5.3 to have sway 1.11 to have wlroots 0.19.0 to have ability to share individual windows
-mySway = unstable.sway.overrideAttrs (prev: {
-    /*
-    src = pkgs.fetchFromGitHub {
-      owner = "WillPower3309";
-      repo = "swayfx";
-      rev = "";
-      hash = "";
-    };
-    */
-    src = pkgs.fetchFromGitHub {
-      owner = "swaywm";
-      repo = "sway";
-      rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
-      hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
-    };
-  });
+        mySway = newerUnstable.sway.override {
+          sway-unwrapped = (newerUnstable.sway-unwrapped.overrideAttrs (prev: {
+            /*
+            src = pkgs.fetchFromGitHub {
+              owner = "WillPower3309";
+              repo = "swayfx";
+              rev = "";
+              hash = "";
+            };
+            */
+            src = pkgs.fetchFromGitHub {
+              owner = "swaywm";
+              repo = "sway";
+              rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
+              hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
+            };
+          })).override {
+            wlroots = newerUnstable.wlroots.overrideAttrs (prev: {
+              version = "master";
+              src = pkgs.fetchFromGitLab {
+                domain = "gitlab.freedesktop.org";
+                owner = "wlroots";
+                repo = "wlroots";
+                rev = "master";
+                sha256 = "sha256-2FK6FGRpgf/YYqwJST0LVA/pnNRSUDrfrrp6mSwA0Fk=";
+              };
 
+            });
+          };
+        };
 in {
 
   services.greetd = {
@@ -148,6 +163,7 @@ in {
     }))
     */
 
+    sway
     bemenu
 
     xdg-desktop-portal
@@ -446,7 +462,7 @@ in {
           workspace 8 output $disp2 $disp1
           workspace 9 output $disp2 $disp1
           workspace 7 output eDP-1
-          workspace 0 output HEADLESS-1
+          workspace 0 output eDP-1
 
           workspace_auto_back_and_forth false
           focus_wrapping workspace
