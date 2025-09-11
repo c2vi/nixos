@@ -25,7 +25,9 @@
   networking.extraHosts = ''
     ${builtins.readFile "${self}/misc/my-hosts"}
     ${builtins.readFile "${self}/misc/my-hosts-me"}
+    ${builtins.readFile "${self}/misc/my-hosts-t"}
   '';
+
   environment.etc.current_hosts.text = builtins.readFile "${self}/misc/my-hosts-me";
   environment.etc.current_hosts.mode = "rw";
 }

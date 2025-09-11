@@ -78,6 +78,18 @@
 				user = "me";
 			};
 
+		  fe = {
+        port = 22;
+				hostname = "fe";
+				user = "me";
+			};
+
+		  fes = {
+        port = 22;
+				hostname = "fe";
+				user = "server";
+			};
+
 		  fusus = {
         port = 49388;
 				hostname = "fusu";

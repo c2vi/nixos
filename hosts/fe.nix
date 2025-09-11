@@ -45,7 +45,7 @@
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-label/FES-BOOT";
-    fsType = "fat32";
+    fsType = "vfat";
   };
 
 	services.openssh = {
@@ -147,7 +147,7 @@
 			address = "192.168.1.1";
 			interface = "br0";
 		};
-		hostName = "fes";
+		hostName = "fe";
 		nameservers = [ "1.1.1.1" "8.8.8.8" ];
 	};
 

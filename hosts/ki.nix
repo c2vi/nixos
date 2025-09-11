@@ -17,6 +17,7 @@ in {
 
 		inputs.home-manager.nixosModules.home-manager
     inputs.networkmanager.nixosModules.networkmanager
+    inputs.disko.nixosModules.disko
     ../users/me/gui.nix
     ../users/root/default.nix
     ../common/nixos-wayland.nix
@@ -76,17 +77,6 @@ in {
     #qemuOvmfPackage = pkgs.OVMFFull;
   };
 
-	# Use the GRUB 2 boot loader.
-	boot.loader.grub = {
-  	enable = true;
-    #device = "/dev/nbd1";
-    device = "nodev";
-  	efiSupport = true;
-		extraConfig = ''
-			set timeout=2
-		'';
-  };
-
   environment.systemPackages = with pkgs; [
     linuxPackages.usbip
     helvum
@@ -97,33 +87,6 @@ in {
     tcpdump
   ];
 
-
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/mac-root";
-    fsType = "ext4";
-  };
-
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-label/EFI";
-    fsType = "vfat";
-  };
-
-	networking = {
-		#usePredictableInterfaceNames = false;
-		defaultGateway = {
-			address = "192.168.1.1";
-			interface = "enp2s0";
-		};
-		nameservers = [ "1.1.1.1" "8.8.8.8" ];
-		interfaces = {
-			"enp2s0" = {
-				name = "enp2s0";
-				ipv4.addresses = [
-					{ address = "192.168.1.33"; prefixLength = 24;}
-				];
-			};
-		};
-	};
 
 	services.openssh = {
   		enable = true;
@@ -138,39 +101,6 @@ in {
         X11UseLocalhost no
       '';
 	};
-
-  home-manager.users.me.home.file.".config/sway/config".text = ''
-    exec ${pkgs.wayvnc}/bin/wayvnc 0.0.0.0 6666
-    #exec 'wl-paste -w ${pkgs.netcat-openbsd}/bin/nc 192.168.1.11 4405'
-    #exec 'sh -c "while true; do ${pkgs.netcat-openbsd}/bin/nc -l 4405 | wl-copy; done"'
-    #exec 'sh -c "while true; do cat ~/clipboard | wl-paste; done"'
-  '';
-
-  home-manager.users.me.programs.lan-mouse = {
-    enable = true;
-    systemd = true;
-    settings = {
-      authorized_fingerprints."f1:f2:c8:38:fd:e9:34:2f:a0:79:49:b4:ca:d6:4e:c6:31:10:42:1b:9f:ba:61:6f:41:9a:b7:ce:1a:32:47:a1" = "main";
-      port = 4410;
-      clients = [
-        {
-          position = "left";
-          hostname = "main";
-          activate_on_startup = true;
-          ips = [ "192.168.1.11" ];
-          port = 4410;
-          #enter_hook = "${pkgs.wl-clipboard}/bin/wl-paste | ${pkgs.netcat-openbsd}/bin/nc 192.168.1.11 4405";
-          enter_hook = "/run/current-system/sw/bin/cat /home/me/.cache/clipboard | ${pkgs.netcat-openbsd}/bin/nc 192.168.1.11 4405 -N";
-        }
-      ];
-    };
-  };
-  home-manager.users.me.systemd.user.services.lan-mouse.Service.Environment = "PATH=/bin";
-
-  users.users.me.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGw5kYmBQl8oolNg2VUlptvvSrFSESfeuWpsXRovny0x me@phone"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPgKLRF9iYRH3Y8hPjLX1ZY6GyavruqcQ0Q0Y8bnmpv9 me@tab"
-  ];
 
 
   services.greetd = lib.mkForce {
@@ -213,7 +143,6 @@ in {
           };
         };
 
-
       in {
         #command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time -d --env WLR_RENDERER_ALLOW_SOFTWARE=1 --cmd sway";
         command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.writeScriptBin "run-sway" ''
@@ -231,62 +160,11 @@ in {
     };
   };
 
-  systemd.services."sway@" = let
-        mySway = unstable.sway.overrideAttrs (prev: {
-            /*
-            src = pkgs.fetchFromGitHub {
-              owner = "WillPower3309";
-              repo = "swayfx";
-              rev = "";
-              hash = "";
-            };
-            */
-            src = pkgs.fetchFromGitHub {
-              owner = "swaywm";
-              repo = "sway";
-              rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
-              hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
-            };
-          });
-  in {
-    enable = false;
-    after = [ "systemd-user-sessions.service" "dbus.socket" "systemd-logind.service" "getty@%i.service" "plymouth-deactivate.service" "plymouth-quit.service" ];
-    before = [ "graphical.target" ];
-    wants = [ "dbus.socket" "systemd-logind.service" "plymouth-deactivate.service" ];
-    wantedBy = [ "graphical.target" ];
-    conflicts = [ "getty@%i.service" ]; # "plymouth-quit.service" "plymouth-quit-wait.service"
-
-    restartIfChanged = false;
-    serviceConfig = {
-      ExecStart = "${lib.getExe mySway}";
-      User = "me";
-
-      # ConditionPathExists = "/dev/tty0";
-      IgnoreSIGPIPE = "no";
-
-      # Log this user with utmp, letting it show up with commands 'w' and
-      # 'who'. This is needed since we replace (a)getty.
-      UtmpIdentifier = "%I";
-      UtmpMode = "user";
-      # A virtual terminal is needed.
-      TTYPath = "/dev/%I";
-      TTYReset = "yes";
-      TTYVHangup = "yes";
-      TTYVTDisallocate = "yes";
-      # Fail to start if not controlling the virtual terminal.
-      #StandardInput = "tty-fail";
-      #StandardOutput = "syslog";
-      #StandardError = "syslog";
-      # Set up a full (custom) user session for the user, required by Cage.
-      PAMName = "cage";
-    };
-  };
 
   systemd.extraConfig = "DefaultLimitNOFILE=2048";
 
   ###################################################### the kiosk stuff
 
-  boot.plymouth.enable = true;
   services.dbus.enable = true;
 
   fonts.enableDefaultPackages = true;
@@ -296,49 +174,6 @@ in {
   services.udisks2.enable = false;
   hardware.opengl.enable = true;
   hardware.enableRedistributableFirmware = true;
-
-  systemd.services."cage@" = {
-    enable = false;
-    after = [ "systemd-user-sessions.service" "dbus.socket" "systemd-logind.service" "getty@%i.service" "plymouth-deactivate.service" "plymouth-quit.service" ];
-    before = [ "graphical.target" ];
-    wants = [ "dbus.socket" "systemd-logind.service" "plymouth-deactivate.service" ];
-    wantedBy = [ "graphical.target" ];
-    conflicts = [ "getty@%i.service" ]; # "plymouth-quit.service" "plymouth-quit-wait.service"
-
-    restartIfChanged = false;
-    serviceConfig = {
-      ExecStart = "${pkgs.cage}/bin/cage -d -- ${pkgs.moonlight-qt}/bin/moonlight";
-      User = "root";
-
-      # ConditionPathExists = "/dev/tty0";
-      IgnoreSIGPIPE = "no";
-
-      # Log this user with utmp, letting it show up with commands 'w' and
-      # 'who'. This is needed since we replace (a)getty.
-      UtmpIdentifier = "%I";
-      UtmpMode = "user";
-      # A virtual terminal is needed.
-      TTYPath = "/dev/%I";
-      TTYReset = "yes";
-      TTYVHangup = "yes";
-      TTYVTDisallocate = "yes";
-      # Fail to start if not controlling the virtual terminal.
-      StandardInput = "tty-fail";
-      #StandardOutput = "syslog";
-      #StandardError = "syslog";
-      # Set up a full (custom) user session for the user, required by Cage.
-      PAMName = "cage";
-    };
-  };
-
-  security.pam.services.cage.text = ''
-    auth    required pam_unix.so nullok
-    account required pam_unix.so
-    session required pam_unix.so
-    session required ${pkgs.systemd}/lib/security/pam_systemd.so
-  '';
-
-  systemd.targets.graphical.wants = [ "cage@tty1.service" ];
 
   systemd.defaultUnit = "graphical.target";
 
@@ -352,7 +187,7 @@ in {
         id = "pw";
         uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
         type = "wifi";
-        interface-name = "wlp3s0";
+        interface-name = "wlp2s0";
       };
 
       wifi = {
@@ -439,5 +274,51 @@ in {
       };
     };
 
+  };
+
+  ############### disk config
+  boot.plymouth.enable = false;
+  boot.loader.grub.enable = true;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.efiInstallAsRemovable = true;
+  boot.loader.grub.devices = [ "nodev" ];
+	boot.loader.grub.extraConfig = ''
+		set timeout=2
+	'';
+
+  # the flash drive in use for te
+  #disko.devices.disk.root.device = "/dev/disk/by-id/usb-Generic_Flash_Disk_FF830E8F-0:0";
+  disko.devices.disk.root.device = "/dev/disk/by-id/ata-SSD_HB202408140276168";
+  disko.devices = {
+    disk = {
+      root = {
+        type = "disk";
+        content = {
+          type = "gpt";
+          partitions = {
+
+            ESP = {
+              size = "1G";
+              type = "EF00";
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountpoint = "/boot";
+                mountOptions = [ "umask=0077" ];
+              };
+            };
+
+            root = {
+              size = "100%";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/";
+              };
+            };
+          };
+        };
+      };
+    };
   };
 }

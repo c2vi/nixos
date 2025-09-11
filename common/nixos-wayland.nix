@@ -50,7 +50,7 @@ in {
     settings = rec {
       initial_session = {
         #command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time -d --env WLR_RENDERER_ALLOW_SOFTWARE=1 --cmd sway";
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.writeScriptBin "run-sway" ''
+        command = "${pkgs.writeScriptBin "run-sway" ''
           export WLR_RENDERER_ALLOW_SOFTWARE=1
           export SDL_VIDEODRIVER=wayland
           export _JAVA_AWT_WM_NONREPARENTING=1
@@ -506,14 +506,14 @@ in {
           bindsym $mod+m mode ChangeWorkroom
 
       ############################# Fx stuff:
-          blur disable
-          blur_passes 0
-          blur_radius 1
-          blur_noise 0
-          blur_brightness 1
+          #blur disable
+          #blur_passes 0
+          #blur_radius 1
+          #blur_noise 0
+          #blur_brightness 1
 
-          corner_radius 12
-          default_dim_inactive 0.15
+          #corner_radius 12
+          #default_dim_inactive 0.15
 
       # Layout stuff:
           gaps inner 2
@@ -524,7 +524,7 @@ in {
           #smart_gaps on
 
           default_border pixel 2
-          corner_radius 0
+          #corner_radius 0
           # disable_titlebar yes
           floating_modifier $mod normal
 

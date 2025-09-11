@@ -46,6 +46,11 @@
 
     lan-mouse.url = "github:feschber/lan-mouse";
 
+    disko = {
+      url = "github:nix-community/disko/latest";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     robotnix = {
       #url = "github:nix-community/robotnix";
       url = "github:c2vi/robotnix";
@@ -235,6 +240,109 @@
 
   ############ apps ################
   apps = {
+    flash = let
+
+        # echo the disks which will be flashed...
+        diskListing = hostname: let
+          list = mypkgs.lib.attrsets.mapAttrsToList (name: value: "echo flashing disk ${name} onto device ${value.device}") self.nixosConfigurations.${hostname}.config.disko.devices.disk;
+          string = mypkgs.lib.strings.concatStringsSep "\n" list;
+        in string;
+
+        diskDefinitionsList = hostname: let
+          list = mypkgs.lib.attrsets.mapAttrsToList (name: value: "diskDefinitions[${name}]=${value.device}") self.nixosConfigurations.${hostname}.config.disko.devices.disk;
+          string = mypkgs.lib.strings.concatStringsSep "\n" list;
+        in string;
+
+        createFlashScript = hostname: {
+          type = "app";
+          program = "${mypkgs.writeShellScriptBin "flash-te" ''
+            set -eo pipefail
+
+            echo flashing for host ${hostname}
+            ${diskListing hostname}
+
+            declare -A diskDefinitions
+            ${diskDefinitionsList hostname}
+
+
+            # default value if no --mode provided
+            MODE="default"
+            ARGS=()
+
+            while [[ $# -gt 0 ]]; do
+              case "$1" in
+                --)                    # end of options; take remaining args as-is
+                  shift
+                  while [[ $# -gt 0 ]]; do
+                    ARGS+=("$1")
+                    shift
+                  done
+                  break
+                  ;;
+                --mode=*)              # --mode=VALUE
+                  MODE="''${1#*=}"
+                  shift
+                  ;;
+                --mode)                # --mode VALUE
+                  if [[ $# -lt 2 ]]; then
+                    echo "Error: --mode requires a value" >&2
+                    exit 1
+                  fi
+                  MODE="$2"
+                  shift 2
+                  ;;
+                --do-flash)
+                  DO_FLASH=yes
+                  shift 1
+                  ;;
+                --disk)                # --mode VALUE
+                  if [[ $# -lt 3 ]]; then
+                    echo "Error: --disk requires two values" >&2
+                    exit 1
+                  fi
+                  diskname="$2"
+                  diskval="$3"
+                  diskDefinitions["$diskname"]="$diskval"
+                  shift 3
+                  ;;
+                *)
+                  ARGS+=("$1")         # all other args preserved
+                  shift
+                  ;;
+              esac
+            done
+
+
+            # generate arg string from diskDefinitions
+            diskDefinitionString=""
+            for i in "''${!diskDefinitions[@]}"
+            do
+              diskDefinitionString="$diskDefinitionString --disk $i ''${diskDefinitions[$i]}"
+            done
+
+
+            echo would run: sudo -E ${inputs.disko.packages.x86_64-linux.disko-install}/bin/disko-install --mode $MODE --flake ${self}#${hostname} $diskDefinitionString ''${ARGS[@]}
+
+
+            if [[ $DO_FLASH != "yes" ]]
+            then
+              echo type yes to continue...
+              read acc
+              if [[ "$acc" != "yes" ]]
+              then
+                echo aborting...
+                exit
+              fi
+            fi
+
+            echo flashing...
+            sudo -E ${inputs.disko.packages.x86_64-linux.disko-install}/bin/disko-install --mode $MODE --flake ${self}#${hostname} $diskDefinitionString ''${ARGS[@]}
+          ''}/bin/flash-te";
+        };
+      in {
+      te = createFlashScript "te";
+      ki = createFlashScript "ki";
+    };
     test = inputs.nix-on-droid.outputs.apps.x86_64-linux.deploy;
 
     wsl = {
@@ -365,11 +473,46 @@
       		];
    		};
 
-   		"fes" = nixpkgs.lib.nixosSystem {
+      #fesu my second server to fusu
+   		"fe" = nixpkgs.lib.nixosSystem {
 				inherit specialArgs;
       		system = "x86_64-linux";
       		modules = [
-         		./hosts/fes.nix
+         		./hosts/fe.nix
+      		];
+   		};
+      
+      # lesh... seccond raspi
+   		"le" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "aarch64-linux";
+      		modules = [
+         		./hosts/le.nix
+      		];
+   		};
+
+   		"te" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/te.nix
+      		];
+   		};
+
+   		"ki" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/ki.nix
+      		];
+   		};
+
+      # my asus tinker board
+   		"ti" = nixpkgs.lib.nixosSystem {
+				inherit specialArgs;
+      		system = "x86_64-linux";
+      		modules = [
+         		./hosts/ti.nix
       		];
    		};
 
