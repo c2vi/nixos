@@ -1,0 +1,220 @@
+warning: Git tree '/home/me/work/config' is dirty
+evaluation warning: You have set specialArgs.pkgs, which means that options like nixpkgs.config
+                    and nixpkgs.overlays will be ignored. If you wish to reuse an already created
+                    pkgs, which you know is configured correctly for this NixOS configuration,
+                    please import the `nixosModules.readOnlyPkgs` module from the nixpkgs flake or
+                    `(modulesPath + "/misc/nixpkgs/read-only.nix"), and set `{ nixpkgs.pkgs = <your pkgs>; }`.
+                    This properly disables the ignored options to prevent future surprises.
+error:
+       … while calling the 'derivationStrict' builtin
+         at <nix/derivation-internal.nix>:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+
+       … while evaluating derivation 'nixos-image-sd-card-25.05.20250710.10e6872-x86_64-linux.img.zst'
+         whose name attribute is located at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/pkgs/stdenv/generic/make-derivation.nix:480:13
+
+       … while evaluating attribute 'buildCommand' of derivation 'nixos-image-sd-card-25.05.20250710.10e6872-x86_64-linux.img.zst'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/nixos/modules/installer/sd-card/sd-image.nix:235:9:
+          234|
+          235|         buildCommand = ''
+             |         ^
+          236|           mkdir -p $out/nix-support $out/sd-image
+
+       … from call site
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/nixos/modules/installer/sd-card/sd-image.nix:285:13:
+          284|           mkdir firmware
+          285|           ${config.sdImage.populateFirmwareCommands}
+             |             ^
+          286|
+
+       … while calling anonymous lambda
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/attrsets.nix:1182:17:
+         1181|         mapAttrs (
+         1182|           name: value:
+             |                 ^
+         1183|           if isAttrs value && cond value then recurse (path ++ [ name ]) value else f (path ++ [ name ]) value
+
+       … from call site
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/attrsets.nix:1183:85:
+         1182|           name: value:
+         1183|           if isAttrs value && cond value then recurse (path ++ [ name ]) value else f (path ++ [ name ]) value
+             |                                                                                     ^
+         1184|         );
+
+       … while calling anonymous lambda
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:273:71:
+          272|           # For definitions that have an associated option
+          273|           declaredConfig = mapAttrsRecursiveCond (v: !isOption v) (_: v: v.value) options;
+             |                                                                       ^
+          274|
+
+       … while evaluating the attribute 'value'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1084:7:
+         1083|     // {
+         1084|       value = addErrorContext "while evaluating the option `${showOption loc}':" value;
+             |       ^
+         1085|       inherit (res.defsFinal') highestPrio;
+
+       … while evaluating the option `sdImage.populateFirmwareCommands':
+
+       … while evaluating the attribute 'mergedValue'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1131:5:
+         1130|     # Type-check the remaining definitions, and merge them. Or throw if no definitions.
+         1131|     mergedValue =
+             |     ^
+         1132|       if isDefined then
+
+       … while evaluating a branch condition
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1132:7:
+         1131|     mergedValue =
+         1132|       if isDefined then
+             |       ^
+         1133|         if all (def: type.check def.value) defsFinal then
+
+       … while evaluating the attribute 'values'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1125:9:
+         1124|       {
+         1125|         values = defs''';
+             |         ^
+         1126|         inherit (defs'') highestPrio;
+
+       … while evaluating a branch condition
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1119:11:
+         1118|           # Avoid sorting if we don't have to.
+         1119|           if any (def: def.value._type or "" == "order") defs''.values then
+             |           ^
+         1120|             sortProperties defs''.values
+
+       … while calling the 'any' builtin
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1119:14:
+         1118|           # Avoid sorting if we don't have to.
+         1119|           if any (def: def.value._type or "" == "order") defs''.values then
+             |              ^
+         1120|             sortProperties defs''.values
+
+       … while evaluating the attribute 'values'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1252:7:
+         1251|     {
+         1252|       values = concatMap (def: if getPrio def == highestPrio then [ (strip def) ] else [ ]) defs;
+             |       ^
+         1253|       inherit highestPrio;
+
+       … while calling the 'concatMap' builtin
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1252:16:
+         1251|     {
+         1252|       values = concatMap (def: if getPrio def == highestPrio then [ (strip def) ] else [ ]) defs;
+             |                ^
+         1253|       inherit highestPrio;
+
+       … while calling the 'concatMap' builtin
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1099:17:
+         1098|         # Process mkMerge and mkIf properties.
+         1099|         defs' = concatMap (
+             |                 ^
+         1100|           m:
+
+       … while calling anonymous lambda
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1100:11:
+         1099|         defs' = concatMap (
+         1100|           m:
+             |           ^
+         1101|           map (
+
+       … while calling the 'map' builtin
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1101:11:
+         1100|           m:
+         1101|           map (
+             |           ^
+         1102|             value:
+
+       … while evaluating definitions from `/nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/nixos/modules/installer/sd-card/sd-image-aarch64.nix':
+
+       … from call site
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1110:80:
+         1109|               }
+         1110|           ) (addErrorContext "while evaluating definitions from `${m.file}':" (dischargeProperties m.value))
+             |                                                                                ^
+         1111|         ) defs;
+
+       … while calling 'dischargeProperties'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1203:5:
+         1202|   dischargeProperties =
+         1203|     def:
+             |     ^
+         1204|     if def._type or "" == "merge" then
+
+       … while evaluating a branch condition
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:1204:5:
+         1203|     def:
+         1204|     if def._type or "" == "merge" then
+             |     ^
+         1205|       concatMap dischargeProperties def.contents
+
+       … while evaluating the attribute 'value'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/modules.nix:770:21:
+          769|             inherit (module) file;
+          770|             inherit value;
+             |                     ^
+          771|           }) module.config
+
+       … in the condition of the assert statement
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/lib/customisation.nix:422:9:
+          421|       outPath =
+          422|         assert condition;
+             |         ^
+          423|         drv.outPath;
+
+       … while evaluating the attribute 'handled'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/pkgs/stdenv/generic/check-meta.nix:653:9:
+          652|         # or, alternatively, just output a warning message.
+          653|         handled = (
+             |         ^
+          654|           if valid == "yes" then
+
+       … from call site
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/pkgs/stdenv/generic/check-meta.nix:657:14:
+          656|           else if valid == "no" then
+          657|             (handleEvalIssue { inherit meta attrs; } { inherit (validity) reason errormsg; })
+             |              ^
+          658|           else if valid == "warn" then
+
+       … while calling 'handleEvalIssue'
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/pkgs/stdenv/generic/check-meta.nix:301:5:
+          300|     { meta, attrs }:
+          301|     {
+             |     ^
+          302|       reason,
+
+       … while calling the 'throw' builtin
+         at /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/pkgs/stdenv/generic/check-meta.nix:318:5:
+          317|     in
+          318|     handler msg;
+             |     ^
+          319|
+
+       error: Package ‘uboot-rpi_3_defconfig-2025.01’ in /nix/store/f4989aa56frar4hhr107kg3dxmvv4g9h-source/pkgs/misc/uboot/default.nix:148 is not available on the requested hostPlatform:
+         hostPlatform.config = "x86_64-unknown-linux-gnu"
+         package.meta.platforms = [
+           "aarch64-linux"
+         ]
+         package.meta.badPlatforms = [ ]
+       , refusing to evaluate.
+
+       a) To temporarily allow packages that are unsupported for this system, you can use an environment variable
+          for a single invocation of the nix tools.
+
+            $ export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
+
+          Note: When using `nix shell`, `nix build`, `nix develop`, etc with a flake,
+                then pass `--impure` in order to allow use of environment variables.
+
+       b) For `nixos-rebuild` you can set
+         { nixpkgs.config.allowUnsupportedSystem = true; }
+       in configuration.nix to override this.
+
+       c) For `nix-env`, `nix-build`, `nix-shell` or any other Nix command you can add
+         { allowUnsupportedSystem = true; }
+       to ~/.config/nixpkgs/config.nix.

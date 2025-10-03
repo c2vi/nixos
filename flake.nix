@@ -32,6 +32,11 @@
 
 		nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
 
+    arion = {
+      url = "github:hercules-ci/arion";
+			inputs.nixpkgs.follows = "nixpkgs";
+    };
+
 		nix-index-database.url = "github:Mic92/nix-index-database";
     	nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -110,6 +115,7 @@
 			workDir = "/home/me/work";
 			secretsDir = "/home/me/secrets";
 			persistentDir = "/home/me/work/app-data";
+      dataDir = "/home/me/host";
 
       tunepkgs = import nixpkgs {
 
@@ -150,7 +156,7 @@
       };
 
       specialArgs = {
-				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs unstable nur pkgsUnstable;
+				inherit inputs confDir workDir secretsDir persistentDir self tunepkgs unstable nur pkgsUnstable dataDir;
         system = "x86_64-linux";
         pkgs = mypkgs;
 			};
@@ -266,7 +272,7 @@
 
 
             # default value if no --mode provided
-            MODE="default"
+            MODE="format"
             ARGS=()
 
             while [[ $# -gt 0 ]]; do
@@ -292,6 +298,15 @@
                   shift 2
                   ;;
                 --do-flash)
+                  DO_FLASH=yes
+                  shift 1
+                  ;;
+                --efi-vars)
+                  ARGS+=("--write-efi-boot-entries")         # all other args preserved
+                  shift 1
+                  ;;
+                --help)
+                  ARGS+=("--help")         # all other args preserved
                   DO_FLASH=yes
                   shift 1
                   ;;
@@ -342,6 +357,7 @@
       in {
       te = createFlashScript "te";
       ki = createFlashScript "ki";
+      fasu = createFlashScript "fasu";
     };
     test = inputs.nix-on-droid.outputs.apps.x86_64-linux.deploy;
 
@@ -482,15 +498,6 @@
       		];
    		};
       
-      # lesh... seccond raspi
-   		"le" = nixpkgs.lib.nixosSystem {
-				inherit specialArgs;
-      		system = "aarch64-linux";
-      		modules = [
-         		./hosts/le.nix
-      		];
-   		};
-
    		"te" = nixpkgs.lib.nixosSystem {
 				inherit specialArgs;
       		system = "x86_64-linux";
@@ -543,6 +550,16 @@
           ./hosts/lush.nix
         ];
       };
+
+      # lesh... seccond raspi
+   		"le" = nixpkgs.lib.nixosSystem rec {
+          specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self system; };
+      		system = "aarch64-linux";
+      		modules = [
+         		./hosts/le.nix
+      		];
+   		};
+
 
    		"hec-tmp" = nixpkgs.lib.nixosSystem rec {
         system = "aarch64-linux";

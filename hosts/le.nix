@@ -124,7 +124,7 @@
       3240 # usbip
   ];
 
-  networking.hostName = "lush";
+  networking.hostName = "le";
 
   networking.networkmanager.enable = true;
 
@@ -136,7 +136,7 @@
         type = "wifi";
         interface-name = "wlan0";
         autoconnect = true;
-        autoconnect-priority = "-200";
+        autoconnect-priority = "400";
       };
 
       wifi = {
@@ -156,6 +156,29 @@
       };
     };
 
+    hot = {
+      connection = {
+        id = "hot";
+        uuid = "ab51de8a-9742-465a-928b-be54a83ab6a3";
+        type = "wifi";
+        interface-name = "wlp3s0";
+        autoconnect-priority = "200";
+      };
+      wifi = {
+        mode = "ap";
+        ssid = "c2vi-le";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/wifi-password";
+      };
+
+      ipv4 = {
+        method = "shared";
+      };
+    };
+
     hh40 = {
       connection = {
         id = "hh40";
@@ -163,7 +186,7 @@
         type = "wifi";
         interface-name = "wlan0";
         autoconnect = true;
-        autoconnect-priority = "-999";
+        autoconnect-priority = "300";
       };
 
       wifi = {
@@ -188,7 +211,7 @@
         id = "dhcp";
         uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
         type = "ethernet";
-        autoconnect = "true";
+        autoconnect = true;
         interface-name = "end0";
       };
 

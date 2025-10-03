@@ -24,6 +24,8 @@ in {
   services.tailscale.enable = true;
   programs.nix-ld.enable = true;
 
+  services.pid-fan-controller.enable = true;
+
 	networking.hostName = "mac";
   networking.firewall.enable = false;
   services.avahi = {
@@ -88,6 +90,7 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
+    lm_sensors
     linuxPackages.usbip
     helvum
     passt
@@ -216,7 +219,7 @@ in {
 
       in {
         #command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time -d --env WLR_RENDERER_ALLOW_SOFTWARE=1 --cmd sway";
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.writeScriptBin "run-sway" ''
+        command = "${pkgs.writeScriptBin "run-sway" ''
           export WLR_RENDERER_ALLOW_SOFTWARE=1
           export SDL_VIDEODRIVER=wayland
           export _JAVA_AWT_WM_NONREPARENTING=1
@@ -353,6 +356,7 @@ in {
         uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
         type = "wifi";
         interface-name = "wlp3s0";
+        autoconnect-priority = "200";
       };
 
       wifi = {
@@ -378,8 +382,8 @@ in {
         id = "hot";
         uuid = "ab51de8a-9742-465a-928b-be54a83ab6a3";
         type = "wifi";
-        autoconnect = false;
         interface-name = "wlp3s0";
+        autoconnect-priority = "100";
       };
       wifi = {
         mode = "ap";
@@ -426,6 +430,7 @@ in {
         uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
         type = "ethernet";
         autoconnect = true;
+        autoconnect-priority = "200";
         interface-name = "enp2s0";
       };
 

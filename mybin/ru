@@ -21,6 +21,10 @@ elif [ "$1" == "du" ]
 then
 du -d 1 -h $2 | sort -h -r
 
+elif [ "$1" == "g" ]
+then
+ping 1.1.1.1
+
 
 
 

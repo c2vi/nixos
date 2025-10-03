@@ -13,6 +13,7 @@
 		../../programs/rofi/default.nix
 		../../programs/zathura.nix
     ../../programs/firefox/default.nix
+    ../../programs/thunderbird.nix
     inputs.lan-mouse.homeManagerModules.default
 
     "${inputs.vscode-server}/modules/vscode-server/home.nix"

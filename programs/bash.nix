@@ -1,4 +1,4 @@
-{ secretsDir, confDir, hostname, self, pkgs, config, system, inputs, workDir, ... }:
+{ secretsDir, confDir, hostname, self, pkgs, config, system, workDir, ... }:
 {
 	programs.bash = {
 
@@ -134,36 +134,6 @@
         source ~/work/victorinix/vic
       }
 
-
-
-
-      function rp () {
-        host=$1
-
-        if [[ "$host" == "mosatop" ]]
-        then
-          xfreerdp /u:"c2vi" /v:mosatop /p:$(cat ${secretsDir}/mosatop-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
-
-        elif [[ "$host" == "acern" ]]
-        then
-          xfreerdp /u:"seb" /v:acern /p:$(cat ${secretsDir}/acern-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
-
-        elif [[ "$host" == "mwin" ]]
-        then
-          xfreerdp /u:"me" /v:mac:4400 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
-
-        elif [[ "$host" == "win" ]]
-        then
-          xfreerdp /u:"me" /v:192.168.122.141 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
-
-        elif [[ "$host" == "phone" ]]
-        then
-          ssh phone "source ~/.bashrc && on"
-          ${pkgs.rustdesk}/bin/rustdesk --connect 100.77.80.77
-
-        fi
-      }
-			complete -W "mosatop acern" rp
 
 
 

@@ -1,13 +1,5 @@
 { lib, secretsDir, pkgs, inputs, unstable, ... }: let
 
-myobs = pkgs.wrapOBS {
-  plugins = with pkgs.obs-studio-plugins; [
-    obs-ndi
-    obs-teleport
-  ];
-};
-
-
 in {
 
   imports = [
@@ -25,7 +17,9 @@ in {
   services.tailscale.enable = true;
   programs.nix-ld.enable = true;
 
-	networking.hostName = "mac";
+  services.keyd.enable = lib.mkForce false;
+
+	networking.hostName = "ki";
   networking.firewall.enable = false;
   services.avahi = {
       enable = true;
@@ -60,6 +54,22 @@ in {
       4410 # lan-mouse
 	];
 
+  services.resilio = {
+    enable = true;
+    enableWebUI = true;
+    httpListenAddr = "100.96.201.42";
+    checkForUpdates = false;
+    listeningPort = 44444;
+  };
+  users.users.me.extraGroups = [ "rslsync" ];
+  users.users.rslsync.extraGroups = [ "users" ];
+  users.users.me.homeMode = "770"; # important for resilio
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
+    44444 # resilio sync
+    9000 # resilio webui
+  ];
+
+
 	swapDevices = [ { device = "/swapfile"; } ];
 
   boot.kernelModules = [ "usbip_core" ];
@@ -69,6 +79,10 @@ in {
   boot.binfmt.emulatedSystems = [ 
     "aarch64-linux"
   ];
+
+  home-manager.users.me.home.file.".config/sway/config".text = ''
+    exec ${pkgs.wayvnc}/bin/wayvnc 0.0.0.0 6666
+  '';
 
   virtualisation.libvirtd = {
     enable = true;
@@ -102,68 +116,16 @@ in {
       '';
 	};
 
-
-  services.greetd = lib.mkForce {
-    enable = true;
-    settings = rec {
-      terminal.vt = 1;
-      initial_session = let
-
-        newerUnstableSrc = builtins.getFlake "nixpkgs/d0fc30899600b9b3466ddb260fd83deb486c32f1";
-        newerUnstable = import newerUnstableSrc.outPath {};
-
-        mySway = newerUnstable.sway.override {
-          sway-unwrapped = (newerUnstable.sway-unwrapped.overrideAttrs (prev: {
-            /*
-            src = pkgs.fetchFromGitHub {
-              owner = "WillPower3309";
-              repo = "swayfx";
-              rev = "";
-              hash = "";
-            };
-            */
-            src = pkgs.fetchFromGitHub {
-              owner = "swaywm";
-              repo = "sway";
-              rev = "73c244fb4807a29c6599d42c15e8a8759225b2d6";
-              hash = "sha256-P2w1oRVUNBWajt8jZOxPXvBE29urbrhtORy+lfYqnF8=";
-            };
-          })).override {
-            wlroots = newerUnstable.wlroots.overrideAttrs (prev: {
-              version = "master";
-              src = pkgs.fetchFromGitLab {
-                domain = "gitlab.freedesktop.org";
-                owner = "wlroots";
-                repo = "wlroots";
-                rev = "master";
-                sha256 = "sha256-2FK6FGRpgf/YYqwJST0LVA/pnNRSUDrfrrp6mSwA0Fk=";
-              };
-
-            });
-          };
-        };
-
-      in {
-        #command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time -d --env WLR_RENDERER_ALLOW_SOFTWARE=1 --cmd sway";
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.writeScriptBin "run-sway" ''
-          export WLR_RENDERER_ALLOW_SOFTWARE=1
-          export SDL_VIDEODRIVER=wayland
-          export _JAVA_AWT_WM_NONREPARENTING=1
-          export QT_QPA_PLATFORM=wayland
-          export XDG_CURRENT_DESKTOP=sway
-          export XDG_SESSION_DESKTOP=sway
-          exec ${pkgs.lib.getExe mySway}
-        ''}/bin/run-sway";
-        user = "me";
-      };
-      default_session = initial_session;
-    };
-  };
-
-
   systemd.extraConfig = "DefaultLimitNOFILE=2048";
 
-  ###################################################### the kiosk stuff
+	services.logind = {
+		extraConfig = ''
+			HandlePowerKey=suspend-then-hibernate
+		'';
+		lidSwitch = "ignore";
+		lidSwitchExternalPower = "ignore";
+		lidSwitchDocked = "ignore";
+	};
 
   services.dbus.enable = true;
 
@@ -218,7 +180,7 @@ in {
       };
       wifi = {
         mode = "ap";
-        ssid = "c2vi-mac";
+        ssid = "c2vi-ki";
       };
 
       wifi-security = {
@@ -296,6 +258,11 @@ in {
         content = {
           type = "gpt";
           partitions = {
+
+            biosboot = {
+              size = "2M";
+              type = "21686148-6449-6E6F-744E-656564454649"; # BIOS boot
+            };
 
             ESP = {
               size = "1G";

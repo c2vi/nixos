@@ -1,5 +1,5 @@
 
-{ pkgs, lib, workDir, self, secretsDir, config, inputs, system, pkgsUnstable, ... }:
+{ pkgs, lib, persistentDir, self, secretsDir, config, inputs, system, pkgsUnstable, ... }:
 {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=110941
@@ -167,8 +167,15 @@
   services.resilio = {
     enable = true;
     enableWebUI = true;
+    httpListenAddr = "100.71.47.106";
+    checkForUpdates = false;
+    listeningPort = 44444;
   };
   users.users.me.homeMode = "770"; # important for resilio
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
+    44444 # resilio sync
+    9000 # resilio webui
+  ];
 
 
 
@@ -203,11 +210,11 @@
   ################# make firefox default browser
   environment.sessionVariables.DEFAULT_BROWSER = "firefox"; # for electron apps
   xdg.mime.defaultApplications = {
-    "text/html" = "firefox.desktop";
-    "x-scheme-handler/http" = "firefox.desktop";
-    "x-scheme-handler/https" = "firefox.desktop";
-    "x-scheme-handler/about" = "firefox.desktop";
-    "x-scheme-handler/unknown" = "firefox.desktop";
+    "text/html" = "firefox-nightly.desktop";
+    "x-scheme-handler/http" = "firefox-nightly.desktop";
+    "x-scheme-handler/https" = "firefox-nightly.desktop";
+    "x-scheme-handler/about" = "firefox-nightly.desktop";
+    "x-scheme-handler/unknown" = "firefox-nightly.desktop";
   };
 
 
@@ -393,6 +400,62 @@
    '';
    # */
 
+
+
+
+  ################################ extra home-manager config for main #############################
+  home-manager.users.me.programs.bash = {
+    bashrcExtra = ''
+
+      function rp () {
+        host=$1
+
+        if [[ "$host" == "mosatop" ]]
+        then
+          xfreerdp /u:"c2vi" /v:mosatop /p:$(cat ${secretsDir}/mosatop-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
+
+        elif [[ "$host" == "acern" ]]
+        then
+          xfreerdp /u:"seb" /v:acern /p:$(cat ${secretsDir}/acern-rdp-password) /dynamic-resolution +clipboard +auto-reconnect /wm-class:"Microsoft Windows"
+
+        elif [[ "$host" == "mwin" ]]
+        then
+          xfreerdp /u:"me" /v:mac:4400 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
+
+        elif [[ "$host" == "win" ]]
+        then
+          xfreerdp /u:"me" /v:192.168.122.141 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
+
+        elif [[ "$host" == "phone" ]]
+        then
+          ssh phone "source ~/.bashrc && on"
+          ${pkgs.rustdesk}/bin/rustdesk --connect 100.77.80.77
+
+        elif [[ "$host" == "fwin" ]]
+        then
+          ${pkgs.remmina}/bin/remmina -c ${persistentDir}/remmina/fwin.remmina
+
+        elif [[ "$host" == "ki" ]]
+        then
+          ${pkgs.remmina}/bin/remmina -c ${persistentDir}/remmina/ki.remmina
+
+        elif [[ "$host" == "mac" ]]
+        then
+          ${pkgs.remmina}/bin/remmina -c ${persistentDir}/remmina/mac.remmina
+
+        elif [[ "$host" == "mandroid" ]]
+        then
+          ${pkgs.remmina}/bin/remmina -c ${persistentDir}/remmina/mandroid.remmina
+
+        fi
+      }
+			complete -W "mosatop acern phone mwin win fwin ki mac mandroid" rp
+      '';
+  };
+
+
+
+
   ################################ my youtube blocking service #############################
   environment.etc."host.conf" = {
     # needed so that firefox does not ignore the hosts file
@@ -435,10 +498,6 @@
 	networking.firewall.enable = true;
 
 	services.samba.openFirewall = true;
-
-  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 
-    44444 # resilio sync
-  ];
 
 	networking.firewall.allowedTCPPorts = [
   	5357 # wsdd

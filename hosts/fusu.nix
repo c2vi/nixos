@@ -1,6 +1,7 @@
 
-{ inputs, pkgs, secretsDir, ... }:
-{
+{ inputs, pkgs, secretsDir, config, system, ... }: let
+
+in {
 
   #disabledModules = [ "services/databases/couchdb.nix" ];
 	imports = [
@@ -14,6 +15,9 @@
     ../users/root/default.nix
     ../users/files/headless.nix
     ../users/server/headless.nix
+
+    inputs.arion.nixosModules.arion
+    ../mods/fusu-services.nix
 	];
 
   # mac address for wakeonlan: 00:19:99:fd:28:23
@@ -37,12 +41,19 @@
 
 
   services.tailscale.enable = true;
+
+
   services.resilio = {
-    # TODO: add the config for the share to here
     enable = true;
     enableWebUI = true;
     httpListenAddr = "100.70.54.18";
+    checkForUpdates = false;
+    listeningPort = 44444;
   };
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
+    44444 # resilio sync
+    9000 # resilio webui
+  ];
 
 
   boot.supportedFilesystems = [ "zfs" ];
@@ -54,15 +65,6 @@
     device = "storage";
     fsType = "zfs";
   };
-
-  virtualisation.libvirtd = {
-    enable = true;
-    qemuOvmf = true;
-    qemuSwtpm = true;
-    #qemuOvmfPackage = pkgs.OVMFFull;
-  };
-  virtualisation.docker.enable = true;
-  users.users.server.extraGroups = [ "docker" ];
 
 	# Use the GRUB 2 boot loader.
 	boot.loader.grub = {
@@ -97,12 +99,6 @@
 
 	networking.firewall.allowPing = true;
 	networking.firewall.enable = true;
-
-  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 
-    443 # couchdb for obsidian live sync https
-    44444 # resilio sync
-    9000 # resilio webui
-  ];
 
 	services.samba.openFirewall = true;
 
@@ -154,6 +150,8 @@
     fuse3
     terraform
     usbutils
+    qemu_full
+    libvirt
   ];
 
 	nix.settings = {

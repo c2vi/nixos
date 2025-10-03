@@ -289,7 +289,7 @@ in {
   boot.loader.grub.enable = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.grub.devices = [ "nodev" ];
+  boot.loader.grub.device = "nodev";
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "ehci_pci"
