@@ -40,12 +40,13 @@
     enableVirtualCamera = true;
     plugins = with pkgs.obs-studio-plugins; [
       droidcam-obs
-      obs-ndi
+      #distroav
       obs-teleport
     ];
   };
 
   # virtual display
+  /*
   hardware.display = {
 
     edid.packages = [
@@ -66,12 +67,13 @@
         UUEwQzAxNzgwMDEKACU=
         EOF
       '')
-      */
     ];
 
 
+    */
     # find a free GPU output using this command:
     # for p in /sys/class/drm/*/status; do con=${p%/status}; echo -n "${con#*/card?-}: "; cat $p; done
+    /*
     outputs."DP-2" = {
       edid = "virtual.bin";
 
@@ -81,9 +83,24 @@
       mode = "1920x1080e";
     };
   };
+  */
 
+    ##### Netbird Configuration
+    services.netbird.clients.ppc = {
+      #login = {
+        #enable = true;
+        #setupKeyFile = "${secretsDir}/netbird-setup-key";
+        #};
+      port = 51821;
+      ui.enable = false;
+      openFirewall = true;
+      #openInternalFirewall = true;
+    };
+  
 
   programs.fuse.userAllowOther = true;
+
+  services.gnome.gnome-keyring.enable = true;
 
   services.sunshine = {
     enable = false;
@@ -128,6 +145,10 @@
     });
   };
 
+  fonts.packages = with pkgs; [
+    league-gothic
+  ]; 
+
 
 
   hardware.graphics.extraPackages = with pkgs; [
@@ -135,22 +156,41 @@
   ];
 
 
+  services.keyd = {
+    enable = true;
+    /*
+    keyboards.bluetooth-3-0-keyboard = {
+      ids = [ "05ac:0255:f22563e9" ];
+      settings.main = {
+        leftalt = "meta";
+        leftcontrol = "leftalt";
+      };
+    };
+    */
+    #keyboards.default.ids = [ "-05ac:0255" ]; completely disables my rebinding...... hmmmm
+    keyboards.default.settings = {
+      main = {
+        leftalt = "leftcontrol";
+        leftcontrol = "leftalt";
+      };
+    };
+  };
+
+
+
 
   home-manager.users.me.programs.lan-mouse = {
     enable = true;
     settings = {
-      authorized_fingerprints."0d:4f:2c:8a:46:d5:6a:e2:22:c9:02:89:39:da:75:69:2d:e9:32:39:d7:dc:e6:e2:50:d6:20:22:a5:26:d4:44" = "mac";
+      authorized_fingerprints."20:e2:a0:c1:e9:52:9b:72:d5:68:8c:7c:91:c0:ac:33:ba:ec:bc:61:73:e9:8e:c1:a8:30:1a:ea:ae:2b:55:33" = "mac";
       port = 4410;
       clients = [
         {
           position = "right";
           hostname = "mac";
           activate_on_startup = true;
-          ips = [ "192.168.1.33" ];
+          ips = [ "192.168.4.3" "100.100.55.117" ];
           port = 4410;
-          #enter_hook = "${pkgs.wl-clipboard}/bin/wl-paste | ${pkgs.openssh}/bin/ssh mac 'cat > ~/clipboard'";
-          #enter_hook = "/run/current-system/sw/bin/echo hooooooooooo > /home/me/p1";
-          enter_hook = "/run/current-system/sw/bin/cat /home/me/.cache/clipboard | /run/current-system/sw/bin/ssh mac 'cat >~/clipboard'";
         }
       ];
     };
@@ -165,7 +205,7 @@
   services.tailscale.enable = true;
 
   services.resilio = {
-    enable = true;
+    enable = false;
     enableWebUI = true;
     httpListenAddr = "100.71.47.106";
     checkForUpdates = false;
@@ -231,6 +271,7 @@
 		#../common/nixos-graphical.nix
     ../common/nixos-wayland.nix
     ../common/building.nix
+    ../common/nixos.nix
 		../mods/battery_monitor.nix
 
     inputs.networkmanager.nixosModules.networkmanager
@@ -246,12 +287,17 @@
     #inputs.waveforms.nixosModule
 	];
 
-  services.udev.packages = [ inputs.waveforms.packages.${system}.adept2-runtime ];
-  users.users.rslsync.extraGroups = ["users"];
+
+  #services.udev.packages = [ inputs.waveforms.packages.${system}.adept2-runtime ];
+  #users.users.rslsync.extraGroups = ["users"];
 
   # add myself to plugdev group for waveforms
   # and incus-admin to use incus without sudo
-  users.users.me.extraGroups = [ "incus-admin" "plugdev" "rslsync" ];
+  users.users.me.extraGroups = [ 
+    "incus-admin" "plugdev" 
+    #"rslsync" 
+    "docker" 
+  ];
 
 
   nixpkgs.config.permittedInsecurePackages = [
@@ -260,7 +306,14 @@
 
 
   environment.systemPackages = with pkgs; [
-    inputs.waveforms.packages.${system}.waveforms
+    
+    ((builtins.getFlake "nixpkgs/96bc8fec15133d6056410ed3abae2fb9419fb545").legacyPackages.${system}.affine.overrideAttrs {
+      patches = [
+        ../overlays/patches/affin-edgeless-right-click-drag.patch
+      ];
+    })
+    
+    #inputs.waveforms.packages.${system}.waveforms
     intel-compute-runtime-legacy1
     ffmpeg-full
     remmina
@@ -294,7 +347,7 @@
     dhcpcd
     looking-glass-client
     swtpm
-    win-virtio
+    virtio-win
   ];
 
   # shedule nix builds with low priority, so the laptop is still usable while building something
@@ -428,12 +481,16 @@
 
         elif [[ "$host" == "phone" ]]
         then
-          ssh phone "source ~/.bashrc && on"
+          ssh phone "source ~/.bashrc && on" &
           ${pkgs.rustdesk}/bin/rustdesk --connect 100.77.80.77
+
+        elif [[ "$host" == "vnc-fwin" ]]
+        then
+          ${pkgs.remmina}/bin/remmina -c ${persistentDir}/remmina/fwin.remmina
 
         elif [[ "$host" == "fwin" ]]
         then
-          ${pkgs.remmina}/bin/remmina -c ${persistentDir}/remmina/fwin.remmina
+          xfreerdp /u:"me" /v:fusu:9002 /p:$(cat /home/me/secrets/win-vm-pwd) /dynamic-resolution +clipboard +auto-reconnect +home-drive /wm-class:"Microsoft Windows";
 
         elif [[ "$host" == "ki" ]]
         then
@@ -517,6 +574,7 @@
       53 # allow dns
       48899 # GoodWe inverter discovery
       4410 # lan-mouse
+      41641 # tailscale
 	];
 
   #networking.search = [ "c2vi.local" ];
@@ -532,10 +590,10 @@
         uuid = "a02273d9-ad12-395e-8372-f61129635b6f";
         type = "ethernet";
         autoconnect-priority = "-999";
-        interface-name = "enp1s0";
+        interface-name = "enp0s13f0u1u4u3";
       };
       ipv4 = {
-        address1 = "192.168.1.11/24,192.168.1.1";
+        address2 = "192.168.4.2/24";
         dns = "1.1.1.1;";
         method = "manual";
       };
@@ -592,6 +650,7 @@
         uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
         type = "wifi";
         interface-name = "wlo1";
+        autoconnect-priority = "200";
       };
 
       wifi = {
@@ -603,6 +662,33 @@
       wifi-security = {
         key-mgmt = "wpa-psk";
         psk = builtins.readFile "${secretsDir}/wifi-password";
+      };
+
+      ipv4 = {
+        #address1 = "192.168.20.11/24";
+        dns = "1.1.1.1;8.8.8.8;";
+        method = "auto";
+      };
+    };
+
+    gw = {
+      connection = {
+        id = "gw";
+        uuid = "de655c52-1af2-4b46-b7b2-8ddad9edb52f";
+        type = "wifi";
+        interface-name = "wlo1";
+        autoconnect-priority = "300";
+      };
+
+      wifi = {
+        hidden = "true";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/gw-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/gw-password";
       };
 
       ipv4 = {
@@ -685,8 +771,8 @@
         id = "dhcp";
         uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
         type = "ethernet";
-        autoconnect = "false";
-        interface-name = "enp1s0";
+        autoconnect = "true";
+        interface-name = "enp0s13f0u1u3";
       };
 
       ethernet = {
@@ -780,9 +866,10 @@
 
 
   ######################################### virtualisation ###############################
+    virtualisation.docker.enable = true;
   	virtualisation.libvirtd = {
       enable = true;
-      qemuOvmf = true;
+      #qemuOvmf = true;
       qemuSwtpm = true;
       #qemuOvmfPackage = pkgs.OVMFFull;
     };
@@ -835,9 +922,9 @@
 
 	# boot.resumeDevice = "/swapfile";
 	services.logind = {
-		extraConfig = ''
-			HandlePowerKey=suspend-then-hibernate
-		'';
+		#extraConfig = ''
+			#HandlePowerKey=suspend-then-hibernate
+		#'';
 		lidSwitch = "lock";
 		lidSwitchExternalPower = "lock";
 		lidSwitchDocked = "ignore";
@@ -846,6 +933,45 @@
 		HibernateDelaySec=4h
 		HibernateMode=shutdown
 	'';
+
+
+	############################## swap and hibernate ###################################
+  /*
+  fileSystems."/home/me/work/things/ppc" = {
+    device = "https://dav.ppc.social";
+    fsType = "davfs";
+    options = [
+      "netdev"
+      "rw"
+      "user"
+      "uid=1000"
+      "filemode=0644"
+      "dirmode=0755"
+      "noauto"
+      "x-systemd.automount"
+    ];
+  };
+  */
+
+  services = {
+    davfs2 = {
+      enable = true;
+      davUser = "me";
+      settings = {
+        globalSection = {
+          gui_optimize = true;
+          file_refresh = 30;
+        };
+        sections = {
+          "/home/me/work/things/ppc" = {
+            gui_optimize = true;
+            file_refresh = 30;
+          };
+        };
+      };
+    };
+  };
+
+
+
 }
-
-

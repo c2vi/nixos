@@ -52,6 +52,7 @@ in {
 	networking.firewall.allowedUDPPorts = [
       48899 # GoodWe inverter discovery
       4410 # lan-mouse
+      41641 # tailscale
 	];
 
   services.resilio = {
@@ -150,6 +151,7 @@ in {
         uuid = "e0103dac-7da0-4e32-a01b-487b8c4c813c";
         type = "wifi";
         interface-name = "wlp2s0";
+        autoconnect-priority = "200";
       };
 
       wifi = {
@@ -161,6 +163,33 @@ in {
       wifi-security = {
         key-mgmt = "wpa-psk";
         psk = builtins.readFile "${secretsDir}/wifi-password";
+      };
+
+      ipv4 = {
+        #address1 = "192.168.20.11/24";
+        dns = "1.1.1.1;8.8.8.8;";
+        method = "auto";
+      };
+    };
+
+    gw = {
+      connection = {
+        id = "gw";
+        uuid = "de655c52-1af2-4b46-b7b2-8ddad9edb52f";
+        type = "wifi";
+        interface-name = "wlp2s0";
+        autoconnect-priority = "300";
+      };
+
+      wifi = {
+        hidden = "false";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/gw-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/gw-password";
       };
 
       ipv4 = {

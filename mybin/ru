@@ -166,9 +166,7 @@ sudo systemctl hibernate
 
 elif [ "$1" == "suspend" ]
 then
-sudo systemctl suspend-then-hibernate
+sudo systemctl suspend
 
 
 fi
-
-

@@ -155,6 +155,32 @@
         method = "auto";
       };
     };
+    gw = {
+      connection = {
+        id = "gw";
+        uuid = "de655c52-1af2-4b46-b7b2-8ddad9edb52f";
+        type = "wifi";
+        interface-name = "wlan0";
+        autoconnect-priority = "300";
+      };
+
+      wifi = {
+        hidden = "true";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/gw-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/gw-password";
+      };
+
+      ipv4 = {
+        #address1 = "192.168.20.11/24";
+        dns = "1.1.1.1;8.8.8.8;";
+        method = "auto";
+      };
+    };
 
     hh40 = {
       connection = {

@@ -27,7 +27,6 @@ in {
     pkgs.docker-client
 
     # add all the service managers
-    (createArionServiceManager "libvirt" "")
   ];
 
   # Arion works with Docker, but for NixOS-based containers, you need Podman
@@ -38,37 +37,12 @@ in {
 
   users.extraUsers.me.extraGroups = ["podman"];
 
-  ######################## libvirtd in container #########################
+
   virtualisation.arion = {
     backend = "podman-socket";
 
-    projects.libvirt.settings.services.libvirt = { pkgs, lib, ... }: {
-      nixos.useSystemd = true;
-      service.useHostStore = true;
 
-      nixos.configuration = {
-        boot.tmp.useTmpfs = true;
-  	    virtualisation.libvirtd = {
-          enable = true;
-        };
-        users.users.me = {
-          uid = 1001;
-          isNormalUser = true;
-          password = "changeme";
-          extraGroups = [ "networkmanager" "wheel" "libvirtd" "plugdev" ];
-        };
-      };
-
-      service = {
-        privileged = true;
-
-        volumes = [ 
-          "${dataDir}/libvirt/run:/run/libvirt"
-          "${dataDir}/libvirt/lib:/var/lib/libvirt"
-        ];
-      };
-
-    };
   };
+
 
 }

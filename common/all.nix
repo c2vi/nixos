@@ -13,7 +13,7 @@
   programs.dconf.enable = true;
 
 	# set root user pwd
-	users.users.root.password = "changeme";
+	#users.users.root.password = "changeme";
 
 	# Set your time zone.
 	time.timeZone = "Europe/Vienna";
@@ -39,6 +39,13 @@
   nix.channel.enable = false;
 
   services.openssh.settings.GatewayPorts = "clientspecified";
+
+  # add extre nix registries
+  nix.registry = {
+    ni.flake = inputs.nixpkgs;
+    nu.flake = inputs.nixpkgs-unstable;
+    me.flake = self;
+  };
 
 
 

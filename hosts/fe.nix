@@ -13,8 +13,17 @@
     ../users/me/headless.nix
     ../users/root/default.nix
     ../users/server/headless.nix
+
+    inputs.arion.nixosModules.arion
+    ../mods/fesu-services.nix
 	];
 
+  users.users.server.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKNXOPxlnSxkhm050ui56D5SHrkhuFwUOU0Gf0C+Vmks melektron@goarnix"
+  ];
+  users.users.me.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKNXOPxlnSxkhm050ui56D5SHrkhuFwUOU0Gf0C+Vmks melektron@goarnix"
+  ];
 
   services.tailscale.enable = true;
 
@@ -24,7 +33,6 @@
     qemuSwtpm = true;
     #qemuOvmfPackage = pkgs.OVMFFull;
   };
-  virtualisation.docker.enable = true;
   users.users.server.extraGroups = [ "docker" ];
 
 	# Use the GRUB 2 boot loader.
@@ -54,7 +62,7 @@
   		settings.PasswordAuthentication = false;
   		settings.KbdInteractiveAuthentication = false;
   		settings.PermitRootLogin = "yes";
-      ports = [ 22 ];
+      ports = [ 22 49004 ];
 
       settings.X11Forwarding = true;
 
@@ -75,6 +83,9 @@
 	services.samba.openFirewall = true;
 
 	networking.firewall.allowedTCPPorts = [
+    80 # http
+    443 # https
+
 		8888 # for general usage
 		9999 # for general usage
     8080 # for mitm proxy
@@ -94,10 +105,10 @@
 
 
   networking.firewall.allowedTCPPortRanges = [
-    { from = 25500; to = 27777;} # minecraft
+    { from = 49000; to = 49300;} # general
   ];
   networking.firewall.allowedUDPPortRanges = [
-    { from = 27700; to = 28800;} # minecraft
+    { from = 49000; to = 49300;} # general
   ];
 
 	networking.firewall.allowedUDPPorts = [

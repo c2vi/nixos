@@ -40,6 +40,29 @@
         port = 49388;
         user = "server";
       };
+      fwin = {
+        user = "me";
+        hostname = "fwin";
+      };
+
+
+      feh = {
+        user = "root";
+        hostname = "100.107.101.77";
+        port = 49001;
+      };
+      ppc-hosting = {
+        user = "root";
+        hostname = "100.107.101.77";
+        port = 49002;
+      };
+      pcmc = {
+        user = "root";
+        hostname = "100.107.101.77";
+        port = 49003;
+      };
+
+
       phone = {
         user = "u0_a345";
         port = 8022;

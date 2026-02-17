@@ -13,10 +13,19 @@
     cmakeFlags = prev.cmakeFlags or [] ++ [ "-DENABLE_SWAY=ON" ];
   });
 
-  mylf = pkgs.lf.overrideAttrs (final: prev: {
+  oldpkgs = (builtins.getFlake "nixpkgs/release-25.05").legacyPackages.${system};
+  mylf = oldpkgs.lf.overrideAttrs (final: prev: {
     patches = (prev.patches or [ ]) ++ [
       ./lf-filter.patch
     ];
+    /*
+    src = pkgs.fetchFromGitHub { # use the old v35 version of lf... so that my patch applies
+      owner = "gokcehan";
+      repo = "lf";
+      rev = "r35";
+      hash = "sha256-0ZyIbEKiQ9l30gqHlpW7l/6/TzqVRvnKk9c2FiQ6E6Y=";
+    };
+    */
     checkPhase = "";
   });
 
@@ -52,7 +61,7 @@
       exiftool # (metadata/audio, and file detection for .webm files)
       jq # (json and metadata)
       lynx # (html/web pages)
-      poppler_utils # pdftoppm # (pdf)
+      poppler-utils # pdftoppm # (pdf)
       odt2txt # (odt)
       imagemagick # convert from imagemagick (fonts)
       atool # (archives)
@@ -105,7 +114,7 @@
 
 		enable = true;
 		commands = {
-			dragon-out = ''%${pkgs.xdragon}/bin/xdragon -a -x "$fx"'';
+			dragon-out = ''%${pkgs.dragon-drop}/bin/xdragon -a -x "$fx"'';
 			editor-open = ''$$EDITOR $f'';
 			mkdir = ''
 				''${{

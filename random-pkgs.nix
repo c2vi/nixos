@@ -6,6 +6,11 @@
   pkgsUnstable = import nixpkgs-unstable { inherit system; };
   lib = pkgs.lib;
 in rec {
+  
+  affine = pkgs.affine.overrideAttrs {
+    patches = [
+    ../overlays/patches/affin-edgeless-right-click-drag.patch
+  ];
 
   runc = pkgs.runc.overrideAttrs ({
     src = /home/me/work/config/gitignore/runc;

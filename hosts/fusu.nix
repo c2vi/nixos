@@ -1,5 +1,5 @@
 
-{ inputs, pkgs, secretsDir, config, system, ... }: let
+{ inputs, pkgs, secretsDir, config, dataDir, ... }: let
 
 in {
 
@@ -27,6 +27,17 @@ in {
     #"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHTV1VoNAjMha5IP+qb8XABDo02pW3iN0yPBIbSqZA27 me@acern"
   #];
 
+  virtualisation.libvirtd = {
+    enable = true;
+    qemuOvmf = true;
+    qemuSwtpm = true;
+  };
+  # store libvirt data in dataDir
+	fileSystems."/var/lib/libvirt" = {
+		device = "/home/me/host/libvirt";
+  	options = [ "bind" ];
+	};
+
   
 
   # allow server user to shutdown fusu
@@ -53,6 +64,16 @@ in {
   networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
     44444 # resilio sync
     9000 # resilio webui
+    9001 # fwin vnc
+    9002 # fwin rdp
+    9003 # fwin ssh
+  ];
+  networking.firewall.interfaces."br0".allowedTCPPorts = [
+    44444 # resilio sync
+    9000 # resilio webui
+    9001 # fwin vnc
+    9002 # fwin rdp
+    9003 # fwin ssh
   ];
 
 

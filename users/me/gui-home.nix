@@ -1,5 +1,5 @@
 
-{ config, pkgs, self, workDir, inputs, persistentDir, system, ... }:
+{ config, secretsDir, pkgs, self, workDir, inputs, persistentDir, system, pkgsUnstable, ... }:
 
 {
 	imports = [
@@ -17,8 +17,20 @@
     inputs.lan-mouse.homeManagerModules.default
 
     "${inputs.vscode-server}/modules/vscode-server/home.nix"
+
+    inputs.walker.homeManagerModules.default
 	];
-  services.vscode-server.enable = true;
+
+  programs.zed-editor = {
+    enable = true;
+    package = inputs.zed.packages.x86_64-linux.default;
+  };
+
+  programs.walker = {
+    enable = false;
+    runAsService = true;
+  };
+
 
   programs.vscode.enable = true;
   programs.vscode.extensions = with pkgs.vscode-extensions; [
@@ -55,12 +67,15 @@
   home.sessionVariables = {
     inherit system;
     VIC_BINARY = "/home/me/work/victorinix/vic";
+    PPC_DATA_DIR = "/home/me/work/gitignore/ppc/data";
   };
 
 	services.dunst.enable = true;
 
 
   home.file = {
+    ".davfs2/secrets".source = config.lib.file.mkOutOfStoreSymlink "${secretsDir}/davfs2-secrets";
+
     #".mozilla/firefox".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/firefox";
     ".cache/rofi-3.runcache".source = config.lib.file.mkOutOfStoreSymlink "${persistentDir}/rofi-run-cache";
 
@@ -76,6 +91,7 @@
     # packages that i might not need everywhere??
 		#wstunnel
 		rclone
+		pkgsUnstable.tsx
 		playerctl
 		alsa-utils
 		usbutils
@@ -122,7 +138,7 @@
     xorg.xmodmap
     inkscape
     kazam
-    onlyoffice-bin
+    onlyoffice-desktopeditors
 
     # my own packages
     supabase-cli
@@ -147,12 +163,14 @@
 		libvirt
 		virt-manager
 		freerdp
+		nixd
     #(pkgs.writeShellApplication {
       #name = "log";
       #runtimeInputs = [ inputs.my-log.packages.${system}.pythonForLog ];
       #text = "cd /home/me/work/log/new; nix develop -c 'python ${workDir}/log/new/client.py'";
       #text = ''${inputs.my-log.packages.${system}.pythonForLog}/bin/python ${workDir}/log/new/client.py "$@"'';
     #})
+    
     (pkgs.writeShellApplication {
       name = "rpi";
       text = let 
@@ -298,5 +316,3 @@
     })
 	];
 }
-
-

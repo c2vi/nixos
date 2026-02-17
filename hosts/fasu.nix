@@ -26,6 +26,8 @@
     }
   ];
 
+  services.tailscale.enable = true;
+
 
   #fileSystems."/boot" = {
   #  device = "/dev/disk/by-label/fusu-boot";
@@ -114,6 +116,19 @@
 	boot.loader.grub.extraConfig = ''
 		set timeout=2
 	'';
+  # Add these modules 
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "ehci_pci"
+    "ahci"
+    "usbhid"
+    "usb_storage"
+    "sd_mod"
+    "virtio_balloon"
+    "virtio_blk"
+    "virtio_pci"
+    "virtio_ring"
+  ];
 
   # the flash drive in use for fasu
   disko.devices.disk.root.device = "/dev/nbd0";

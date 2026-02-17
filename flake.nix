@@ -4,8 +4,9 @@
   ################################### INPUTS #########################################
 	inputs = {
 		nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
-		#nixpkgs.url = "github:NixOS/nixpkgs/b9562c824b11473587286eb499680129c2d0d4f1";
 		#nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+		
+		nixpkgs-new.url = "github:NixOS/nixpkgs/release-25.11";
 
 		nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 		nixpkgs-old.url = "github:NixOS/nixpkgs/release-23.11";
@@ -18,12 +19,36 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    
+    zed.url = "github:zed-industries/zed";
+    #zed.inputs.nixpkgs.follows = "nixpkgs";
 
+    hetzner_ddns = {
+      url = "github:c2vi/hetzner_ddns";
+      flake = false;
+    };
+    
 		home-manager = {
 			url = "github:nix-community/home-manager/release-25.05";
 			#url = "github:nix-community/home-manager/release-24.05";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
+
+    compass = {
+      url = "github:ppc-social/compass";
+			inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    elephant = {
+      url = "github:abenz1267/elephant";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    walker = {
+      url = "github:abenz1267/walker";
+      inputs.elephant.follows = "elephant";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
 
 		home-manager-old = {
 			url = "github:nix-community/home-manager/release-23.11";
@@ -62,16 +87,16 @@
       #inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # use fork see: https://github.com/nix-community/nix-on-droid/pull/203#issuecomment-2956162178
     nix-on-droid = {
-      url = "github:nix-community/nix-on-droid/release-23.05";
-      #url = "github:zhaofengli/nix-on-droid";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:frankitox/nix-on-droid/supervisord";
       inputs.home-manager.follows = "home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     # for bootstrap zip ball creation and proot-termux builds, we use a fixed version of nixpkgs to ease maintanence.
     # head of nixos-23.05 as of 2023-06-18
     # note: when updating nixpkgs-for-bootstrap, update store paths of proot-termux in modules/environment/login/default.nix
-    nixpkgs-for-bootstrap.url = "github:NixOS/nixpkgs/c7ff1b9b95620ce8728c0d7bd501c458e6da9e04";
+    nixpkgs-for-nix-on-droid-bootstrap.url = "github:NixOS/nixpkgs/49ee0e94463abada1de470c9c07bfc12b36dcf40";
 
     nix-wsl.url = "github:nix-community/NixOS-WSL";
 
@@ -115,7 +140,7 @@
 			workDir = "/home/me/work";
 			secretsDir = "/home/me/secrets";
 			persistentDir = "/home/me/work/app-data";
-      dataDir = "/home/me/host";
+      dataDir = "/home/server/host";
 
       tunepkgs = import nixpkgs {
 
@@ -189,9 +214,16 @@
       overlays = [ (import ./overlays/static-overlay.nix) (import ./overlays/my-overlay.nix) ];
     };
 
-    acern = self.nixosConfigurations.acern.config.system.build.tarballBuilder;
-    lush = self.nixosConfigurations.lush.config.system.build.sdImage;
-    rpi = self.nixosConfigurations.rpi.config.system.build.sdImage;
+    nod = (mypkgs.callPackage ./mods/nix-on-droid-pkgs.nix {
+      system = "aarch64-linux";
+      _nativeSystem = "x86_64-linux";
+      nix-on-droid-flake = inputs.nix-on-droid;
+      nixpkgs = inputs.nixpkgs-for-nix-on-droid-bootstrap;
+      nixOnDroidChannelURL = "${inputs.nix-on-droid}";
+      nixpkgsChannelURL = "${inputs.nixpkgs-for-nix-on-droid-bootstrap}";
+      home-manager-flake = inputs.home-manager-old; 
+      #nixOnDroidFlakeURL = inputs.nix-on-droid.
+    }).customPkgs.bootstrapZip;
 
     # collection of only my nur pkgs
     # my nur is unstable by default
@@ -359,7 +391,6 @@
       ki = createFlashScript "ki";
       fasu = createFlashScript "fasu";
     };
-    test = inputs.nix-on-droid.outputs.apps.x86_64-linux.deploy;
 
     wsl = {
       type = "app";
@@ -424,7 +455,47 @@
     };
 
   ############ nixosConfigurations ################
-   	nixosConfigurations = rec {
+    nixosConfigurations = rec {
+      "_lsp_dummp" = nixpkgs.lib.nixosSystem {
+        inherit specialArgs;
+    		system = "x86_64-linux";
+    		modules = [
+          inputs.home-manager.nixosModules.home-manager
+          inputs.networkmanager.nixosModules.networkmanager
+          inputs.arion.nixosModules.arion
+          inputs.disko.nixosModules.disko
+          
+          # other overlay and home manager module access
+          {
+            nixpkgs.overlays = [
+              # overlay for nix vscode extensions to appear in packages
+              #nix-vscode-extensions.overlays.default
+            ];
+            # a dummy user to expose home-manager modules
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {
+              inherit self;
+            };
+            users.users._lsp_dummy_user = {
+              isNormalUser = true;
+              description = "dummy";
+            };
+            # the user is managed by home-manager
+            home-manager.users._lsp_dummy_user = {
+              home.username = "_lsp_dummy_user";
+              home.homeDirectory = "/home/_lsp_dummy_user";
+              home.stateVersion = "24.05";
+
+              # add custom and third party options and configurations
+              imports = [
+                inputs.lan-mouse.homeManagerModules.default
+              ];
+            };
+          }
+        ];
+      };
+      
    		"main" = nixpkgs.lib.nixosSystem {
 				inherit specialArgs;
       		system = "x86_64-linux";
@@ -515,12 +586,12 @@
    		};
 
       # my asus tinker board
-   		"ti" = nixpkgs.lib.nixosSystem {
-				inherit specialArgs;
-      		system = "x86_64-linux";
-      		modules = [
-         		./hosts/ti.nix
-      		];
+   		"ti" = nixpkgs.lib.nixosSystem rec {
+				specialArgs = { inherit inputs confDir workDir secretsDir persistentDir self unstable nur dataDir system;};
+        system = "aarch64-linux";
+        modules = [
+          ./hosts/ti.nix
+        ];
    		};
 
       # server that hosts stuff
@@ -728,6 +799,7 @@
   ############ nixOnDroidConfigurations ################
     nixOnDroidConfigurations = rec {
       "phone" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+        pkgs = import nixpkgs { system = "aarch64-linux"; };
         modules = [
           ./hosts/phone/nix-on-droid.nix
           {
@@ -743,6 +815,7 @@
         ];
       };
       "tab" = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+        pkgs = import nixpkgs { system = "aarch64-linux"; };
         modules = [
           ./hosts/tab/nix-on-droid.nix
           {
@@ -761,4 +834,3 @@
     };
 	};
 }
-

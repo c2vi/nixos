@@ -23,6 +23,10 @@
       # "${workDir}/htl/labor/nas/nixos/lush-module.nix"
   ];
 
+  #nixpkgs.config.allowUnsupportedSystem = true;
+  #nixpkgs.hostPlatform.system = "aarch64-linux";
+  #nixpkgs.buildPlatform.system = "x86_64-linux";
+
   # fix bluetooth
   hardware = {
     bluetooth = {
@@ -38,12 +42,7 @@
   ];
 
 
-  boot.kernelParams = lib.mkForce ["console=ttyS0,115200n8" "console=ttyAMA0,115200n8" "console=tty0" "nohibernate" "loglevel=7" ];
-	# hardware.bluetooth.enable = true;
-
-
-
- # home-manager.users.me = import ../users/me/home-headless.nix;
+  #boot.kernelParams = lib.mkForce ["console=ttyS0,115200n8" "console=ttyAMA0,115200n8" "console=tty0" "nohibernate" "loglevel=7" ];
 
 
   /* for cross compiling
@@ -87,7 +86,6 @@
   };
 
   boot = {
-    #kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
     loader = {
       generic-extlinux-compatible.enable = lib.mkDefault true;
       grub.enable = lib.mkDefault false;
@@ -124,7 +122,7 @@
       3240 # usbip
   ];
 
-  networking.hostName = "lush";
+  networking.hostName = "ti";
 
   networking.networkmanager.enable = true;
 
@@ -152,6 +150,33 @@
 
       ipv4 = {
         address1 = "192.168.20.21/24";
+        method = "auto";
+      };
+    };
+
+    gw = {
+      connection = {
+        id = "gw";
+        uuid = "de655c52-1af2-4b46-b7b2-8ddad9edb52f";
+        type = "wifi";
+        interface-name = "wlp2s0";
+        autoconnect-priority = "300";
+      };
+
+      wifi = {
+        hidden = "false";
+        mode = "infrastructure";
+        ssid = builtins.readFile "${secretsDir}/gw-ssid";
+      };
+
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = builtins.readFile "${secretsDir}/gw-password";
+      };
+
+      ipv4 = {
+        #address1 = "192.168.20.11/24";
+        dns = "1.1.1.1;8.8.8.8;";
         method = "auto";
       };
     };
@@ -189,7 +214,7 @@
         uuid = "c006389a-1697-4f77-91c3-95b466f85f13";
         type = "ethernet";
         autoconnect = "true";
-        interface-name = "end0";
+        interface-name = "eth0";
       };
 
       ethernet = {
@@ -208,7 +233,7 @@
         uuid = "f55f34e3-4595-4642-b1f6-df3185bc0a04";
         type = "ethernet";
         autoconnect = false;
-        interface-name = "end0";
+        interface-name = "eth0";
       };
 
       ethernet = {

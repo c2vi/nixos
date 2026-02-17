@@ -1,4 +1,4 @@
-{ secretsDir, confDir, hostname, self, pkgs, config, system, workDir, ... }:
+{ lib, secretsDir, confDir, hostname, self, pkgs, config, system, workDir, ... }:
 {
 	programs.bash = {
 
@@ -21,7 +21,6 @@
 			# check the window size after each command and, if necessary,
 			# update the values of LINES and COLUMNS.
 			"checkwinsize"
-
 			# If set, the pattern "**" used in a pathname expansion context will
 			# match all files and zero or more directories and subdirectories.
 			"globstar"
@@ -34,19 +33,21 @@
 			# is needed to that ssh works
 			# TERM = "xterm";
 
-			# my prompt
-			PS1 = ''\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ '';
 
 			TEST = "hiiiiiiiiiiiiiiiiiiiiiiiiiii";
 
 		};
 
 		shellAliases = {
+      archive-video = "${lib.getExe pkgs.yt-dlp} -f \"bv*+ba/b\" --merge-output-format mp4 --embed-thumbnail --write-thumbnail --convert-thumbnails png --add-metadata -o \"%(title)s.%(ext)s\"";
+
+      zed="WAYLAND_DISPLAY= zeditor";
+      npm="pnpm";
       md="~/work/modules/modules/dev/run";
       mize="~/work/mize/mize";
       m="~/work/mize/mize";
 
-      c2="~/work/c2-system/target/debug/system-c2-cli";
+      c2="~/work/c2-system/cli/target/debug/system-c2-cli";
 
       ports = "${pkgs.lsof}/bin/lsof -i -P -n";
       losetup = "${pkgs.util-linux}/bin/losetup";
@@ -65,7 +66,7 @@
 			shutdown = "echo try harder.... xD";
 			npw = "nmcli c up pw";
 			flex = "neofetch | lolcat";
-			kwoche = "curl https://kalenderwoche.celll.net/?api=1; echo";
+			kwoche = "curl -k https://kalenderwoche.celll.net/?api=1; echo";
 			psg = "ps -e | grep";
 			vilias = "nvim -c 'set syntax=bash' ${confDir}/common/programs/bash.nix";
 			stl = "sudo systemctl";
@@ -117,9 +118,16 @@
 			# my prompt
 			if [[ "${hostname}" == "main" ]]
 			then
-				export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+				#export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+				#export PS1="\[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] > "
+        # \n\[\033[1;34m\][\[\e]0;\u@\h: \w\a\]\u@\h:\w]\$\[\033[0m\]
+        #export PS1="\W > ";
+
+        export PS1="\[\033[01;34m\]\W\033[00m ❯❯❯ "
 			else
-				export PS1="\033[1;32m${hostname}❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+				#export PS1="\033[1;32m${hostname}❯ \[\033[01;34m\]\W\[\033[00m\]\[\033[01;32m\]\[\033[00m\] ❯❯❯ "
+
+        export PS1="\033[1;32m${hostname}\[\033[01;34m\] \W\033[00m ❯❯❯ "
 			fi
 
 
@@ -187,6 +195,7 @@
           scp -O "$1" tab:/sdcard/fast/
         fi
       }
+
 
       tph(){
         if [[ "$1" == "" ]]

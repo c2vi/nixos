@@ -1,5 +1,9 @@
 { pkgs, ... }:
 {
+
+  home.packages = with pkgs; [
+    ccls
+  ];
 	programs.neovim = {
 		enable = true;
 		withPython3 = true;
@@ -25,6 +29,16 @@
 		  "rust-analyzer.diagnostics.enable" = true;
 		  "rust-analyzer.checkOnSave.enable" = false;
 		  "languageserver" = {
+        "ccls" = {
+          "command" = "ccls";
+          "filetypes" = ["c" "cpp" "objc" "objcpp"];
+          "rootPatterns" = [".ccls" "compile_commands.json" ".vim/" ".git/" ".hg/"];
+          "initializationOptions" = {
+             "cache" = {
+               "directory" = "/tmp/ccls";
+             };
+           };
+        };
         "slint" = {
           "filetypes" = [ "slint" ];
           "command" = "slint-lsp";

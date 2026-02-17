@@ -14,7 +14,7 @@ rustPlatform.buildRustPackage rec {
     sha256 = "sha256-vRqYQd5OaYXAc74Jlg8twBGDr9YxP+Mk1ZY9JGJTmvc=";
 	};
 
-  cargoHash = "sha256-xz+pi6awwDeiISGqJs5DxqFdryc5mY8wMuds1ZXRr1Q=";
+  cargoHash = "sha256-RoDXIPCjygdmG9dfDMtKiSdj2rgDAfxkKUXkIUAWotI=";
 
   meta = with lib; {
     description = "Command line utilities for the Simple Voice Chat Minecraft Mod";
