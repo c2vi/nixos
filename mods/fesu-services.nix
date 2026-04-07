@@ -22,6 +22,8 @@
 - 49112 mc second voice
 - 49113 mc second bedrock
 - 49114 mc lobby bedrock
+- 49115 mc nilla
+- 49116 mc nilla voice
 
 - me hosting ports
 	- 8000 wiki site
